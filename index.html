@@ -13,14 +13,19 @@
   height: 100px;
   background: red;
 }
+#root {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+  grid-gap: 10px;
+}
 </style>
     </head>
     <body>
-        <div id="root">
           <button id="adder">ADD</button>
           <button id="remover">REMOVE</button>
+        <div id="root">
           <div id="square"></div>
         </div>
-        <script src="main.js"></script>
+        <script type="module" src="./main.js"></script>
     </body>
 </html>
