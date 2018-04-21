@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-    <head>
-<style>
+  <head>
+    <style>
 #square {
   background: green;
 }
@@ -13,25 +13,28 @@
   margin: 10px;
   background: red;
 }
-/*#root {
-  display: grid;
-  grid-template-columns: 100px 100px 100px;
-  grid-gap: 10px;
-}*/
+
 #root {
+  width: 400px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
 }
 
-</style>
-    </head>
-    <body>
-          <button id="adder">ADD</button>
-          <button id="remover">REMOVE</button>
-        <div id="root">
-          <div class="box" id="square"></div>
-        </div>
-        <script type="module" src="./playground.js"></script>
-    </body>
+    </style>
+  </head>
+  <body>
+    <button id="add-header">ADD HEADER</button>
+    <button id="remove-header">REMOVE HEADER</button>
+    <button id="add-paragraph">ADD PARAGRAPH</button>
+    <button id="remove-paragraph">REMOVE PARAGRAPH</button>
+    <button id="add-ball">ADD BALL</button>
+    <button id="remove-ball">REMOVE BALL</button>
+    <article id="article">
+    </article>
+    <div id="root">
+      <div class="box" id="square"></div>
+    </div>
+    <script type="module" src="./playground.js"></script>
+  </body>
 </html>
