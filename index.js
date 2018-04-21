@@ -1,13 +1,17 @@
 let mjuka = [];
 
+const easing = "cubic-bezier(.26,1.53,.52,.91)";
+
 export function mjukna(element, config) {
   const item = {
     element,
     config,
     previousPosition: element.getBoundingClientRect()
-  }
+  };
   mjuka.push(item);
-  return () => { mjuka = mjuka.filter(mjuk => mjuk !== item) }
+  return () => {
+    mjuka = mjuka.filter(mjuk => mjuk !== item);
+  };
 }
 
 function positionsEqual(pos1, pos2) {
@@ -15,14 +19,35 @@ function positionsEqual(pos1, pos2) {
 }
 
 function resetTransform(element) {
-  element.style.transform = '';
-  element.style.transition = '';
+  element.style.transform = "";
+  element.style.transition = "";
 }
 
 export function init(root = document) {
   const observer = new MutationObserver(mutations => {
+    const addedNodes = mutations.reduce(
+      (added, mutation) => added.concat(...mutation.addedNodes),
+      []
+    );
+
     mjuka.forEach(mjuk => {
-      // TODO: skip if mutation target is element
+      const { element } = mjuk;
+
+      if (addedNodes.includes(mjuk.element)) {
+        // Entry animation
+        mjuk.previousPosition = element.getBoundingClientRect();
+        element.style.transform = "translateY(-30px)";
+        element.style.opacity = 0;
+        requestAnimationFrame(() => {
+          element.style.transition = "transform 0.3s, opacity 0.3s";
+          element.style.transitionTimingFunction = easing;
+          element.style.transform = "translate(0)";
+          element.style.opacity = 1;
+        });
+        return;
+      }
+
+      // TODO: listen to attributes and skip if mutation target is element
       const newPosition = mjuk.element.getBoundingClientRect();
       if (positionsEqual(newPosition, mjuk.previousPosition)) {
         return;
@@ -34,18 +59,20 @@ export function init(root = document) {
       const yDiff = mjuk.previousPosition.y - newPosition.y;
 
       mjuk.previousPosition = mjuk.element.getBoundingClientRect();
-      square.style.transform = `translate(${xDiff}px, ${yDiff}px)`;
+      mjuk.element.style.transform = `translate(${xDiff}px, ${yDiff}px)`;
 
       requestAnimationFrame(() => {
-        mjuk.element.style.transition = 'transform 0.3s';
-        mjuk.element.style.transform = 'translate(0)';
+        element.style.transitionProperty = "transform";
+        element.style.transitionDuration = "0.3s";
+        element.style.transitionTimingFunction = easing;
+        element.style.transform = "translate(0)";
       });
     });
   });
 
-  observer.observe(document, {
+  observer.observe(root, {
     childList: true,
-    subtree: true,
+    subtree: true
   });
   return () => observer.disconnect();
 }

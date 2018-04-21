@@ -10,6 +10,7 @@ function setup() {
     const div = document.createElement('div');
     div.className = 'box';
     root.prepend(div);
+    mjukna(div);
   });
 
   remover.addEventListener('click', () => {

@@ -1,0 +1,22 @@
+{
+  "name": "mjukt",
+  "version": "0.0.1",
+  "description": "animate layout changes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daniel-lundin/mjukt.git"
+  },
+  "author": "Daniel Lundin <d-dog@d-dog.se>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daniel-lundin/mjukt/issues"
+  },
+  "homepage": "https://github.com/daniel-lundin/mjukt#readme",
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  }
+}

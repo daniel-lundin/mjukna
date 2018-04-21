@@ -3,29 +3,35 @@
     <head>
 <style>
 #square {
-  width: 100px;
-  height: 100px;
   background: green;
 }
 
 .box {
   width: 100px;
   height: 100px;
+  border-radius: 100%;
+  margin: 10px;
   background: red;
 }
-#root {
+/*#root {
   display: grid;
   grid-template-columns: 100px 100px 100px;
   grid-gap: 10px;
+}*/
+#root {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
+
 </style>
     </head>
     <body>
           <button id="adder">ADD</button>
           <button id="remover">REMOVE</button>
         <div id="root">
-          <div id="square"></div>
+          <div class="box" id="square"></div>
         </div>
-        <script type="module" src="./main.js"></script>
+        <script type="module" src="./playground.js"></script>
     </body>
 </html>
