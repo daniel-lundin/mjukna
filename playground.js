@@ -3,11 +3,13 @@ const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dictum nisl et ligula commodo sollicitudin. Cras volutpat consectetur lorem, et lobortis purus dictum sit amet. Maecenas eget eros id lacus egestas maximus.";
 
 function setup() {
+  let isBig = false;
   const root = document.getElementById("root");
   const addHeader = document.getElementById("add-header");
   const removeHeader = document.getElementById("remove-header");
   const addParagraph = document.getElementById("add-paragraph");
   const removeParagraph = document.getElementById("remove-paragraph");
+  const toggleBig = document.getElementById("toggle-big");
   const addBall = document.getElementById("add-ball");
   const removeBall = document.getElementById("remove-ball");
   const square = document.getElementById("square");
@@ -30,6 +32,20 @@ function setup() {
   removeParagraph.addEventListener("click", () => {
     const p = document.querySelector("p");
     article.removeChild(p);
+  });
+
+  toggleBig.addEventListener("click", () => {
+    const elements = [...document.querySelectorAll("h2, p")];
+    if (isBig) {
+      elements.forEach(e => {
+        e.classList.remove("big");
+      });
+    } else {
+      elements.forEach(e => {
+        e.classList.add("big");
+      });
+    }
+    isBig = !isBig;
   });
 
   addHeader.addEventListener("click", () => {

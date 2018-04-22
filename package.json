@@ -4,7 +4,9 @@
   "description": "animate layout changes",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare-demo": "mkdir -p demos && cp index.js demos/ && cp playground.js demos && cp playground.html demos",
+    "gh-pages": "npm run prepare-demo && gh-pages -d demos"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,7 @@
   },
   "homepage": "https://github.com/daniel-lundin/mjukt#readme",
   "devDependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "^4.19.1",
+    "gh-pages": "^1.1.0"
   }
 }

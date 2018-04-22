@@ -25,9 +25,19 @@ function resetTransform(element) {
 
 export function init(root = document) {
   const observer = new MutationObserver(mutations => {
+    observer.disconnect();
     const addedNodes = mutations.reduce(
       (added, mutation) => added.concat(...mutation.addedNodes),
       []
+    );
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        observer.observe(root, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+      })
     );
 
     mjuka.forEach(mjuk => {
@@ -72,7 +82,8 @@ export function init(root = document) {
 
   observer.observe(root, {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: true
   });
   return () => observer.disconnect();
 }
