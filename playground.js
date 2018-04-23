@@ -1,4 +1,11 @@
 import { init, mjukna } from "./index.js";
+
+function randomCat() {
+  const x = 100 + Math.floor(Math.random() * 500);
+  const y = 100 + Math.floor(Math.random() * 500);
+  return `https://placekitten.com/${x}/${y}`;
+}
+
 const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dictum nisl et ligula commodo sollicitudin. Cras volutpat consectetur lorem, et lobortis purus dictum sit amet. Maecenas eget eros id lacus egestas maximus.";
 
@@ -35,7 +42,7 @@ function setup() {
   });
 
   toggleBig.addEventListener("click", () => {
-    const elements = [...document.querySelectorAll("h2, p")];
+    const elements = [...document.querySelectorAll("h2, p, .box")];
     if (isBig) {
       elements.forEach(e => {
         e.classList.remove("big");
