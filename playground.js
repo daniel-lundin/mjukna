@@ -19,6 +19,7 @@ function setup() {
   const toggleBig = document.getElementById("toggle-big");
   const addBall = document.getElementById("add-ball");
   const removeBall = document.getElementById("remove-ball");
+  const addCat = document.getElementById("add-cat");
   const square = document.getElementById("square");
   const article = document.getElementById("article");
 
@@ -28,6 +29,13 @@ function setup() {
     root.prepend(div);
     mjukna(div);
   });
+
+  // addCat.addEventListener("click", () => {
+  //   const img = document.createElement("img");
+  //   img.src = randomCat();
+  //   root.prepend(img);
+  //   mjukna(img);
+  // });
 
   addParagraph.addEventListener("click", () => {
     const p = document.createElement("p");
