@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     <style>
 #square {
   background: green;
@@ -10,17 +11,23 @@
   width: 100px;
   height: 100px;
   border-radius: 100%;
-  margin: 10px;
   background: red;
+  margin: 10px;
+}
+h1 {
+  color: green;
+}
+.box.big {
+  width: 200px;
+  height: 200px;
 }
 
 h2.big {
-  font-size: 36px;
-  font-weight: bold;
+  font-size: 60px;
 }
+
 p.big {
   font-size: 24px;
-  font-weight: bold;
 }
 
 #root {
@@ -33,6 +40,7 @@ p.big {
     </style>
   </head>
   <body>
+    <div>
     <button id="add-header">ADD HEADER</button>
     <button id="remove-header">REMOVE HEADER</button>
     <button id="add-paragraph">ADD PARAGRAPH</button>
@@ -40,6 +48,8 @@ p.big {
     <button id="toggle-big">TOGGLE BIG</button>
     <button id="add-ball">ADD BALL</button>
     <button id="remove-ball">REMOVE BALL</button>
+    <!--<button id="add-cat">ADD CAT</button>-->
+    </div>
     <article id="article">
     </article>
     <div id="root">

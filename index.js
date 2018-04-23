@@ -1,8 +1,9 @@
+import tween from "https://unpkg.com/spring-array@1.1.1/src/index.js?module";
 let mjuka = [];
 
 const easing = "cubic-bezier(.26,1.53,.52,.91)";
 
-export function mjukna(element, config) {
+export function mjukna(element, config = { scale: false }) {
   const item = {
     element,
     config,
@@ -35,7 +36,8 @@ export function init(root = document) {
         observer.observe(root, {
           childList: true,
           subtree: true,
-          attributes: true
+          attributes: true,
+          attributeFilter: ["class"]
         });
       })
     );
@@ -46,13 +48,16 @@ export function init(root = document) {
       if (addedNodes.includes(mjuk.element)) {
         // Entry animation
         mjuk.previousPosition = element.getBoundingClientRect();
-        element.style.transform = "translateY(-30px)";
-        element.style.opacity = 0;
-        requestAnimationFrame(() => {
-          element.style.transition = "transform 0.3s, opacity 0.3s";
-          element.style.transitionTimingFunction = easing;
-          element.style.transform = "translate(0)";
-          element.style.opacity = 1;
+        const value = [-30, 0];
+        tween({
+          from: value,
+          to: [0, 1],
+          update: ([y, opacity]) => {
+            element.style.transform = `translateY(${y}px)`;
+            element.style.opacity = opacity;
+          },
+          tension: 0.1,
+          deceleration: 0.7
         });
         return;
       }
@@ -65,17 +70,35 @@ export function init(root = document) {
 
       resetTransform(mjuk.element);
 
-      const xDiff = mjuk.previousPosition.x - newPosition.x;
-      const yDiff = mjuk.previousPosition.y - newPosition.y;
+      const xCenterDiff =
+        mjuk.previousPosition.x +
+        mjuk.previousPosition.width / 2 -
+        (newPosition.x + newPosition.width / 2);
+      const yCenterDiff =
+        mjuk.previousPosition.y +
+        mjuk.previousPosition.height / 2 -
+        (newPosition.y + newPosition.height / 2);
+      const xScaleCompensation =
+        mjuk.previousPosition.width / newPosition.width;
+      const yScaleCompensation =
+        mjuk.previousPosition.height / newPosition.height;
 
       mjuk.previousPosition = mjuk.element.getBoundingClientRect();
-      mjuk.element.style.transform = `translate(${xDiff}px, ${yDiff}px)`;
+      mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
-      requestAnimationFrame(() => {
-        element.style.transitionProperty = "transform";
-        element.style.transitionDuration = "0.3s";
-        element.style.transitionTimingFunction = easing;
-        element.style.transform = "translate(0)";
+      tween({
+        from: [
+          xCenterDiff,
+          yCenterDiff,
+          xScaleCompensation,
+          yScaleCompensation
+        ],
+        to: [0, 0, 1, 1],
+        update: ([x, y, scaleX, scaleY]) => {
+          element.style.transform = `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
+        },
+        tension: 0.1,
+        deceleration: 0.7
       });
     });
   });
@@ -83,7 +106,8 @@ export function init(root = document) {
   observer.observe(root, {
     childList: true,
     subtree: true,
-    attributes: true
+    attributes: true,
+    attributeFilter: ["class"]
   });
   return () => observer.disconnect();
 }

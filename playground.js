@@ -1,4 +1,11 @@
 import { init, mjukna } from "./index.js";
+
+function randomCat() {
+  const x = 100 + Math.floor(Math.random() * 500);
+  const y = 100 + Math.floor(Math.random() * 500);
+  return `https://placekitten.com/${x}/${y}`;
+}
+
 const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dictum nisl et ligula commodo sollicitudin. Cras volutpat consectetur lorem, et lobortis purus dictum sit amet. Maecenas eget eros id lacus egestas maximus.";
 
@@ -12,6 +19,7 @@ function setup() {
   const toggleBig = document.getElementById("toggle-big");
   const addBall = document.getElementById("add-ball");
   const removeBall = document.getElementById("remove-ball");
+  const addCat = document.getElementById("add-cat");
   const square = document.getElementById("square");
   const article = document.getElementById("article");
 
@@ -21,6 +29,13 @@ function setup() {
     root.prepend(div);
     mjukna(div);
   });
+
+  // addCat.addEventListener("click", () => {
+  //   const img = document.createElement("img");
+  //   img.src = randomCat();
+  //   root.prepend(img);
+  //   mjukna(img);
+  // });
 
   addParagraph.addEventListener("click", () => {
     const p = document.createElement("p");
@@ -35,7 +50,7 @@ function setup() {
   });
 
   toggleBig.addEventListener("click", () => {
-    const elements = [...document.querySelectorAll("h2, p")];
+    const elements = [...document.querySelectorAll("h2, p, .box")];
     if (isBig) {
       elements.forEach(e => {
         e.classList.remove("big");
