@@ -6,8 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare-demo": "mkdir -p demos && cp index.js demos/ && cp playground.js demos && cp playground.html demos",
-    "gh-pages": "npm run prepare-demo && gh-pages -d demos"
+    "gh-pages": "npm run prepare-demo && gh-pages -d demos",
+    "build": "babel index.js --out-dir dist"
   },
+  "module": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daniel-lundin/mjukt.git"
@@ -19,7 +21,13 @@
   },
   "homepage": "https://github.com/daniel-lundin/mjukt#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-module-rewrite": "^0.2.0",
     "eslint": "^4.19.1",
     "gh-pages": "^1.1.0"
-  }
+  },
+  "dependencies": {
+    "spring-array": "^1.1.1"
+  },
+  "files": ["dist"]
 }
