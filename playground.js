@@ -1,8 +1,8 @@
 import { init, mjukna } from "./index.js";
 
 function randomCat() {
-  const x = 100 + Math.floor(Math.random() * 500);
-  const y = 100 + Math.floor(Math.random() * 500);
+  const x = 50 + Math.floor(Math.random() * 100);
+  const y = 50 + Math.floor(Math.random() * 100);
   return `https://placekitten.com/${x}/${y}`;
 }
 
@@ -27,15 +27,15 @@ function setup() {
     const div = document.createElement("div");
     div.className = "box";
     root.prepend(div);
-    mjukna(div);
+    mjukna(div, { scale: true });
   });
 
-  // addCat.addEventListener("click", () => {
-  //   const img = document.createElement("img");
-  //   img.src = randomCat();
-  //   root.prepend(img);
-  //   mjukna(img);
-  // });
+  addCat.addEventListener("click", () => {
+    const img = document.createElement("img");
+    img.src = randomCat();
+    article.prepend(img);
+    mjukna(img);
+  });
 
   addParagraph.addEventListener("click", () => {
     const p = document.createElement("p");
