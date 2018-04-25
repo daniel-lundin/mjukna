@@ -1,4 +1,4 @@
-import { init, mjukna } from "./index.js";
+import { mjukna } from "./index.js";
 
 function randomCat() {
   const x = 50 + Math.floor(Math.random() * 100);
@@ -80,7 +80,6 @@ function setup() {
     root.removeChild(div);
   });
 
-  init();
   mjukna(square);
 }
 

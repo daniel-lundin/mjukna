@@ -1,6 +1,51 @@
 import tween from "https://unpkg.com/spring-array@1.1.1/src/index.js?module";
 let mjuka = [];
+let disconnector;
 
+export function mjukna(element, config = { scale: false }) {
+  if (mjuka.length === 0) {
+    disconnector = init();
+  }
+  const item = {
+    element,
+    config,
+    previousPosition: element.getBoundingClientRect()
+  };
+  mjuka.push(item);
+  return () => {
+    mjuka = mjuka.filter(mjuk => mjuk !== item);
+    if (mjuka.length === 0) {
+      disconnector();
+    }
+  };
+}
+
+function init(root = document) {
+  const observer = new MutationObserver(mutations => {
+    const addedNodes = mutations.reduce(
+      (added, mutation) => added.concat(...mutation.addedNodes),
+      []
+    );
+
+    addedNodes.forEach(node => {
+      if (node.tagName === "IMG") {
+        node.addEventListener("load", () => {
+          updateElements([]);
+        });
+      }
+    });
+
+    updateElements(addedNodes);
+  });
+
+  observer.observe(root, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"]
+  });
+  return () => observer.disconnect();
+}
 function FLIPTranslate(mjuk, newPosition) {
   const { previousPosition, element } = mjuk;
   const xCenterDiff = previousPosition.x - newPosition.x;
@@ -50,18 +95,6 @@ function FLIPScaleTranslate(mjuk, newPosition) {
     deceleration: 0.7
   });
 }
-export function mjukna(element, config = { scale: false }) {
-  const item = {
-    element,
-    config,
-    previousPosition: element.getBoundingClientRect()
-  };
-  mjuka.push(item);
-  return () => {
-    mjuka = mjuka.filter(mjuk => mjuk !== item);
-  };
-}
-
 function updateElements(addedNodes) {
   mjuka.forEach(mjuk => {
     const { element } = mjuk;
@@ -96,33 +129,7 @@ function updateElements(addedNodes) {
     }
   });
 }
+
 function positionsEqual(pos1, pos2) {
   return pos1.top === pos2.top && pos1.left === pos2.left;
-}
-
-export function init(root = document) {
-  const observer = new MutationObserver(mutations => {
-    const addedNodes = mutations.reduce(
-      (added, mutation) => added.concat(...mutation.addedNodes),
-      []
-    );
-
-    addedNodes.forEach(node => {
-      if (node.tagName === "IMG") {
-        node.addEventListener("load", () => {
-          updateElements([]);
-        });
-      }
-    });
-
-    updateElements(addedNodes);
-  });
-
-  observer.observe(root, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["class"]
-  });
-  return () => observer.disconnect();
 }
