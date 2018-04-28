@@ -80,7 +80,7 @@ function setup() {
     root.removeChild(div);
   });
 
-  mjukna(square);
+  mjukna(square, { scale: true });
 }
 
 setup();

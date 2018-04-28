@@ -1,6 +1,8 @@
 import tween from "https://unpkg.com/spring-array@1.1.1/src/index.js?module";
 let mjuka = [];
 let disconnector;
+const tension = 0.2;
+const deceleration = 0.6;
 
 export function mjukna(element, config = { scale: false }) {
   if (mjuka.length === 0) {
@@ -30,12 +32,12 @@ function init(root = document) {
     addedNodes.forEach(node => {
       if (node.tagName === "IMG") {
         node.addEventListener("load", () => {
-          updateElements([]);
+          updateElements();
         });
       }
     });
 
-    updateElements(addedNodes);
+    updateElements();
   });
 
   observer.observe(root, {
@@ -46,6 +48,7 @@ function init(root = document) {
   });
   return () => observer.disconnect();
 }
+
 function FLIPTranslate(mjuk, newPosition) {
   const { previousPosition, element } = mjuk;
   const xCenterDiff = previousPosition.x - newPosition.x;
@@ -62,8 +65,8 @@ function FLIPTranslate(mjuk, newPosition) {
     done() {
       mjuk.previousPosition = element.getBoundingClientRect();
     },
-    tension: 0.1,
-    deceleration: 0.7
+    tension,
+    deceleration
   });
 }
 
@@ -91,31 +94,13 @@ function FLIPScaleTranslate(mjuk, newPosition) {
     done() {
       mjuk.previousPosition = element.getBoundingClientRect();
     },
-    tension: 0.1,
-    deceleration: 0.7
+    tension,
+    deceleration
   });
 }
-function updateElements(addedNodes) {
+
+function updateElements() {
   mjuka.forEach(mjuk => {
-    const { element } = mjuk;
-
-    if (addedNodes.includes(mjuk.element)) {
-      // Entry animation
-      mjuk.previousPosition = element.getBoundingClientRect();
-      const value = [-30, 0];
-      tween({
-        from: value,
-        to: [0, 1],
-        update: ([y, opacity]) => {
-          element.style.transform = `translateY(${y}px)`;
-          element.style.opacity = opacity;
-        },
-        tension: 0.1,
-        deceleration: 0.7
-      });
-      return;
-    }
-
     // TODO: listen to attributes and skip if mutation target is element
     const newPosition = mjuk.element.getBoundingClientRect();
     if (positionsEqual(newPosition, mjuk.previousPosition)) {
@@ -131,5 +116,10 @@ function updateElements(addedNodes) {
 }
 
 function positionsEqual(pos1, pos2) {
-  return pos1.top === pos2.top && pos1.left === pos2.left;
+  return (
+    pos1.top === pos2.top &&
+    pos1.left === pos2.left &&
+    pos1.right === pos2.right &&
+    pos1.bottom === pos2.bottom
+  );
 }
