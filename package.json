@@ -1,12 +1,13 @@
 {
   "name": "mjukna",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "animate layout changes",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare-demo": "mkdir -p demos && cp index.js demos/ && cp playground.js demos && cp playground.html demos && cp words.html demos && cp words.js demos",
     "gh-pages": "npm run prepare-demo && gh-pages -d demos",
+    "prepublishOnly": "npm run build",
     "build": "babel index.js --out-dir dist"
   },
   "module": "dist/index.js",
