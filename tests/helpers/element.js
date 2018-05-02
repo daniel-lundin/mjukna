@@ -1,5 +1,3 @@
-const elementSize = 100;
-
 const whitespace = len => "".padStart(len);
 
 function getTransformOffsets(style) {
@@ -18,7 +16,11 @@ function Element(type, _parent) {
   this.type = type;
   this._parent = _parent;
   this.children = [];
-  this.style = {};
+  this.style = {
+    display: "block",
+    width: 100,
+    height: 100
+  };
 }
 
 Element.prototype.prepend = function(element) {
@@ -31,6 +33,10 @@ Element.prototype.appendChild = function(element) {
   this.children = this.children.concat(element);
 };
 
+Element.prototype.removeChild = function(element) {
+  this.children = this.children.filter(child => child !== element);
+};
+
 Element.prototype.getBoundingClientRect = function() {
   // TODO: Take transform into account
   const { x: extraX, y: extraY } = getTransformOffsets(this.style);
@@ -38,12 +44,12 @@ Element.prototype.getBoundingClientRect = function() {
   return {
     top: this._getTop() + extraY,
     y: this._getTop() + extraY,
-    bottom: this._getTop() + elementSize + extraY,
+    bottom: this._getTop() + this.style.height + extraY,
     left: 0 + extraX,
     x: 0 + extraX,
-    right: elementSize + extraX,
-    width: elementSize,
-    height: elementSize
+    right: this.style.width + extraX,
+    width: this.style.width,
+    height: this.style.height
   };
 };
 
@@ -51,7 +57,11 @@ Element.prototype._getTop = function() {
   if (!this._parent) return 0;
 
   const myIndex = this._parent.children.indexOf(this);
-  return myIndex * elementSize + this._parent._getTop();
+  const siblingHeight = this._parent.children
+    .slice(0, myIndex)
+    .map(e => e.style.height)
+    .reduce((acc, curr) => acc + curr, 0);
+  return siblingHeight + this._parent._getTop();
 };
 
 Element.prototype.createElement = function(type) {
