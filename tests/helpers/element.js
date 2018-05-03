@@ -1,17 +1,31 @@
+const { repeat } = require("./utils");
 const whitespace = len => "".padStart(len);
+
+function getTranslateOffsets(style) {
+  const translateRegEx = /translate\((-?.*)px, (-?.*)px\)/;
+  if (!translateRegEx.test(style.transform)) {
+    return { x: 0, y: 0 };
+  }
+  const [x, y] = style.transform.match(translateRegEx).slice(1, 3);
+  return { x: +x, y: +y };
+}
+
+function getScaleTransform(style) {
+  const scaleRegEx = /scale\((.*), (.*)\)/;
+  if (!scaleRegEx.test(style.transform)) {
+    return { scaleX: 1, scaleY: 1 };
+  }
+  const [x, y] = style.transform.match(scaleRegEx).slice(1, 3);
+  return { scaleX: +x, scaleY: +y };
+}
 
 function getTransformOffsets(style) {
   if (!style.transform) {
-    return { x: 0, y: 0 };
+    return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
   }
-
-  const r = /translate\((-?.*)px, (-?.*)px\)/;
-  if (!r.test(style.transform)) {
-    return { x: 0, y: 0 };
-  }
-  const [x, y] = style.transform.match(r).slice(1, 3);
-  return { x: parseInt(x), y: parseInt(y) };
+  return Object.assign({}, getTranslateOffsets(style), getScaleTransform(style));
 }
+
 function Element(type, _parent) {
   this.type = type;
   this._parent = _parent;
@@ -38,18 +52,25 @@ Element.prototype.removeChild = function(element) {
 };
 
 Element.prototype.getBoundingClientRect = function() {
-  // TODO: Take transform into account
-  const { x: extraX, y: extraY } = getTransformOffsets(this.style);
+  const { x: extraX, y: extraY, scaleX, scaleY } = getTransformOffsets(this.style);
+
+  const width = this.style.width * scaleX;
+  const height = this.style.height * scaleY;
+  const centerX = this._getLeft() + this.style.width / 2 + extraX;
+  const centerY = this._getTop() + this.style.height / 2 + extraY;
+  const left = centerX - width / 2;
+  const right = centerX + width / 2;
+  const top = centerY - height / 2;
 
   return {
-    top: this._getTop() + extraY,
-    y: this._getTop() + extraY,
-    bottom: this._getTop() + this.style.height + extraY,
-    left: 0 + extraX,
-    x: 0 + extraX,
-    right: this.style.width + extraX,
-    width: this.style.width,
-    height: this.style.height
+    x: left,
+    y: top,
+    top,
+    bottom: top + height,
+    left,
+    right,
+    width,
+    height
   };
 };
 
@@ -66,10 +87,7 @@ Element.prototype._rowHeights = function() {
       }
       if (isInline(elements[index - 1]) && isInline(element)) {
         const [maxHeight, columnCount] = heights[heights.length - 1];
-        heights[heights.length - 1] = [
-          Math.max(maxHeight, element.style.height),
-          columnCount + 1
-        ];
+        heights[heights.length - 1] = [Math.max(maxHeight, element.style.height), columnCount + 1];
         return heights;
       }
       return heights.concat([[element.style.height, 1]]);
@@ -96,11 +114,23 @@ Element.prototype._getTop = function() {
     elementIndex += columnCount;
   }
   return height + this._parent._getTop();
-  // const siblingHeight = this._parent.children
-  //   .slice(0, myIndex)
-  //   .map(e => e.style.height)
-  //   .reduce((acc, curr) => acc + curr, 0);
-  // return siblingHeight + this._parent._getTop();
+};
+
+Element.prototype._getLeft = function() {
+  if (!this._parent) return 0;
+
+  const elements = this._parent.children;
+  let myIndex = this._parent.children.indexOf(this);
+  let left = 0;
+
+  repeat(myIndex + 1)(index => {
+    if (isInline(elements[index]) && isInline(elements[index - 1])) {
+      left += elements[index - 1].style.width;
+    } else {
+      left = 0;
+    }
+  });
+  return left;
 };
 
 Element.prototype.createElement = function(type) {
@@ -108,7 +138,7 @@ Element.prototype.createElement = function(type) {
 };
 
 Element.prototype.dump = function(level = 0) {
-  const str = `${whitespace(level)} <${this.type}>\n`;
+  const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(this.style)}}>\n`;
   return this.children.reduce((s, c) => (s += c.dump(level + 1)), str);
 };
 

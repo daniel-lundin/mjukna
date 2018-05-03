@@ -24,10 +24,7 @@ export function mjukna(element, config = { scale: false }) {
 
 function init(root = document) {
   const observer = new MutationObserver(mutations => {
-    const addedNodes = mutations.reduce(
-      (added, mutation) => added.concat(...mutation.addedNodes),
-      []
-    );
+    const addedNodes = mutations.reduce((added, mutation) => added.concat(...mutation.addedNodes), []);
 
     addedNodes.forEach(node => {
       if (node.tagName === "IMG") {
@@ -72,14 +69,8 @@ function FLIPTranslate(mjuk, newPosition) {
 
 function FLIPScaleTranslate(mjuk, newPosition) {
   const { previousPosition, element } = mjuk;
-  const xCenterDiff =
-    previousPosition.x +
-    previousPosition.width / 2 -
-    (newPosition.x + newPosition.width / 2);
-  const yCenterDiff =
-    previousPosition.y +
-    previousPosition.height / 2 -
-    (newPosition.y + newPosition.height / 2);
+  const xCenterDiff = previousPosition.x + previousPosition.width / 2 - (newPosition.x + newPosition.width / 2);
+  const yCenterDiff = previousPosition.y + previousPosition.height / 2 - (newPosition.y + newPosition.height / 2);
   const xScaleCompensation = previousPosition.width / newPosition.width;
   const yScaleCompensation = previousPosition.height / newPosition.height;
 
@@ -116,10 +107,5 @@ function updateElements() {
 }
 
 function positionsEqual(pos1, pos2) {
-  return (
-    pos1.top === pos2.top &&
-    pos1.left === pos2.left &&
-    pos1.right === pos2.right &&
-    pos1.bottom === pos2.bottom
-  );
+  return pos1.top === pos2.top && pos1.left === pos2.left && pos1.right === pos2.right && pos1.bottom === pos2.bottom;
 }
