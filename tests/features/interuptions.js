@@ -1,0 +1,104 @@
+const assert = require("assert");
+const { feature } = require("kuta/lib/bdd");
+const dumdom = require("../helpers/dumdom");
+const { mjukna } = require("../../index.js");
+const { sleep } = require("../helpers/utils");
+const { rafUntilStill } = require("../helpers/wait");
+
+feature("interuptions", scenario => {
+  scenario(
+    "mutations while animations in progess",
+    ({ before, after, given, when, then, and }) => {
+      const scope = {};
+
+      before(() => dumdom.init());
+      after(() => dumdom.reset());
+
+      given("a mjukt element", () => {
+        const div = document.createElement("div");
+        document.appendChild(div);
+        scope.element = div;
+        mjukna(div);
+      });
+
+      when("a block element is added", () => {
+        scope.firstAddition = document.createElement("div");
+        document.prepend(scope.firstAddition);
+        document.triggerMutationObserver();
+      });
+
+      and("a few rAFs happen", async () => {
+        dumdom.triggerRAF();
+        await sleep(0);
+        dumdom.triggerRAF();
+        await sleep(0);
+        scope.previousPosition = scope.element.getBoundingClientRect();
+      });
+
+      when("a new element is added", async () => {
+        scope.secondAddition = document.createElement("div");
+
+        document.prepend(scope.secondAddition);
+        document.triggerMutationObserver();
+      });
+
+      then("the mjukt element should stay in place", async () => {
+        const newPosition = scope.element.getBoundingClientRect();
+        assert.deepStrictEqual(newPosition, scope.previousPosition);
+      });
+      and("the element should move into its final place", async () => {
+        await rafUntilStill(scope.element);
+        const finalPosition = scope.element.getBoundingClientRect();
+        assert.deepStrictEqual(finalPosition.top, 200);
+      });
+    }
+  );
+
+  scenario(
+    "scaling element while scale not completed",
+    ({ before, after, given, when, then, and }) => {
+      const scope = {};
+
+      before(() => dumdom.init());
+      after(() => dumdom.reset());
+
+      given("a mjukt element", () => {
+        const div = document.createElement("div");
+        document.appendChild(div);
+        scope.element = div;
+        mjukna(div, { scale: true });
+      });
+
+      when("when element is resized", () => {
+        scope.element.style.width = scope.element.style.height = 200;
+        document.triggerMutationObserver();
+      });
+
+      and("a few rAFs happen", async () => {
+        dumdom.triggerRAF();
+        await sleep(0);
+        scope.previousPosition = scope.element.getBoundingClientRect();
+      });
+
+      when("element is resized again", async () => {
+        scope.element.style.width = scope.element.style.height = 300;
+        scope.element.style.transform = "";
+        document.triggerMutationObserver();
+      });
+
+      then("the mjukt element should stay in place", async () => {
+        const newPosition = scope.element.getBoundingClientRect();
+        assert.deepStrictEqual(newPosition, scope.previousPosition);
+      });
+
+      and("the element should move into its final place", async () => {
+        await rafUntilStill(scope.element);
+        const finalPosition = scope.element.getBoundingClientRect();
+        assert.deepStrictEqual(finalPosition.top, 0);
+        assert.deepStrictEqual(finalPosition.left, 0);
+        assert.deepStrictEqual(finalPosition.right, 300);
+        assert.deepStrictEqual(finalPosition.bottom, 300);
+      });
+    }
+  );
+});
