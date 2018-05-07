@@ -1,6 +1,8 @@
-import tween from "https://unpkg.com/spring-array@1.1.1/src/index.js?module";
+import tween from "https://unpkg.com/spring-array@1.2.3/src/index.js?module";
 let mjuka = [];
 let disconnector;
+const tension = 0.1;
+const deceleration = 0.65;
 
 export function mjukna(element, config = { scale: false }) {
   if (mjuka.length === 0) {
@@ -9,7 +11,14 @@ export function mjukna(element, config = { scale: false }) {
   const item = {
     element,
     config,
-    previousPosition: element.getBoundingClientRect()
+    previousPosition: element.getBoundingClientRect(),
+    animationOffsets: {
+      x: 0,
+      y: 0,
+      widthDiff: 0,
+      heightDiff: 0
+    },
+    stop: () => {}
   };
   mjuka.push(item);
   return () => {
@@ -30,12 +39,12 @@ function init(root = document) {
     addedNodes.forEach(node => {
       if (node.tagName === "IMG") {
         node.addEventListener("load", () => {
-          updateElements([]);
+          updateElements();
         });
       }
     });
 
-    updateElements(addedNodes);
+    updateElements();
   });
 
   observer.observe(root, {
@@ -46,82 +55,98 @@ function init(root = document) {
   });
   return () => observer.disconnect();
 }
+
 function FLIPTranslate(mjuk, newPosition) {
-  const { previousPosition, element } = mjuk;
-  const xCenterDiff = previousPosition.x - newPosition.x;
-  const yCenterDiff = previousPosition.y - newPosition.y;
+  const { previousPosition, element, animationOffsets } = mjuk;
+  const xCenterDiff = previousPosition.x - newPosition.x - animationOffsets.x;
+  const yCenterDiff = previousPosition.y - newPosition.y - animationOffsets.y;
 
-  mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
+  element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
 
-  tween({
+  mjuk.stop();
+  const stopper = tween({
     from: [xCenterDiff, yCenterDiff],
     to: [0, 0],
     update([x, y]) {
       element.style.transform = `translate(${x}px, ${y}px)`;
+      animationOffsets.x = xCenterDiff - x;
+      animationOffsets.y = yCenterDiff - y;
     },
     done() {
+      element.style.transform = "";
       mjuk.previousPosition = element.getBoundingClientRect();
+      animationOffsets.x = 0;
+      animationOffsets.y = 0;
     },
-    tension: 0.1,
-    deceleration: 0.7
+    tension,
+    deceleration
   });
+
+  mjuk.stop = stopper;
 }
 
 function FLIPScaleTranslate(mjuk, newPosition) {
-  const { previousPosition, element } = mjuk;
+  const { previousPosition, element, animationOffsets } = mjuk;
   const xCenterDiff =
-    previousPosition.x +
+    previousPosition.x -
+    animationOffsets.x +
     previousPosition.width / 2 -
     (newPosition.x + newPosition.width / 2);
   const yCenterDiff =
-    previousPosition.y +
+    previousPosition.y -
+    animationOffsets.y +
     previousPosition.height / 2 -
     (newPosition.y + newPosition.height / 2);
-  const xScaleCompensation = previousPosition.width / newPosition.width;
-  const yScaleCompensation = previousPosition.height / newPosition.height;
+
+  const xScaleCompensation =
+    (previousPosition.width + animationOffsets.widthDiff) / newPosition.width;
+  const yScaleCompensation =
+    (previousPosition.height + animationOffsets.heightDiff) /
+    newPosition.height;
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
-  tween({
+  mjuk.stop();
+  const stopper = tween({
     from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation],
     to: [0, 0, 1, 1],
     update([x, y, scaleX, scaleY]) {
       element.style.transform = `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
+      animationOffsets.x = xCenterDiff - x;
+      animationOffsets.y = yCenterDiff - y;
+      animationOffsets.widthDiff =
+        scaleX * newPosition.width - previousPosition.width;
+      animationOffsets.heightDiff =
+        scaleY * newPosition.height - previousPosition.height;
     },
     done() {
+      element.style.transform = "";
       mjuk.previousPosition = element.getBoundingClientRect();
+      animationOffsets.x = 0;
+      animationOffsets.y = 0;
+      animationOffsets.widthDiff = 0;
+      animationOffsets.heightDiff = 0;
     },
-    tension: 0.1,
-    deceleration: 0.7
+    tension,
+    deceleration
   });
+  mjuk.stop = stopper;
 }
-function updateElements(addedNodes) {
+
+function updateElements() {
   mjuka.forEach(mjuk => {
-    const { element } = mjuk;
-
-    if (addedNodes.includes(mjuk.element)) {
-      // Entry animation
-      mjuk.previousPosition = element.getBoundingClientRect();
-      const value = [-30, 0];
-      tween({
-        from: value,
-        to: [0, 1],
-        update: ([y, opacity]) => {
-          element.style.transform = `translateY(${y}px)`;
-          element.style.opacity = opacity;
-        },
-        tension: 0.1,
-        deceleration: 0.7
-      });
-      return;
-    }
-
     // TODO: listen to attributes and skip if mutation target is element
-    const newPosition = mjuk.element.getBoundingClientRect();
-    if (positionsEqual(newPosition, mjuk.previousPosition)) {
+    if (
+      positionsEqual(
+        mjuk.element.getBoundingClientRect(),
+        mjuk.previousPosition
+      )
+    ) {
       return;
     }
 
+    mjuk.element.style.transform = "";
+    const newPosition = mjuk.element.getBoundingClientRect();
     if (mjuk.config.scale) {
       FLIPScaleTranslate(mjuk, newPosition);
     } else {
@@ -131,5 +156,10 @@ function updateElements(addedNodes) {
 }
 
 function positionsEqual(pos1, pos2) {
-  return pos1.top === pos2.top && pos1.left === pos2.left;
+  return (
+    pos1.top === pos2.top &&
+    pos1.left === pos2.left &&
+    pos1.right === pos2.right &&
+    pos1.bottom === pos2.bottom
+  );
 }
