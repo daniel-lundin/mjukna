@@ -3,30 +3,48 @@
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     <style>
-.small {
+span {
+  color: whitesmoke;
+}
+span.small {
   font-size: 14px;
 }
-.medium {
+span.medium {
   font-size: 22px;
 }
-.big {
+span.big {
   font-size: 36px;
 }
 
 article {
+  background: black;
+  padding: 6px;
+  border: 1px sold whitesmoke;
+}
+article.medium {
   width: 400px;
+}
+article.small {
+  width: 200px;
+}
+article.big {
+  width: 600px;
 }
 span {
   display: inline-block;
+  will-change: transform;
 }
     </style>
   </head>
   <body>
     <div>
-    <button id="make-small">Small</button>
-    <button id="make-medium">Medium</button>
-    <button id="make-big">Big</button>
-    <article id="root">
+    <button id="make-font-small">Small font</button>
+    <button id="make-font-medium">Medium font</button>
+    <button id="make-font-big">Big font</button>
+    <button id="make-box-small">Small box</button>
+    <button id="make-box-medium">Medium box</button>
+    <button id="make-box-big">Big box</button>
+    <article class="medium" id="root">
     </article>
     <script type="module" src="./words.js"></script>
   </body>

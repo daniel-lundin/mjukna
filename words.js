@@ -4,7 +4,7 @@ const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dictum nisl et ligula commodo sollicitudin. Cras volutpat consectetur lorem, et lobortis purus dictum sit amet. Maecenas eget eros id lacus egestas maximus.";
 
 function setupListeners() {
-  document.getElementById("make-small").addEventListener("click", () => {
+  document.getElementById("make-font-small").addEventListener("click", () => {
     const elements = [...document.querySelectorAll("span")];
     elements.forEach(e => {
       e.classList.remove("medium");
@@ -12,7 +12,7 @@ function setupListeners() {
       e.classList.add("small");
     });
   });
-  document.getElementById("make-medium").addEventListener("click", () => {
+  document.getElementById("make-font-medium").addEventListener("click", () => {
     const elements = [...document.querySelectorAll("span")];
     elements.forEach(e => {
       e.classList.remove("small");
@@ -20,13 +20,32 @@ function setupListeners() {
       e.classList.add("medium");
     });
   });
-  document.getElementById("make-big").addEventListener("click", () => {
+  document.getElementById("make-font-big").addEventListener("click", () => {
     const elements = [...document.querySelectorAll("span")];
     elements.forEach(e => {
       e.classList.remove("small");
       e.classList.remove("medium");
       e.classList.add("big");
     });
+  });
+
+  document.getElementById("make-box-small").addEventListener("click", () => {
+    const box = document.querySelector("article");
+    box.classList.remove("medium");
+    box.classList.remove("big");
+    box.classList.add("small");
+  });
+  document.getElementById("make-box-medium").addEventListener("click", () => {
+    const box = document.querySelector("article");
+    box.classList.add("medium");
+    box.classList.remove("big");
+    box.classList.remove("small");
+  });
+  document.getElementById("make-box-big").addEventListener("click", () => {
+    const box = document.querySelector("article");
+    box.classList.add("big");
+    box.classList.remove("medium");
+    box.classList.remove("small");
   });
 }
 function setup() {
