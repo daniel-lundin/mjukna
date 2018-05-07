@@ -1,8 +1,8 @@
 import tween from "https://unpkg.com/spring-array@1.2.3/src/index.js?module";
 let mjuka = [];
 let disconnector;
-const tension = 0.3;
-const deceleration = 0.8;
+const tension = 0.1;
+const deceleration = 0.65;
 
 export function mjukna(element, config = { scale: false }) {
   if (mjuka.length === 0) {
@@ -136,12 +136,17 @@ function FLIPScaleTranslate(mjuk, newPosition) {
 function updateElements() {
   mjuka.forEach(mjuk => {
     // TODO: listen to attributes and skip if mutation target is element
-    mjuk.element.style.transform = "";
-    const newPosition = mjuk.element.getBoundingClientRect();
-    if (positionsEqual(newPosition, mjuk.previousPosition)) {
+    if (
+      positionsEqual(
+        mjuk.element.getBoundingClientRect(),
+        mjuk.previousPosition
+      )
+    ) {
       return;
     }
 
+    mjuk.element.style.transform = "";
+    const newPosition = mjuk.element.getBoundingClientRect();
     if (mjuk.config.scale) {
       FLIPScaleTranslate(mjuk, newPosition);
     } else {

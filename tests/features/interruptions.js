@@ -5,7 +5,7 @@ const { mjukna } = require("../../index.js");
 const { sleep } = require("../helpers/utils");
 const { rafUntilStill } = require("../helpers/wait");
 
-feature.only("interruptions", scenario => {
+feature("interruptions", scenario => {
   scenario(
     "mutations while animations in progess",
     ({ before, after, given, when, then, and }) => {
@@ -24,6 +24,7 @@ feature.only("interruptions", scenario => {
 
       when("an inline-block element is added", () => {
         scope.firstAddition = document.createElement("div");
+
         scope.firstAddition.style.display = "inline-block";
         document.prepend(scope.firstAddition);
         document.triggerMutationObserver();
@@ -105,4 +106,51 @@ feature.only("interruptions", scenario => {
       });
     }
   );
+
+  scenario("back and forth", ({ before, after, given, when, then, and }) => {
+    const scope = {};
+
+    before(() => dumdom.init());
+    after(() => dumdom.reset());
+
+    given("a mjukt element", () => {
+      const div = document.createElement("div");
+      div.style.display = "block";
+      document.appendChild(div);
+      scope.element = div;
+      mjukna(div);
+    });
+
+    when("a block element is added", () => {
+      scope.addition = document.createElement("div");
+      scope.addition.style.display = "inline-block";
+      document.prepend(scope.addition);
+      document.triggerMutationObserver();
+    });
+
+    and("a few rAFs happen", async () => {
+      dumdom.triggerRAF();
+      await sleep(0);
+      dumdom.triggerRAF();
+      await sleep(0);
+      scope.previousPosition = scope.element.getBoundingClientRect();
+    });
+
+    when("the block is removed", async () => {
+      document.removeChild(scope.addition);
+      document.triggerMutationObserver();
+    });
+
+    then("the mjukt element should stay in place", async () => {
+      const newPosition = scope.element.getBoundingClientRect();
+      assert.deepStrictEqual(newPosition.top, scope.previousPosition.top);
+    });
+
+    and("the element should move into its original place", async () => {
+      await rafUntilStill(scope.element);
+      const finalPosition = scope.element.getBoundingClientRect();
+      assert.deepStrictEqual(finalPosition.left, 0);
+      assert.deepStrictEqual(finalPosition.top, 0);
+    });
+  });
 });
