@@ -5,7 +5,7 @@ const { mjukna } = require("../../index.js");
 const { sleep } = require("../helpers/utils");
 const { rafUntilStill } = require("../helpers/wait");
 
-feature("interuptions", scenario => {
+feature.only("interruptions", scenario => {
   scenario(
     "mutations while animations in progess",
     ({ before, after, given, when, then, and }) => {
@@ -16,13 +16,15 @@ feature("interuptions", scenario => {
 
       given("a mjukt element", () => {
         const div = document.createElement("div");
+        div.style.display = "inline-block";
         document.appendChild(div);
         scope.element = div;
         mjukna(div);
       });
 
-      when("a block element is added", () => {
+      when("an inline-block element is added", () => {
         scope.firstAddition = document.createElement("div");
+        scope.firstAddition.style.display = "inline-block";
         document.prepend(scope.firstAddition);
         document.triggerMutationObserver();
       });
@@ -46,10 +48,12 @@ feature("interuptions", scenario => {
         const newPosition = scope.element.getBoundingClientRect();
         assert.deepStrictEqual(newPosition, scope.previousPosition);
       });
+
       and("the element should move into its final place", async () => {
         await rafUntilStill(scope.element);
         const finalPosition = scope.element.getBoundingClientRect();
-        assert.deepStrictEqual(finalPosition.top, 200);
+        assert.deepStrictEqual(finalPosition.left, 100);
+        assert.deepStrictEqual(finalPosition.top, 100);
       });
     }
   );

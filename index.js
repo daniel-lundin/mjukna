@@ -1,4 +1,4 @@
-import tween from "https://unpkg.com/spring-array@1.2.2/src/index.js?module";
+import tween from "https://unpkg.com/spring-array@1.2.3/src/index.js?module";
 let mjuka = [];
 let disconnector;
 const tension = 0.3;
@@ -18,7 +18,7 @@ export function mjukna(element, config = { scale: false }) {
       widthDiff: 0,
       heightDiff: 0
     },
-    stopper: () => {}
+    stop: () => {}
   };
   mjuka.push(item);
   return () => {
@@ -61,10 +61,9 @@ function FLIPTranslate(mjuk, newPosition) {
   const xCenterDiff = previousPosition.x - newPosition.x - animationOffsets.x;
   const yCenterDiff = previousPosition.y - newPosition.y - animationOffsets.y;
 
-  mjuk.previousPosition = previousPosition;
   element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
 
-  mjuk.stopper();
+  mjuk.stop();
   const stopper = tween({
     from: [xCenterDiff, yCenterDiff],
     to: [0, 0],
@@ -73,12 +72,8 @@ function FLIPTranslate(mjuk, newPosition) {
       animationOffsets.x = xCenterDiff - x;
       animationOffsets.y = yCenterDiff - y;
     },
-    easing: true,
-    easer(i) {
-      return i;
-    },
-    duration: 3000,
     done() {
+      element.style.transform = "";
       mjuk.previousPosition = element.getBoundingClientRect();
       animationOffsets.x = 0;
       animationOffsets.y = 0;
@@ -87,7 +82,7 @@ function FLIPTranslate(mjuk, newPosition) {
     deceleration
   });
 
-  mjuk.stopper = stopper;
+  mjuk.stop = stopper;
 }
 
 function FLIPScaleTranslate(mjuk, newPosition) {
@@ -111,7 +106,7 @@ function FLIPScaleTranslate(mjuk, newPosition) {
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
-  mjuk.stopper();
+  mjuk.stop();
   const stopper = tween({
     from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation],
     to: [0, 0, 1, 1],
@@ -124,12 +119,8 @@ function FLIPScaleTranslate(mjuk, newPosition) {
       animationOffsets.heightDiff =
         scaleY * newPosition.height - previousPosition.height;
     },
-    easing: true,
-    easer(i) {
-      return i;
-    },
-    duration: 3000,
     done() {
+      element.style.transform = "";
       mjuk.previousPosition = element.getBoundingClientRect();
       animationOffsets.x = 0;
       animationOffsets.y = 0;
@@ -139,7 +130,7 @@ function FLIPScaleTranslate(mjuk, newPosition) {
     tension,
     deceleration
   });
-  mjuk.stopper = stopper;
+  mjuk.stop = stopper;
 }
 
 function updateElements() {
