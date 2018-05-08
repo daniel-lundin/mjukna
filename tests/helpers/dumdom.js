@@ -36,8 +36,7 @@ function init() {
 }
 
 function triggerRAF() {
-  rafCallbacks.forEach(c => setTimeout(c, 0));
-  rafCallbacks = [];
+  rafCallbacks.splice(0).forEach(c => c());
 }
 
 function reset() {}

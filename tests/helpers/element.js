@@ -1,4 +1,6 @@
 const { repeat } = require("./utils");
+const PNG = require("node-png").PNG;
+
 const whitespace = len => "".padStart(len);
 
 function getTranslateOffsets(style) {
@@ -23,7 +25,11 @@ function getTransformOffsets(style) {
   if (!style.transform) {
     return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
   }
-  return Object.assign({}, getTranslateOffsets(style), getScaleTransform(style));
+  return Object.assign(
+    {},
+    getTranslateOffsets(style),
+    getScaleTransform(style)
+  );
 }
 
 class Element {
@@ -53,7 +59,9 @@ class Element {
   }
 
   getBoundingClientRect() {
-    const { x: extraX, y: extraY, scaleX, scaleY } = getTransformOffsets(this.style);
+    const { x: extraX, y: extraY, scaleX, scaleY } = getTransformOffsets(
+      this.style
+    );
 
     const width = this.style.width * scaleX;
     const height = this.style.height * scaleY;
@@ -83,7 +91,10 @@ class Element {
         }
         if (isInline(elements[index - 1]) && isInline(element)) {
           const [maxHeight, columnCount] = heights[heights.length - 1];
-          heights[heights.length - 1] = [Math.max(maxHeight, element.style.height), columnCount + 1];
+          heights[heights.length - 1] = [
+            Math.max(maxHeight, element.style.height),
+            columnCount + 1
+          ];
           return heights;
         }
         return heights.concat([[element.style.height, 1]]);
@@ -134,8 +145,35 @@ class Element {
   }
 
   dump(level = 0) {
-    const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(this.style)}}>\n`;
+    const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(
+      this.style
+    )}}>\n`;
     return this.children.reduce((s, c) => (s += c.dump(level + 1)), str);
+  }
+
+  dumpAsPng(width = 400, height = 400) {
+    const png = new PNG({
+      width,
+      height
+    });
+
+    const colors = [[0, 255, 255], [255, 0, 255]];
+
+    this.children.forEach((element, index) => {
+      const box = element.getBoundingClientRect();
+      const color = colors[index % colors.length];
+      for (let x = box.left; x < box.left + box.width; ++x) {
+        for (let y = box.top; y < box.top + box.height; ++y) {
+          const idx = (width * Math.round(y) + Math.round(x)) * 4;
+          png.data[idx] = color[0];
+          png.data[idx + 1] = color[1];
+          png.data[idx + 2] = color[2];
+          png.data[idx + 3] = 255;
+        }
+      }
+    });
+
+    return png.pack();
   }
 }
 
