@@ -1,6 +1,6 @@
 {
   "name": "mjukna",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "animate layout changes",
   "main": "index.js",
   "kuta": {
