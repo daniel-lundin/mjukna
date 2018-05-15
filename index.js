@@ -12,6 +12,7 @@ export function mjukna(element, config = { scale: false }) {
     element,
     config,
     previousPosition: element.getBoundingClientRect(),
+    targetPosition: element.getBoundingClientRect(),
     animationOffsets: {
       x: 0,
       y: 0,
@@ -58,10 +59,12 @@ function init(root = document) {
 
 function FLIPTranslate(mjuk, newPosition) {
   const { previousPosition, element, animationOffsets } = mjuk;
-  const xCenterDiff = previousPosition.x - newPosition.x - animationOffsets.x;
-  const yCenterDiff = previousPosition.y - newPosition.y - animationOffsets.y;
+  // mjuk.targetPosition = newPosition;
+  const xCenterDiff = previousPosition.x - newPosition.x + animationOffsets.x;
+  const yCenterDiff = previousPosition.y - newPosition.y + animationOffsets.y;
 
   element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
+  element.previousPosition = newPosition;
 
   mjuk.stop();
   const stopper = tween({
@@ -69,8 +72,8 @@ function FLIPTranslate(mjuk, newPosition) {
     to: [0, 0],
     update([x, y]) {
       element.style.transform = `translate(${x}px, ${y}px)`;
-      animationOffsets.x = xCenterDiff - x;
-      animationOffsets.y = yCenterDiff - y;
+      animationOffsets.x = newPosition.left + x;
+      animationOffsets.y = newPosition.top + y;
     },
     done() {
       element.style.transform = "";
