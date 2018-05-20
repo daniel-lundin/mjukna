@@ -72,7 +72,9 @@ function FLIPTranslate(mjuk, newPosition) {
   const xCenterDiff = previousPosition.x - newPosition.x + animationOffsets.x;
   const yCenterDiff = previousPosition.y - newPosition.y + animationOffsets.y;
 
-  element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
+  unObserved(() => {
+    element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
+  });
 
   mjuk.stop();
   const stopper = tween({
@@ -115,7 +117,9 @@ function FLIPScaleTranslate(mjuk, newPosition) {
   const xScaleCompensation = previousPosition.width / newPosition.width;
   const yScaleCompensation = previousPosition.height / newPosition.height;
 
-  mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
+  unObserved(() => {
+    mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
+  });
 
   mjuk.stop();
   const stopper = tween({
@@ -151,7 +155,9 @@ function updateElements() {
       return;
     }
 
-    mjuk.element.style.transform = "";
+    unObserved(() => {
+      mjuk.element.style.transform = "";
+    });
     const newPosition = mjuk.element.getBoundingClientRect();
     if (mjuk.config.scale) {
       FLIPScaleTranslate(mjuk, newPosition);
