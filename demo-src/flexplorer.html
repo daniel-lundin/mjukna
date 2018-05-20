@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <style>
+    #flex-container {
+      display:flex;
+      width: 500px;
+      height: 200px;
+      background: #e87d31;
+    }
+    .box {
+      background: black;
+    }
+    .box:nth-child(1n) {
+      width: 100px;
+      height: 60px;
+    }
+    .box:nth-child(2n) {
+      width: 80px;
+      height: 120px;
+    }
+    .box:nth-child(3n) {
+      width: 110px;
+      height: 170px;
+    }
+    .box:nth-child(3n) {
+      width: 50px;
+      height: 70px;
+    }
+    </style>
+  </head>
+  <body>
+    <label for="align-items">Align items</label>
+    <select class="u-full-width" id="align-items">
+      <option value="flex-start">flex-start</option>
+      <option value="flex-end">flex-end</option>
+      <option value="center">center</option>
+      <option value="baseline">baseline</option>
+      <option value="stretch">stretch</option>
+    </select>
+    <label for="justify-content">Justify content</label>
+    <select class="u-full-width" id="justify-content">
+      <option value="flex-start">flex-start</option>
+      <option value="flex-end">flex-end</option>
+      <option value="center">center</option>
+      <option value="space-around">space-around</option>
+      <option value="space-evenly">space-evenly</option>
+    </select>
+    <div id="flex-container">
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+      <div class="box"></div>
+    </div>
+    <script type="module" src="./flexplorer.js"></script>
+  </body>
+</html>
+
+
