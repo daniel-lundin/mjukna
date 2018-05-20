@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "kuta",
-    "prepare-demo": "mkdir -p demos && cp demo-src/* demos/ && cp index.js demos/",
+    "prepare-demo": "mkdir -p demos && find demo-src/ -type f ! -name index.js | xargs -J % cp % demos && cp index.js demos/",
     "gh-pages": "npm run prepare-demo && gh-pages -d demos",
     "prepublishOnly": "npm run build",
     "build": "babel index.js --out-dir dist"
