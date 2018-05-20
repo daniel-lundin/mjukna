@@ -1,4 +1,4 @@
-import { mjukna } from "../index.js";
+import { mjukna } from "./index.js";
 
 [...document.querySelectorAll(".box")].forEach(element => {
   mjukna(element, { scale: true });

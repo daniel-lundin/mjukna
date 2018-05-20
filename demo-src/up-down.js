@@ -1,4 +1,4 @@
-import { mjukna } from "../index.js";
+import { mjukna } from "./index.js";
 
 const thing = document.getElementById("thing");
 mjukna(thing, { scale: true });
