@@ -1,8 +1,21 @@
 import tween from "https://unpkg.com/spring-array@1.2.4/src/index.js?module";
 let mjuka = [];
 let disconnector;
+let observer;
+let _root;
+const observeConfig = {
+  childList: true,
+  subtree: true,
+  attributes: true
+};
 const tension = 0.1;
 const deceleration = 0.65;
+
+function unObserved(fn) {
+  disconnector();
+  fn();
+  observer.observe(_root, observeConfig);
+}
 
 export function mjukna(element, config = { scale: false }) {
   if (mjuka.length === 0) {
@@ -31,7 +44,8 @@ export function mjukna(element, config = { scale: false }) {
 }
 
 function init(root = document) {
-  const observer = new MutationObserver(mutations => {
+  _root = root;
+  observer = new MutationObserver(mutations => {
     const addedNodes = mutations.reduce(
       (added, mutation) => added.concat(...mutation.addedNodes),
       []
@@ -48,12 +62,7 @@ function init(root = document) {
     updateElements();
   });
 
-  observer.observe(root, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["class"]
-  });
+  observer.observe(root, observeConfig);
   return () => observer.disconnect();
 }
 
@@ -70,12 +79,16 @@ function FLIPTranslate(mjuk, newPosition) {
     from: [xCenterDiff, yCenterDiff],
     to: [0, 0],
     update([x, y]) {
-      element.style.transform = `translate(${x}px, ${y}px)`;
-      animationOffsets.x = newPosition.left + x;
-      animationOffsets.y = newPosition.top + y;
+      unObserved(() => {
+        element.style.transform = `translate(${x}px, ${y}px)`;
+        animationOffsets.x = newPosition.left + x;
+        animationOffsets.y = newPosition.top + y;
+      });
     },
     done() {
-      element.style.transform = "";
+      unObserved(() => {
+        element.style.transform = "";
+      });
       mjuk.previousPosition = element.getBoundingClientRect();
       animationOffsets.x = 0;
       animationOffsets.y = 0;
@@ -109,11 +122,15 @@ function FLIPScaleTranslate(mjuk, newPosition) {
     from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation],
     to: [0, 0, 1, 1],
     update([x, y, scaleX, scaleY]) {
-      element.style.transform = `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
-      mjuk.previousPosition = element.getBoundingClientRect();
+      unObserved(() => {
+        element.style.transform = `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
+        mjuk.previousPosition = element.getBoundingClientRect();
+      });
     },
     done() {
-      element.style.transform = "";
+      unObserved(() => {
+        element.style.transform = "";
+      });
       mjuk.previousPosition = element.getBoundingClientRect();
     },
     tension,
