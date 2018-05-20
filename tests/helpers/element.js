@@ -59,14 +59,17 @@ class Element {
   }
 
   getBoundingClientRect() {
-    const { x: extraX, y: extraY, scaleX, scaleY } = getTransformOffsets(
-      this.style
-    );
+    const {
+      x: translateX,
+      y: translateY,
+      scaleX,
+      scaleY
+    } = getTransformOffsets(this.style);
 
     const width = this.style.width * scaleX;
     const height = this.style.height * scaleY;
-    const centerX = this._getLeft() + this.style.width / 2 + extraX;
-    const centerY = this._getTop() + this.style.height / 2 + extraY;
+    const centerX = this._getLeft() + this.style.width / 2 + translateX;
+    const centerY = this._getTop() + this.style.height / 2 + translateY;
     const left = centerX - width / 2;
     const right = centerX + width / 2;
     const top = centerY - height / 2;

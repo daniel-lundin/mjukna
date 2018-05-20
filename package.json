@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "kuta",
-    "prepare-demo": "mkdir -p demos && cp index.js demos/ && cp playground.js demos && cp playground.html demos && cp words.html demos && cp words.js demos",
+    "prepare-demo": "mkdir -p demos && cp demo-src/* demos/ && cp index.js demos/",
     "gh-pages": "npm run prepare-demo && gh-pages -d demos",
     "prepublishOnly": "npm run build",
     "build": "babel index.js --out-dir dist"
@@ -37,7 +37,7 @@
     "gh-pages": "^1.1.0",
     "kuta": "^1.7.4",
     "node-png": "^0.4.3",
-    "spring-array": "^1.2.3"
+    "spring-array": "^1.2.4"
   },
   "dependencies": {},
   "files": [

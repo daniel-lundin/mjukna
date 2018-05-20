@@ -1,4 +1,4 @@
-import tween from "https://unpkg.com/spring-array@1.2.3/src/index.js?module";
+import tween from "https://unpkg.com/spring-array@1.2.4/src/index.js?module";
 let mjuka = [];
 let disconnector;
 const tension = 0.1;
@@ -64,7 +64,6 @@ function FLIPTranslate(mjuk, newPosition) {
   const yCenterDiff = previousPosition.y - newPosition.y + animationOffsets.y;
 
   element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
-  element.previousPosition = newPosition;
 
   mjuk.stop();
   const stopper = tween({
@@ -89,23 +88,19 @@ function FLIPTranslate(mjuk, newPosition) {
 }
 
 function FLIPScaleTranslate(mjuk, newPosition) {
-  const { previousPosition, element, animationOffsets } = mjuk;
+  const { previousPosition, element } = mjuk;
   const xCenterDiff =
-    previousPosition.x -
-    animationOffsets.x +
+    previousPosition.x +
     previousPosition.width / 2 -
     (newPosition.x + newPosition.width / 2);
+
   const yCenterDiff =
-    previousPosition.y -
-    animationOffsets.y +
+    previousPosition.y +
     previousPosition.height / 2 -
     (newPosition.y + newPosition.height / 2);
 
-  const xScaleCompensation =
-    (previousPosition.width + animationOffsets.widthDiff) / newPosition.width;
-  const yScaleCompensation =
-    (previousPosition.height + animationOffsets.heightDiff) /
-    newPosition.height;
+  const xScaleCompensation = previousPosition.width / newPosition.width;
+  const yScaleCompensation = previousPosition.height / newPosition.height;
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
@@ -115,20 +110,11 @@ function FLIPScaleTranslate(mjuk, newPosition) {
     to: [0, 0, 1, 1],
     update([x, y, scaleX, scaleY]) {
       element.style.transform = `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
-      animationOffsets.x = xCenterDiff - x;
-      animationOffsets.y = yCenterDiff - y;
-      animationOffsets.widthDiff =
-        scaleX * newPosition.width - previousPosition.width;
-      animationOffsets.heightDiff =
-        scaleY * newPosition.height - previousPosition.height;
+      mjuk.previousPosition = element.getBoundingClientRect();
     },
     done() {
       element.style.transform = "";
       mjuk.previousPosition = element.getBoundingClientRect();
-      animationOffsets.x = 0;
-      animationOffsets.y = 0;
-      animationOffsets.widthDiff = 0;
-      animationOffsets.heightDiff = 0;
     },
     tension,
     deceleration
