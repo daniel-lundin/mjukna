@@ -5,14 +5,19 @@ import { mjukna } from "./index.js";
 });
 
 const byId = document.getElementById.bind(document);
+const $ = document.querySelectorAll.bind(document);
 const container = byId("flex-container");
 
 function setupListeners() {
-  byId("align-items").addEventListener("change", event => {
-    container.style.alignItems = event.target.value;
+  [...$("input[name='align-items']")].forEach(element => {
+    element.addEventListener("change", evt => {
+      container.style.alignItems = evt.target.value;
+    });
   });
-  byId("justify-content").addEventListener("change", event => {
-    container.style.justifyContent = event.target.value;
+  [...$("input[name='justify-content']")].forEach(element => {
+    element.addEventListener("change", evt => {
+      container.style.justifyContent = evt.target.value;
+    });
   });
 }
 

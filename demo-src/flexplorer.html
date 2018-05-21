@@ -2,51 +2,79 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
     #flex-container {
       display:flex;
-      width: 500px;
-      height: 200px;
+      width: 100%;
+      height: 40vh;
       background: #e87d31;
     }
+    label {
+      display: initial;
+    }
+
     .box {
       background: black;
     }
     .box:nth-child(1n) {
-      width: 100px;
-      height: 60px;
+      width: 20%;
+      height: 90%;
     }
     .box:nth-child(2n) {
-      width: 80px;
-      height: 120px;
+      width: 20%;
+      height: 70%;
     }
     .box:nth-child(3n) {
-      width: 110px;
-      height: 170px;
+      width: 20%;
+      height: 30%;
     }
-    .box:nth-child(3n) {
-      width: 50px;
-      height: 70px;
+    .box:nth-child(4n) {
+      width: 20%;
+      height: 70%;
     }
     </style>
   </head>
   <body>
-    <label for="align-items">Align items</label>
-    <select class="u-full-width" id="align-items">
-      <option value="flex-start">flex-start</option>
-      <option value="flex-end">flex-end</option>
-      <option value="center">center</option>
-      <option value="baseline">baseline</option>
-      <option value="stretch">stretch</option>
-    </select>
-    <label for="justify-content">Justify content</label>
-    <select class="u-full-width" id="justify-content">
-      <option value="flex-start">flex-start</option>
-      <option value="flex-end">flex-end</option>
-      <option value="center">center</option>
-      <option value="space-around">space-around</option>
-      <option value="space-evenly">space-evenly</option>
-    </select>
+    <fieldset>
+      <legend>Align items</legend>
+      <label for="flex-start">
+        <input type="radio" value="flex-start" id="flex-start" name="align-items" checked>flex-start
+      </label>
+      <label for="flex-end">
+        <input type="radio" value="flex-end" id="flex-end" name="align-items">flex-end
+      </label>
+      <label for="center">
+        <input type="radio" value="center" id="center" name="align-items">center
+      </label>
+      <label for="baseline">
+        <input type="radio" value="baseline" id="baseline" name="align-items">baseline
+      </label>
+      <label for="stretch">
+        <input type="radio" value="stretch" id="stretch" name="align-items">stretch
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Align items</legend>
+    <label for="j-flex-start">
+      <input type="radio" value="flex-start" id="j-flex-start" name="justify-content">flex-start
+    </label>
+    <label for="j-flex-end">
+      <input type="radio" value="flex-end" id="j-flex-end" name="justify-content">flex-end
+    </label>
+    <label for="j-center">
+      <input type="radio" value="center" id="j-center" name="justify-content">center
+    </label>
+    <label for="j-space-between">
+      <input type="radio" value="space-between" id="j-space-between" name="justify-content">space-between
+    </label>
+    <label for="j-space-around">
+      <input type="radio" value="space-around" id="j-space-around" name="justify-content">space-around
+    </label>
+    <label for="j-space-evenly">
+      <input type="radio" value="space-evenly" id="j-space-evenly" name="justify-content">space-evenly
+    </label>
+    <fieldset>
     <div id="flex-container">
       <div class="box"></div>
       <div class="box"></div>
