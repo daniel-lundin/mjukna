@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <style>
+      body {
+        font-size: 30px;
+      }
+      .grid {
+        display: grid;
+        grid-template: repeat(10, 1fr) / repeat(10, 1fr);
+        width: 100vw;
+        height: 100vh;
+      }
+      .animal {
+        display: flex;
+        background: tomato;
+        border: 1px solid #CCC;
+        padding: 1em;
+      }
+      .animal span {
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid">
+      <div class="animal elephant">
+        <span>🐘</span>
+      </div>
+      <div class="animal dog">
+        <span>🐕</span>
+      </div>
+      <div class="animal turtle">
+        <span>🐢</span>
+      </div>
+    </div>
+    <script type="module" src="./grid.js"></script>
+  </body>
+</html>
+
+
