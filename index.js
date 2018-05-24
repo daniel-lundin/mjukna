@@ -7,33 +7,36 @@ const observeConfig = {
   subtree: true,
   attributes: true
 };
-const TENSION = 0.1;
-const DECELERATION = 0.65;
+const DEFAULT_TENSION = 0.1;
+const DEFAULT_DECELERATION = 0.65;
+
+let inProgress = [];
 
 export function mjukna(
   elements,
   {
     scale = false,
-    tension = TENSION,
-    deceleration = DECELERATION,
+    tension = DEFAULT_TENSION,
+    deceleration = DEFAULT_DECELERATION,
     staggerBy = 0
   } = {}
 ) {
-  if (mjuka.length === 0) {
-    init();
-  }
+  init();
   [].concat(elements).forEach(element => {
+    // Stop any running animations for element
+    inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
+      if (e === element) {
+        clearInterval(staggerTimer);
+        stopper();
+      }
+      return e !== element;
+    });
+
     const item = {
       element,
       config: { scale, tension, deceleration, staggerBy },
       previousPosition: element.getBoundingClientRect(),
       targetPosition: element.getBoundingClientRect(),
-      animationOffsets: {
-        x: 0,
-        y: 0,
-        widthDiff: 0,
-        heightDiff: 0
-      },
       stop: () => {}
     };
     mjuka.push(item);
@@ -61,10 +64,13 @@ function FLIPTranslate(mjuk, newPosition, index) {
 
   element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
 
+  const progress = [element, void 0, () => {}];
+  inProgress.push(progress);
+
   const runner =
     staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
-  runner(() => {
-    tween({
+  progress[1] = runner(() => {
+    progress[2] = tween({
       from: [xCenterDiff, yCenterDiff],
       to: [0, 0],
       update([x, y]) {
@@ -100,8 +106,13 @@ function FLIPScaleTranslate(mjuk, newPosition, index) {
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
-  setTimeout(() => {
-    tween({
+  const progress = [element, void 0, () => {}];
+  inProgress.push(progress);
+
+  const runner =
+    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
+  progress[1] = runner(() => {
+    progress[2] = tween({
       from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation],
       to: [0, 0, 1, 1],
       update([x, y, scaleX, scaleY]) {
@@ -113,7 +124,7 @@ function FLIPScaleTranslate(mjuk, newPosition, index) {
       tension,
       deceleration
     });
-  }, index * staggerBy);
+  });
 }
 
 function updateElements() {
