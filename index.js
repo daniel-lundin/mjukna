@@ -61,7 +61,9 @@ function FLIPTranslate(mjuk, newPosition, index) {
 
   element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
 
-  setTimeout(() => {
+  const runner =
+    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
+  runner(() => {
     tween({
       from: [xCenterDiff, yCenterDiff],
       to: [0, 0],
@@ -74,7 +76,7 @@ function FLIPTranslate(mjuk, newPosition, index) {
       tension,
       deceleration
     });
-  }, index * staggerBy);
+  });
 }
 
 function FLIPScaleTranslate(mjuk, newPosition, index) {

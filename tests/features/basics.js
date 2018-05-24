@@ -22,6 +22,7 @@ feature("basics", scenario => {
     });
 
     when("a h1 is added and an inline block is added", () => {
+      mjukna(scope.element);
       scope.inline = document.createElement("div");
       scope.inline.style.display = "inline-block";
       document.prepend(scope.inline);
@@ -124,10 +125,10 @@ feature("basics", scenario => {
       document.appendChild(div);
       scope.element = div;
       scope.previousPosition = div.getBoundingClientRect();
-      mjukna(div);
     });
 
     when("an element is removed", () => {
+      mjukna(scope.element);
       document.removeChild(scope.firstElement);
       document.triggerMutationObserver();
     });
