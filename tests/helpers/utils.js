@@ -11,10 +11,17 @@ function deepEquals(a, b) {
   }
 }
 
-const repeat = length => cb => Array.from({ length }).forEach((_, index) => cb(index));
+const assertEqualPositions = (pos1, pos2) => {
+  if (Object.keys(pos1).some(key => Math.abs(pos1[key] - pos2[key]) > 0.01))
+    assert.deepStrictEqual(pos1, pos2);
+};
+
+const repeat = length => cb =>
+  Array.from({ length }).forEach((_, index) => cb(index));
 
 module.exports = {
   deepEquals,
+  assertEqualPositions,
   sleep,
   repeat
 };

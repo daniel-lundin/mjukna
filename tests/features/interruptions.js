@@ -2,18 +2,8 @@ const assert = require("assert");
 const { feature } = require("kuta/lib/bdd");
 const dumdom = require("../helpers/dumdom");
 const { mjukna } = require("../../index.js");
-const { sleep } = require("../helpers/utils");
+const { assertEqualPositions, sleep } = require("../helpers/utils");
 const { rafUntilStill } = require("../helpers/wait");
-
-const assertEqualPositions = (pos1, pos2) => {
-  if (
-    !Object.keys(pos1).reduce(
-      (diff, key) => diff && pos1[key] - pos2[key] < 0.01,
-      true
-    )
-  )
-    assert.deepStrictEqual(pos1, pos2);
-};
 
 feature("interruptions", scenario => {
   scenario(

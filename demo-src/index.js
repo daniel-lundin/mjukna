@@ -127,7 +127,40 @@ function FLIPScaleTranslate(mjuk, newPosition, index) {
   });
 }
 
+function buildTree(nodes, element, parent = null) {
+  const foundParent = nodes.find(node => {
+    return node.element.contains(element);
+  });
+  if (foundParent) {
+    return nodes.map(node => {
+      if (node === foundParent) {
+        return {
+          element: node.element,
+          parent,
+          children: buildTree(foundParent.children, element)
+        };
+      } else {
+        return node;
+      }
+    });
+  } else {
+    const elementChildren = nodes.filter(node => {
+      return element.contains(node.element);
+    });
+    const nonChildren = nodes.filter(node => {
+      return !element.contains(node.element);
+    });
+
+    return [...nonChildren, { element, parent, children: elementChildren }];
+  }
+}
+
 function updateElements() {
+  const tree = mjuka.reduce((acc, { element }) => {
+    const res = buildTree(acc, element);
+    return res;
+  }, []);
+
   mjuka.forEach((mjuk, index) => {
     if (
       positionsEqual(
