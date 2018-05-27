@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <style>
+      .container {
+        display: block;
+        width: 200px;
+        height: 200px;
+        background: magenta;
+      }
+
+      .inner {
+        display: inline-block;
+        font-size: 36px;
+        background: green;
+      }
+
+      .container.custom {
+        margin-top: 100px;
+        width: 200px;
+        height: 200px;
+      }
+      .container.custom .inner {
+        margin-top: 100px;
+        margin-left: 100px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <button id="add">Add</button>
+    <button id="remove">Remove</button>
+    <div class="container">
+      <div class="inner i1">
+        yolo
+      </div>
+    </div>
+    <script type="module" src="./nesting.js"></script>
+  </body>
+</html>
+
+
+
