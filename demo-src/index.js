@@ -36,7 +36,6 @@ export function mjukna(
       element,
       config: { scale, tension, deceleration, staggerBy },
       previousPosition: element.getBoundingClientRect(),
-      targetPosition: element.getBoundingClientRect(),
       stop: () => {}
     };
     mjuka.push(item);
@@ -53,14 +52,10 @@ function init(root = document) {
   return () => observer.disconnect();
 }
 
-function FLIPTranslate(mjuk, newPosition, index) {
-  const {
-    previousPosition,
-    element,
-    config: { tension, deceleration, staggerBy }
-  } = mjuk;
-  const xCenterDiff = previousPosition.x - newPosition.x;
-  const yCenterDiff = previousPosition.y - newPosition.y;
+function FLIPTranslate(mjuk, previousPosition, newPosition, index) {
+  const { element, config: { tension, deceleration, staggerBy } } = mjuk;
+  const xCenterDiff = previousPosition.left - newPosition.left;
+  const yCenterDiff = previousPosition.top - newPosition.top;
 
   element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
 
@@ -85,21 +80,17 @@ function FLIPTranslate(mjuk, newPosition, index) {
   });
 }
 
-function FLIPScaleTranslate(mjuk, newPosition, index) {
-  const {
-    previousPosition,
-    element,
-    config: { tension, deceleration, staggerBy }
-  } = mjuk;
+function FLIPScaleTranslate(mjuk, previousPosition, newPosition, index) {
+  const { element, config: { tension, deceleration, staggerBy } } = mjuk;
   const xCenterDiff =
-    previousPosition.x +
+    previousPosition.left +
     previousPosition.width / 2 -
-    (newPosition.x + newPosition.width / 2);
+    (newPosition.left + newPosition.width / 2);
 
   const yCenterDiff =
-    previousPosition.y +
+    previousPosition.top +
     previousPosition.height / 2 -
-    (newPosition.y + newPosition.height / 2);
+    (newPosition.top + newPosition.height / 2);
 
   const xScaleCompensation = previousPosition.width / newPosition.width;
   const yScaleCompensation = previousPosition.height / newPosition.height;
@@ -127,56 +118,92 @@ function FLIPScaleTranslate(mjuk, newPosition, index) {
   });
 }
 
-function buildTree(nodes, element, parent = null) {
+function reParent(nodes, parent) {
+  nodes.forEach(node => {
+    node.parent = parent;
+  });
+  return nodes;
+}
+
+function buildTree(nodes, mjuk, parent = null) {
   const foundParent = nodes.find(node => {
-    return node.element.contains(element);
+    return node.mjuk.element.contains(mjuk.element);
   });
   if (foundParent) {
     return nodes.map(node => {
       if (node === foundParent) {
         return {
-          element: node.element,
+          mjuk,
           parent,
-          children: buildTree(foundParent.children, element)
+          children: buildTree(foundParent.children, mjuk)
         };
       } else {
         return node;
       }
     });
   } else {
-    const elementChildren = nodes.filter(node => {
-      return element.contains(node.element);
-    });
-    const nonChildren = nodes.filter(node => {
-      return !element.contains(node.element);
-    });
+    const elementChildren = nodes.filter(node =>
+      mjuk.element.contains(node.mjuk.element)
+    );
+    const nonChildren = nodes.filter(
+      node => !mjuk.element.contains(node.mjuk.element)
+    );
 
-    return [...nonChildren, { element, parent, children: elementChildren }];
+    const me = { mjuk, parent, children: elementChildren };
+    reParent(me.children, me);
+    return [...nonChildren, me];
   }
 }
 
-function updateElements() {
-  const tree = mjuka.reduce((acc, { element }) => {
-    const res = buildTree(acc, element);
-    return res;
-  }, []);
+const relativeRect = (outer, inner) => ({
+  left: inner.left - outer.left,
+  top: inner.top - outer.top,
+  width: inner.width,
+  height: inner.height
+});
 
-  mjuka.forEach((mjuk, index) => {
-    if (
-      positionsEqual(
-        mjuk.element.getBoundingClientRect(),
-        mjuk.previousPosition
-      )
-    ) {
+function withRelativeValues(tree) {
+  return tree.map(node => {
+    const { previousPosition } = node.mjuk;
+    const newPosition = node.mjuk.element.getBoundingClientRect();
+    node.newPosition = node.parent
+      ? relativeRect(node.parent.newPosition, newPosition)
+      : newPosition;
+    node.previousPosition = node.parent
+      ? relativeRect(node.parent.previousPosition, previousPosition)
+      : previousPosition;
+    node.children = withRelativeValues(node.children);
+    return node;
+  });
+}
+
+function flatten(tree, items = []) {
+  tree.forEach(n => {
+    items.push(n);
+    flatten(n.children, items);
+  });
+  return items;
+}
+
+function updateElements() {
+  const tree = mjuka.reduce((acc, mjuk) => buildTree(acc, mjuk), []);
+  const flatTree = flatten(withRelativeValues(tree));
+
+  flatTree.forEach((node, index) => {
+    if (positionsEqual(node.newPosition, node.previousPosition)) {
       return;
     }
 
-    mjuk.element.style.transform = "";
-    const newPosition = mjuk.element.getBoundingClientRect();
-    if (mjuk.config.scale) {
-      FLIPScaleTranslate(mjuk, newPosition, index);
+    node.mjuk.element.style.transform = "";
+    if (node.mjuk.config.scale) {
+      FLIPScaleTranslate(
+        node.mjuk,
+        node.previousPosition,
+        node.newPosition,
+        index
+      );
     } else {
-      FLIPTranslate(mjuk, newPosition, index);
+      FLIPTranslate(node.mjuk, node.previousPosition, node.newPosition, index);
     }
   });
   mjuka = [];
