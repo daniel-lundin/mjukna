@@ -14,12 +14,7 @@ let inProgress = [];
 
 export function mjukna(
   elements,
-  {
-    scale = false,
-    tension = DEFAULT_TENSION,
-    deceleration = DEFAULT_DECELERATION,
-    staggerBy = 0
-  } = {}
+  { scale = false, tension = DEFAULT_TENSION, deceleration = DEFAULT_DECELERATION, staggerBy = 0 } = {}
 ) {
   init();
   [].concat(elements).forEach(element => {
@@ -62,8 +57,7 @@ function FLIPTranslate(mjuk, previousPosition, newPosition, index) {
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 
-  const runner =
-    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
+  const runner = staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
   progress[1] = runner(() => {
     progress[2] = tween({
       from: [xCenterDiff, yCenterDiff],
@@ -82,15 +76,9 @@ function FLIPTranslate(mjuk, previousPosition, newPosition, index) {
 
 function FLIPScaleTranslate(mjuk, previousPosition, newPosition, index) {
   const { element, config: { tension, deceleration, staggerBy } } = mjuk;
-  const xCenterDiff =
-    previousPosition.left +
-    previousPosition.width / 2 -
-    (newPosition.left + newPosition.width / 2);
+  const xCenterDiff = previousPosition.left + previousPosition.width / 2 - (newPosition.left + newPosition.width / 2);
 
-  const yCenterDiff =
-    previousPosition.top +
-    previousPosition.height / 2 -
-    (newPosition.top + newPosition.height / 2);
+  const yCenterDiff = previousPosition.top + previousPosition.height / 2 - (newPosition.top + newPosition.height / 2);
 
   const xScaleCompensation = previousPosition.width / newPosition.width;
   const yScaleCompensation = previousPosition.height / newPosition.height;
@@ -100,8 +88,7 @@ function FLIPScaleTranslate(mjuk, previousPosition, newPosition, index) {
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 
-  const runner =
-    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
+  const runner = staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
   progress[1] = runner(() => {
     progress[2] = tween({
       from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation],
@@ -142,12 +129,8 @@ function buildTree(nodes, mjuk, parent = null) {
       }
     });
   } else {
-    const elementChildren = nodes.filter(node =>
-      mjuk.element.contains(node.mjuk.element)
-    );
-    const nonChildren = nodes.filter(
-      node => !mjuk.element.contains(node.mjuk.element)
-    );
+    const elementChildren = nodes.filter(node => mjuk.element.contains(node.mjuk.element));
+    const nonChildren = nodes.filter(node => !mjuk.element.contains(node.mjuk.element));
 
     const me = { mjuk, parent, children: elementChildren };
     reParent(me.children, me);
@@ -165,10 +148,9 @@ const relativeRect = (outer, inner) => ({
 function withRelativeValues(tree) {
   return tree.map(node => {
     const { previousPosition } = node.mjuk;
+    node.mjuk.element.style.transform = "";
     const newPosition = node.mjuk.element.getBoundingClientRect();
-    node.newPosition = node.parent
-      ? relativeRect(node.parent.newPosition, newPosition)
-      : newPosition;
+    node.newPosition = node.parent ? relativeRect(node.parent.newPosition, newPosition) : newPosition;
     node.previousPosition = node.parent
       ? relativeRect(node.parent.previousPosition, previousPosition)
       : previousPosition;
@@ -195,13 +177,9 @@ function updateElements() {
     }
 
     node.mjuk.element.style.transform = "";
+
     if (node.mjuk.config.scale) {
-      FLIPScaleTranslate(
-        node.mjuk,
-        node.previousPosition,
-        node.newPosition,
-        index
-      );
+      FLIPScaleTranslate(node.mjuk, node.previousPosition, node.newPosition, index);
     } else {
       FLIPTranslate(node.mjuk, node.previousPosition, node.newPosition, index);
     }
@@ -210,10 +188,5 @@ function updateElements() {
 }
 
 function positionsEqual(pos1, pos2) {
-  return (
-    pos1.top === pos2.top &&
-    pos1.left === pos2.left &&
-    pos1.right === pos2.right &&
-    pos1.bottom === pos2.bottom
-  );
+  return pos1.top === pos2.top && pos1.left === pos2.left && pos1.right === pos2.right && pos1.bottom === pos2.bottom;
 }

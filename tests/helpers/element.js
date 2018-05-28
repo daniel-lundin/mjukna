@@ -25,11 +25,7 @@ function getTransformOffsets(style) {
   if (!style.transform) {
     return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
   }
-  return Object.assign(
-    {},
-    getTranslateOffsets(style),
-    getScaleTransform(style)
-  );
+  return Object.assign({}, getTranslateOffsets(style), getScaleTransform(style));
 }
 
 class Element {
@@ -58,13 +54,12 @@ class Element {
     this.children = this.children.filter(child => child !== element);
   }
 
+  contains(element) {
+    return this.children.find(e => e === element || e.contains(element));
+  }
+
   getBoundingClientRect() {
-    const {
-      x: translateX,
-      y: translateY,
-      scaleX,
-      scaleY
-    } = getTransformOffsets(this.style);
+    const { x: translateX, y: translateY, scaleX, scaleY } = getTransformOffsets(this.style);
 
     const width = this.style.width * scaleX;
     const height = this.style.height * scaleY;
@@ -94,10 +89,7 @@ class Element {
         }
         if (isInline(elements[index - 1]) && isInline(element)) {
           const [maxHeight, columnCount] = heights[heights.length - 1];
-          heights[heights.length - 1] = [
-            Math.max(maxHeight, element.style.height),
-            columnCount + 1
-          ];
+          heights[heights.length - 1] = [Math.max(maxHeight, element.style.height), columnCount + 1];
           return heights;
         }
         return heights.concat([[element.style.height, 1]]);
@@ -148,9 +140,7 @@ class Element {
   }
 
   dump(level = 0) {
-    const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(
-      this.style
-    )}}>\n`;
+    const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(this.style)}}>\n`;
     return this.children.reduce((s, c) => (s += c.dump(level + 1)), str);
   }
 
