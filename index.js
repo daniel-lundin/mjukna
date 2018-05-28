@@ -14,12 +14,7 @@ let inProgress = [];
 
 export function mjukna(
   elements,
-  {
-    scale = false,
-    tension = DEFAULT_TENSION,
-    deceleration = DEFAULT_DECELERATION,
-    staggerBy = 0
-  } = {}
+  { tension = DEFAULT_TENSION, deceleration = DEFAULT_DECELERATION, staggerBy = 0 } = {}
 ) {
   init();
   [].concat(elements).forEach(element => {
@@ -34,9 +29,8 @@ export function mjukna(
 
     const item = {
       element,
-      config: { scale, tension, deceleration, staggerBy },
+      config: { tension, deceleration, staggerBy },
       previousPosition: element.getBoundingClientRect(),
-      targetPosition: element.getBoundingClientRect(),
       stop: () => {}
     };
     mjuka.push(item);
@@ -53,64 +47,21 @@ function init(root = document) {
   return () => observer.disconnect();
 }
 
-function FLIPTranslate(mjuk, newPosition, index) {
-  const {
-    previousPosition,
-    element,
-    config: { tension, deceleration, staggerBy }
-  } = mjuk;
-  const xCenterDiff = previousPosition.x - newPosition.x;
-  const yCenterDiff = previousPosition.y - newPosition.y;
+function FLIPScaleTranslate(mjuk, index) {
+  const { element, previousPosition, newPosition, config: { tension, deceleration, staggerBy } } = mjuk;
+  const xCenterDiff = previousPosition.left + previousPosition.width / 2 - (newPosition.left + newPosition.width / 2);
 
-  element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
+  const yCenterDiff = previousPosition.top + previousPosition.height / 2 - (newPosition.top + newPosition.height / 2);
 
-  const progress = [element, void 0, () => {}];
-  inProgress.push(progress);
-
-  const runner =
-    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
-  progress[1] = runner(() => {
-    progress[2] = tween({
-      from: [xCenterDiff, yCenterDiff],
-      to: [0, 0],
-      update([x, y]) {
-        element.style.transform = `translate(${x}px, ${y}px)`;
-      },
-      done() {
-        element.style.transform = "";
-      },
-      tension,
-      deceleration
-    });
-  });
-}
-
-function FLIPScaleTranslate(mjuk, newPosition, index) {
-  const {
-    previousPosition,
-    element,
-    config: { tension, deceleration, staggerBy }
-  } = mjuk;
-  const xCenterDiff =
-    previousPosition.x +
-    previousPosition.width / 2 -
-    (newPosition.x + newPosition.width / 2);
-
-  const yCenterDiff =
-    previousPosition.y +
-    previousPosition.height / 2 -
-    (newPosition.y + newPosition.height / 2);
-
-  const xScaleCompensation = previousPosition.width / newPosition.width;
-  const yScaleCompensation = previousPosition.height / newPosition.height;
+  const xScaleCompensation = mjuk.scale.x; // previousPosition.width / newPosition.width;
+  const yScaleCompensation = mjuk.scale.y; //previousPosition.height / newPosition.height;
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 
-  const runner =
-    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
+  const runner = staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
   progress[1] = runner(() => {
     progress[2] = tween({
       from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation],
@@ -127,33 +78,94 @@ function FLIPScaleTranslate(mjuk, newPosition, index) {
   });
 }
 
+function reParent(nodes, parent) {
+  nodes.forEach(node => {
+    node.parent = parent;
+  });
+  return nodes;
+}
+
+function buildTree(nodes, mjuk, parent = null) {
+  const foundParent = nodes.find(node => {
+    return node.element.contains(mjuk.element);
+  });
+
+  if (foundParent) {
+    return nodes.map(node => {
+      if (node === foundParent) {
+        return Object.assign(node, {
+          parent,
+          children: buildTree(foundParent.children, mjuk)
+        });
+      } else {
+        return node;
+      }
+    });
+  } else {
+    const elementChildren = nodes.filter(node => mjuk.element.contains(node.element));
+    const nonChildren = nodes.filter(node => !mjuk.element.contains(node.element));
+
+    const me = Object.assign(mjuk, { parent, children: elementChildren });
+    reParent(me.children, me);
+    return [...nonChildren, me];
+  }
+}
+
+const relativeRect = (outer, inner) => ({
+  left: inner.left - outer.left,
+  top: inner.top - outer.top,
+  width: inner.width,
+  height: inner.height
+});
+
+function multipleScale(parent, current) {
+  return {
+    x: current.x / parent.x,
+    y: current.y / parent.y
+  };
+}
+
+function withRelativeValues(tree) {
+  return tree.map(node => {
+    const { previousPosition } = node;
+    node.element.style.transform = "";
+    const newPosition = node.element.getBoundingClientRect();
+    const scale = {
+      x: previousPosition.width / newPosition.width,
+      y: previousPosition.height / newPosition.height
+    };
+    node.newPosition = node.parent ? relativeRect(node.parent.newPosition, newPosition) : newPosition;
+    node.scale = node.parent ? multipleScale(node.parent.scale, scale) : scale;
+    node.previousPosition = node.parent
+      ? relativeRect(node.parent.previousPosition, previousPosition)
+      : previousPosition;
+    node.children = withRelativeValues(node.children);
+    return node;
+  });
+}
+
+function flatten(tree, items = []) {
+  tree.forEach(n => {
+    items.push(n);
+    flatten(n.children, items);
+  });
+  return items;
+}
+
 function updateElements() {
-  mjuka.forEach((mjuk, index) => {
-    if (
-      positionsEqual(
-        mjuk.element.getBoundingClientRect(),
-        mjuk.previousPosition
-      )
-    ) {
+  const tree = mjuka.reduce((acc, mjuk) => buildTree(acc, mjuk), []);
+  const flatTree = flatten(withRelativeValues(tree));
+
+  flatTree.forEach((node, index) => {
+    if (positionsEqual(node.newPosition, node.previousPosition)) {
       return;
     }
 
-    mjuk.element.style.transform = "";
-    const newPosition = mjuk.element.getBoundingClientRect();
-    if (mjuk.config.scale) {
-      FLIPScaleTranslate(mjuk, newPosition, index);
-    } else {
-      FLIPTranslate(mjuk, newPosition, index);
-    }
+    FLIPScaleTranslate(node, index);
   });
   mjuka = [];
 }
 
 function positionsEqual(pos1, pos2) {
-  return (
-    pos1.top === pos2.top &&
-    pos1.left === pos2.left &&
-    pos1.right === pos2.right &&
-    pos1.bottom === pos2.bottom
-  );
+  return pos1.top === pos2.top && pos1.left === pos2.left && pos1.right === pos2.right && pos1.bottom === pos2.bottom;
 }
