@@ -28,6 +28,17 @@ function getTransformOffsets(style) {
   return Object.assign({}, getTranslateOffsets(style), getScaleTransform(style));
 }
 
+function addClientRects(clientRect1, clientRect2) {
+  return {
+    top: clientRect1.top + clientRect2.top,
+    bottom: clientRect1.bottom + clientRect2.top,
+    left: clientRect1.left + clientRect2.left,
+    right: clientRect1.right + clientRect2.left,
+    width: clientRect1.width,
+    height: clientRect1.height
+  };
+}
+
 class Element {
   constructor(type, _parent) {
     this.type = type;
@@ -69,9 +80,7 @@ class Element {
     const right = centerX + width / 2;
     const top = centerY - height / 2;
 
-    return {
-      x: left,
-      y: top,
+    const clientRect = {
       top,
       bottom: top + height,
       left,
@@ -79,7 +88,12 @@ class Element {
       width,
       height
     };
+    if (this._parent) {
+      return addClientRects(clientRect, this._parent.getBoundingClientRect());
+    }
+    return clientRect;
   }
+
   _rowHeights() {
     const elements = this._parent.children;
     return elements.reduce(

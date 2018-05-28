@@ -47,8 +47,8 @@ function init(root = document) {
   return () => observer.disconnect();
 }
 
-function FLIPTranslate(mjuk, previousPosition, newPosition, index) {
-  const { element, config: { tension, deceleration, staggerBy } } = mjuk;
+function FLIPTranslate(mjuk, index) {
+  const { element, newPosition, previousPosition, config: { tension, deceleration, staggerBy } } = mjuk;
   const xCenterDiff = previousPosition.left - newPosition.left;
   const yCenterDiff = previousPosition.top - newPosition.top;
 
@@ -74,14 +74,16 @@ function FLIPTranslate(mjuk, previousPosition, newPosition, index) {
   });
 }
 
-function FLIPScaleTranslate(mjuk, previousPosition, newPosition, index) {
-  const { element, config: { tension, deceleration, staggerBy } } = mjuk;
+function FLIPScaleTranslate(mjuk, index) {
+  const { element, previousPosition, newPosition, config: { tension, deceleration, staggerBy } } = mjuk;
   const xCenterDiff = previousPosition.left + previousPosition.width / 2 - (newPosition.left + newPosition.width / 2);
 
   const yCenterDiff = previousPosition.top + previousPosition.height / 2 - (newPosition.top + newPosition.height / 2);
 
-  const xScaleCompensation = previousPosition.width / newPosition.width;
-  const yScaleCompensation = previousPosition.height / newPosition.height;
+  const xScaleCompensation = mjuk.scale.x; // previousPosition.width / newPosition.width;
+  const yScaleCompensation = mjuk.scale.y; //previousPosition.height / newPosition.height;
+  // const xScaleCompensation = previousPosition.width / newPosition.width;
+  // const yScaleCompensation = previousPosition.height / newPosition.height;
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
@@ -114,25 +116,25 @@ function reParent(nodes, parent) {
 
 function buildTree(nodes, mjuk, parent = null) {
   const foundParent = nodes.find(node => {
-    return node.mjuk.element.contains(mjuk.element);
+    return node.element.contains(mjuk.element);
   });
+
   if (foundParent) {
     return nodes.map(node => {
       if (node === foundParent) {
-        return {
-          mjuk,
+        return Object.assign(node, {
           parent,
           children: buildTree(foundParent.children, mjuk)
-        };
+        });
       } else {
         return node;
       }
     });
   } else {
-    const elementChildren = nodes.filter(node => mjuk.element.contains(node.mjuk.element));
-    const nonChildren = nodes.filter(node => !mjuk.element.contains(node.mjuk.element));
+    const elementChildren = nodes.filter(node => mjuk.element.contains(node.element));
+    const nonChildren = nodes.filter(node => !mjuk.element.contains(node.element));
 
-    const me = { mjuk, parent, children: elementChildren };
+    const me = Object.assign(mjuk, { parent, children: elementChildren });
     reParent(me.children, me);
     return [...nonChildren, me];
   }
@@ -145,12 +147,24 @@ const relativeRect = (outer, inner) => ({
   height: inner.height
 });
 
+function multipleScale(parent, current) {
+  return {
+    x: current.x / parent.x,
+    y: current.y / parent.y
+  };
+}
+
 function withRelativeValues(tree) {
   return tree.map(node => {
-    const { previousPosition } = node.mjuk;
-    node.mjuk.element.style.transform = "";
-    const newPosition = node.mjuk.element.getBoundingClientRect();
+    const { previousPosition } = node;
+    node.element.style.transform = "";
+    const newPosition = node.element.getBoundingClientRect();
+    const scale = {
+      x: previousPosition.width / newPosition.width,
+      y: previousPosition.height / newPosition.height
+    };
     node.newPosition = node.parent ? relativeRect(node.parent.newPosition, newPosition) : newPosition;
+    node.scale = node.parent ? multipleScale(node.parent.scale, scale) : scale;
     node.previousPosition = node.parent
       ? relativeRect(node.parent.previousPosition, previousPosition)
       : previousPosition;
@@ -176,12 +190,10 @@ function updateElements() {
       return;
     }
 
-    node.mjuk.element.style.transform = "";
-
-    if (node.mjuk.config.scale) {
-      FLIPScaleTranslate(node.mjuk, node.previousPosition, node.newPosition, index);
+    if (node.config.scale) {
+      FLIPScaleTranslate(node, index);
     } else {
-      FLIPTranslate(node.mjuk, node.previousPosition, node.newPosition, index);
+      FLIPTranslate(node, index);
     }
   });
   mjuka = [];
