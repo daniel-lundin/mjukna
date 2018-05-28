@@ -14,7 +14,7 @@ let inProgress = [];
 
 export function mjukna(
   elements,
-  { scale = false, tension = DEFAULT_TENSION, deceleration = DEFAULT_DECELERATION, staggerBy = 0 } = {}
+  { tension = DEFAULT_TENSION, deceleration = DEFAULT_DECELERATION, staggerBy = 0 } = {}
 ) {
   init();
   [].concat(elements).forEach(element => {
@@ -29,7 +29,7 @@ export function mjukna(
 
     const item = {
       element,
-      config: { scale, tension, deceleration, staggerBy },
+      config: { tension, deceleration, staggerBy },
       previousPosition: element.getBoundingClientRect(),
       stop: () => {}
     };
@@ -47,33 +47,6 @@ function init(root = document) {
   return () => observer.disconnect();
 }
 
-function FLIPTranslate(mjuk, index) {
-  const { element, newPosition, previousPosition, config: { tension, deceleration, staggerBy } } = mjuk;
-  const xCenterDiff = previousPosition.left - newPosition.left;
-  const yCenterDiff = previousPosition.top - newPosition.top;
-
-  element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px)`;
-
-  const progress = [element, void 0, () => {}];
-  inProgress.push(progress);
-
-  const runner = staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
-  progress[1] = runner(() => {
-    progress[2] = tween({
-      from: [xCenterDiff, yCenterDiff],
-      to: [0, 0],
-      update([x, y]) {
-        element.style.transform = `translate(${x}px, ${y}px)`;
-      },
-      done() {
-        element.style.transform = "";
-      },
-      tension,
-      deceleration
-    });
-  });
-}
-
 function FLIPScaleTranslate(mjuk, index) {
   const { element, previousPosition, newPosition, config: { tension, deceleration, staggerBy } } = mjuk;
   const xCenterDiff = previousPosition.left + previousPosition.width / 2 - (newPosition.left + newPosition.width / 2);
@@ -82,8 +55,6 @@ function FLIPScaleTranslate(mjuk, index) {
 
   const xScaleCompensation = mjuk.scale.x; // previousPosition.width / newPosition.width;
   const yScaleCompensation = mjuk.scale.y; //previousPosition.height / newPosition.height;
-  // const xScaleCompensation = previousPosition.width / newPosition.width;
-  // const yScaleCompensation = previousPosition.height / newPosition.height;
 
   mjuk.element.style.transform = `translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
@@ -190,11 +161,7 @@ function updateElements() {
       return;
     }
 
-    if (node.config.scale) {
-      FLIPScaleTranslate(node, index);
-    } else {
-      FLIPTranslate(node, index);
-    }
+    FLIPScaleTranslate(node, index);
   });
   mjuka = [];
 }
