@@ -1,15 +1,15 @@
 import { mjukna } from "./index.js";
 
-const container = document.querySelector(".container");
+const root = document.querySelector(".root");
 const inner = document.querySelectorAll(".inner");
 
 function makeItMjukna() {
-  mjukna([...inner, container], { scale: true });
+  mjukna([...inner, root]);
 }
 
 ["add", "remove"].forEach(evt => {
   document.getElementById(evt).addEventListener("click", () => {
     makeItMjukna();
-    container.classList[evt]("custom");
+    root.classList[evt]("custom");
   });
 });

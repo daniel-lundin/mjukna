@@ -5,7 +5,7 @@ const lorem =
 
 function makeItMjukna() {
   const elements = document.querySelectorAll("span, article");
-  mjukna([...elements], { scale: true });
+  mjukna([...elements]);
 }
 function setupListeners() {
   document.getElementById("make-font-small").addEventListener("click", () => {

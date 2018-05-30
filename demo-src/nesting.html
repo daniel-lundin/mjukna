@@ -3,29 +3,27 @@
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     <style>
-      .container {
-        display: block;
-        width: 200px;
-        height: 200px;
+      .root {
+        width: 100px;
+        height: 100px;
         background: magenta;
       }
 
-      .inner {
-        display: inline-block;
+      .root.custom {
         margin-top: 100px;
-        font-size: 36px;
+        width: 200px;
+      }
+
+      .inner {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto;
         background: green;
       }
 
-      .container.custom {
-        margin-top: 100px;
-        width: 200px;
-        height: 200px;
-      }
-      .container.custom .inner {
-        margin-top: 0px;
-        margin-left: 100px;
-        font-size: 12px;
+      .root.custom .inner {
+        font-size: 48px;
+        height: 100px;
       }
 
     </style>
@@ -33,10 +31,8 @@
   <body>
     <button id="add">Add</button>
     <button id="remove">Remove</button>
-    <div class="container">
-      <div class="inner i1">
-        yolo
-      </div>
+    <div class="root">
+      <div class="inner i1"></div>
     </div>
     <script type="module" src="./nesting.js"></script>
   </body>
