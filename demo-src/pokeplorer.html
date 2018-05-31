@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <style>
+      body {
+        font-size: 30px;
+        background: whitesmoke;
+      }
+      #root {
+        position: relative;
+      }
+      .card {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 120px;
+        margin: 10px;
+        background: white;
+        flex-direction: column;
+        border: 1px solid #ccc;
+      }
+      .card .name {
+        font-size: 18px;
+      }
+      .card img {
+        width: 80px;
+        height: 80px;
+      }
+
+      .card.active {
+        /* position: absolute; */
+        top: calc(50% - 100px);
+        left: calc(50% - 100px);
+        padding: 10px;
+        width: 300px;
+        height: 140px;
+        align-items: flex-start;
+        justify-content: space-around;
+        flex-direction: row;
+      }
+
+      .card.active img {
+        width: 120px;
+        height: 120px;
+      }
+      .card.active .name {
+        font-size: 36px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+    </div>
+    <script type="module" src="./pokeplorer.js"></script>
+  </body>
+</html>
+
+
+
