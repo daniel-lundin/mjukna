@@ -49,14 +49,7 @@ function init(root = document) {
 }
 
 function FLIPScaleTranslate(mjuk, index) {
-  const {
-    parent = { newPosition: { width: 0, height: 0 } },
-    parentScale,
-    element,
-    previousPosition,
-    newPosition,
-    config: { tension, deceleration, staggerBy }
-  } = mjuk;
+  const { parentScale, element, previousPosition, newPosition, config: { tension, deceleration, staggerBy } } = mjuk;
   const xCenterDiff = previousPosition.left + previousPosition.width / 2 - (newPosition.left + newPosition.width / 2);
 
   const yCenterDiff = previousPosition.top + previousPosition.height / 2 - (newPosition.top + newPosition.height / 2);
@@ -64,8 +57,8 @@ function FLIPScaleTranslate(mjuk, index) {
   const xScaleCompensation = mjuk.scale.x;
   const yScaleCompensation = mjuk.scale.y;
 
-  const xForCenter = parent.newPosition.width / 2;
-  const yForCenter = parent.newPosition.height / 2;
+  const xForCenter = newPosition.left + newPosition.width / 2; //parent.newPosition.width / 2;
+  const yForCenter = newPosition.top + newPosition.height / 2; //parent.newPosition.height / 2;
   const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${parentScale.x}, ${
     parentScale.y
   }) translate(${xForCenter}px, ${yForCenter}px)`;
@@ -175,6 +168,7 @@ function updateElements() {
   const flatTree = flatten(withRelativeValues(tree));
 
   flatTree.forEach((node, index) => {
+    // TODO: Needs to take parent scaling into account
     // if (positionsEqual(node.newPosition, node.previousPosition)) {
     //   console.log("skipping", node);
     //   return;
