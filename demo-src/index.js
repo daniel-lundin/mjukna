@@ -1,4 +1,5 @@
 import tween from "https://unpkg.com/spring-array@1.2.4/src/index.js?module";
+
 // import { tween } from "./spring-array.js";
 let mjuka = [];
 let observer;
@@ -78,8 +79,8 @@ function FLIPScaleTranslate(mjuk, index) {
   const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${
     parentScale.x
   }, ${parentScale.y}) translate(${xForCenter}px, ${yForCenter}px)`;
-  mjuk.element.style.transform = `${parentCompensation} translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
 
+  element.style.transform = `${parentCompensation} translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 

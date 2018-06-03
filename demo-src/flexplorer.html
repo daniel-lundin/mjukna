@@ -6,7 +6,7 @@
     <style>
     #flex-container {
       display:flex;
-      width: 100%;
+      width: 40vh;
       height: 40vh;
       background: #e87d31;
     }
@@ -18,20 +18,20 @@
       background: black;
     }
     .box:nth-child(1n) {
-      width: 20%;
-      height: 90%;
-    }
-    .box:nth-child(2n) {
-      width: 20%;
-      height: 70%;
-    }
-    .box:nth-child(3n) {
-      width: 20%;
+      width: 5%;
       height: 30%;
     }
+    .box:nth-child(2n) {
+      width: 30%;
+      height: 20%;
+    }
+    .box:nth-child(3n) {
+      width: 30%;
+      height: 10%;
+    }
     .box:nth-child(4n) {
-      width: 20%;
-      height: 70%;
+      width: 10%;
+      height: 15%;
     }
     </style>
   </head>
@@ -54,27 +54,39 @@
         <input type="radio" value="stretch" id="stretch" name="align-items">stretch
       </label>
     </fieldset>
+
     <fieldset>
       <legend>Align items</legend>
-    <label for="j-flex-start">
-      <input type="radio" value="flex-start" id="j-flex-start" name="justify-content">flex-start
-    </label>
-    <label for="j-flex-end">
-      <input type="radio" value="flex-end" id="j-flex-end" name="justify-content">flex-end
-    </label>
-    <label for="j-center">
-      <input type="radio" value="center" id="j-center" name="justify-content">center
-    </label>
-    <label for="j-space-between">
-      <input type="radio" value="space-between" id="j-space-between" name="justify-content">space-between
-    </label>
-    <label for="j-space-around">
-      <input type="radio" value="space-around" id="j-space-around" name="justify-content">space-around
-    </label>
-    <label for="j-space-evenly">
-      <input type="radio" value="space-evenly" id="j-space-evenly" name="justify-content">space-evenly
-    </label>
+      <label for="j-flex-start">
+        <input type="radio" value="flex-start" id="j-flex-start" name="justify-content">flex-start
+      </label>
+      <label for="j-flex-end">
+        <input type="radio" value="flex-end" id="j-flex-end" name="justify-content">flex-end
+      </label>
+      <label for="j-center">
+        <input type="radio" value="center" id="j-center" name="justify-content">center
+      </label>
+      <label for="j-space-between">
+        <input type="radio" value="space-between" id="j-space-between" name="justify-content">space-between
+      </label>
+      <label for="j-space-around">
+        <input type="radio" value="space-around" id="j-space-around" name="justify-content">space-around
+      </label>
+      <label for="j-space-evenly">
+        <input type="radio" value="space-evenly" id="j-space-evenly" name="justify-content">space-evenly
+      </label>
+    </fieldset>
+
     <fieldset>
+      <legend>Flex direction</legend>
+      <label for="direction-row">
+        <input type="radio" value="row" id="direction-row" name="flex-direction" checked>row
+      </label>
+      <label for="direction-column">
+        <input type="radio" value="column" id="direction-column" name="flex-direction">column
+      </label>
+    <fieldset>
+
     <div id="flex-container">
       <div class="box"></div>
       <div class="box"></div>

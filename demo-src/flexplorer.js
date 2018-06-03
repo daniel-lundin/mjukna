@@ -23,6 +23,12 @@ function setupListeners() {
       container.style.justifyContent = evt.target.value;
     });
   });
+  [...$("input[name='flex-direction']")].forEach(element => {
+    element.addEventListener("change", evt => {
+      makeItMjukt();
+      container.style.flexDirection = evt.target.value;
+    });
+  });
 }
 
 setupListeners();
