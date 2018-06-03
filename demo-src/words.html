@@ -20,7 +20,14 @@ article {
   background: black;
   padding: 6px;
   border: 1px sold whitesmoke;
+  will-change: transform;
 }
+img {
+  display: block;
+  width: 50%;
+  will-change: transform;
+}
+
 article.medium {
   width: 400px;
 }
@@ -46,6 +53,10 @@ span {
       <button id="make-box-small">Small box</button>
       <button id="make-box-medium">Medium box</button>
       <button id="make-box-big">Big box</button>
+    </div>
+    <div>
+      <button id="float-image">Float image</button>
+      <button id="unfloat-image">Unfloat image</button>
     </div>
     <article class="medium" id="root">
     </article>
