@@ -43,7 +43,7 @@ function buildGrid() {
     images.push(image);
     names.push(pokename);
     card.addEventListener("click", () => {
-      mjukna(cards.concat(images).concat(names));
+      mjukna(cards.concat(images).concat(names), { staggerBy: 10 });
       cards.forEach(c => c.classList.remove("active"));
       card.classList.toggle("active");
     });
