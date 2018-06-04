@@ -1,18 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
     <style>
-span {
-  color: whitesmoke;
+html, body {
+  font-family: 'Roboto', sans-serif;
 }
+h5 {
+  will-change: transform;
+  display: inline-block;
+  clear: both;
+}
+
 span.small {
   font-size: 14px;
 }
+
 span.medium {
   font-size: 22px;
 }
-span.big {
+
+span.large {
   font-size: 36px;
 }
 
@@ -22,43 +34,68 @@ article {
   border: 1px sold whitesmoke;
   will-change: transform;
 }
+
 img {
   display: block;
-  width: 50%;
+  width: 100%;
   will-change: transform;
 }
 
 article.medium {
   width: 400px;
 }
+
 article.small {
   width: 200px;
 }
+
 article.big {
   width: 600px;
 }
+
 span {
   display: inline-block;
   will-change: transform;
 }
     </style>
   </head>
-  <body>
-    <div>
-      <button id="make-font-small">Small font</button>
-      <button id="make-font-medium">Medium font</button>
-      <button id="make-font-big">Big font</button>
+  <body class="container">
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Font-size</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary font-size" data-value="small">Small</button>
+        <button class="btn btn-secondary font-size active" data-value="medium">Medium</button>
+        <button class="btn btn-secondary font-size" data-value="large">Large</button>
+      </div>
     </div>
-    <div>
-      <button id="make-box-small">Small box</button>
-      <button id="make-box-medium">Medium box</button>
-      <button id="make-box-big">Big box</button>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Box size</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary box-size" data-value="small">Small</button>
+        <button class="btn btn-secondary box-size active" data-value="medium">Medium</button>
+        <button class="btn btn-secondary box-size" data-value="big">Big</button>
+      </div>
     </div>
-    <div>
-      <button id="float-image">Float image</button>
-      <button id="unfloat-image">Unfloat image</button>
+    <div class="input-group input-group-sm mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-sm">Image style</span>
+      </div>
+      <div class="btn-group">
+        <button class="image-style btn btn-secondary" id="float-image-left">Float left</button>
+        <button class="image-style btn btn-secondary active" id="unfloat-image">Block image</button>
+        <button class="image-style btn btn-secondary" id="float-image-right">Float right</button>
+      </div>
     </div>
-    <article class="medium" id="root">
+    <article class="card medium">
+      <div class="card-body" id="root">
+        <div>
+          <h5 class="card-title">Headline title</h5>
+        </div>
+      </div>
     </article>
     <script type="module" src="./words.js"></script>
   </body>
