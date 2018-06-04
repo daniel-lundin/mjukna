@@ -1,4 +1,6 @@
 import tween from "https://unpkg.com/spring-array@1.2.4/src/index.js?module";
+
+// import { tween } from "./spring-array.js";
 let mjuka = [];
 let observer;
 
@@ -14,7 +16,11 @@ let inProgress = [];
 
 export function mjukna(
   elements,
-  { tension = DEFAULT_TENSION, deceleration = DEFAULT_DECELERATION, staggerBy = 0 } = {}
+  {
+    tension = DEFAULT_TENSION,
+    deceleration = DEFAULT_DECELERATION,
+    staggerBy = 0
+  } = {}
 ) {
   init();
   [].concat(elements).forEach(element => {
@@ -48,31 +54,53 @@ function init(root = document) {
 }
 
 function FLIPScaleTranslate(mjuk, index) {
-  const { parentScale, element, previousPosition, newPosition, config: { tension, deceleration, staggerBy } } = mjuk;
-  const xCenterDiff = previousPosition.left + previousPosition.width / 2 - (newPosition.left + newPosition.width / 2);
+  const {
+    parentScale,
+    element,
+    previousPosition,
+    newPosition,
+    config: { tension, deceleration, staggerBy }
+  } = mjuk;
+  const xCenterDiff =
+    previousPosition.left +
+    previousPosition.width / 2 -
+    (newPosition.left + newPosition.width / 2);
 
-  const yCenterDiff = previousPosition.top + previousPosition.height / 2 - (newPosition.top + newPosition.height / 2);
+  const yCenterDiff =
+    previousPosition.top +
+    previousPosition.height / 2 -
+    (newPosition.top + newPosition.height / 2);
 
   const xScaleCompensation = mjuk.scale.x;
   const yScaleCompensation = mjuk.scale.y;
 
   const xForCenter = newPosition.left + newPosition.width / 2; //parent.newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2; //parent.newPosition.height / 2;
-  const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${parentScale.x}, ${
-    parentScale.y
-  }) translate(${xForCenter}px, ${yForCenter}px)`;
-  mjuk.element.style.transform = `${parentCompensation} translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
+  const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${
+    parentScale.x
+  }, ${parentScale.y}) translate(${xForCenter}px, ${yForCenter}px)`;
 
+  element.style.transform = `${parentCompensation} translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 
-  const runner = staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
+  const runner =
+    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
   progress[1] = runner(() => {
     progress[2] = tween({
-      from: [xCenterDiff, yCenterDiff, xScaleCompensation, yScaleCompensation, parentScale.x, parentScale.y],
+      from: [
+        xCenterDiff,
+        yCenterDiff,
+        xScaleCompensation,
+        yScaleCompensation,
+        parentScale.x,
+        parentScale.y
+      ],
       to: [0, 0, 1, 1, 1, 1],
       update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-        const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${parentScaleX}, ${parentScaleY}) translate(${xForCenter}px, ${yForCenter}px)`;
+        const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${1 /
+          parentScaleX}, ${1 /
+          parentScaleY}) translate(${xForCenter}px, ${yForCenter}px)`;
         element.style.transform = ` ${parentCompensation} translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
       },
       done() {
@@ -110,8 +138,12 @@ function buildTree(nodes, mjuk, parent) {
       }
     });
   } else {
-    const elementChildren = nodes.filter(node => mjuk.element.contains(node.element));
-    const nonChildren = nodes.filter(node => !mjuk.element.contains(node.element));
+    const elementChildren = nodes.filter(node =>
+      mjuk.element.contains(node.element)
+    );
+    const nonChildren = nodes.filter(
+      node => !mjuk.element.contains(node.element)
+    );
 
     const me = Object.assign(mjuk, { parent, children: elementChildren });
     reParent(me.children, me);
@@ -128,8 +160,8 @@ const relativeRect = (outer, inner) => ({
 
 function multipleScale(parent, current) {
   const s = {
-    x: current.x / parent.x,
-    y: current.y / parent.y
+    x: current.x * parent.x,
+    y: current.y * parent.y
   };
   return s;
 }
@@ -143,8 +175,12 @@ function withRelativeValues(tree) {
       y: previousPosition.height / newPosition.height
     };
 
-    node.newPosition = node.parent ? relativeRect(node.parent.newPosition, newPosition) : newPosition;
-    node.parentScale = node.parent ? multipleScale(node.parent.scale, node.parent.parentScale) : { x: 1, y: 1 };
+    node.newPosition = node.parent
+      ? relativeRect(node.parent.newPosition, newPosition)
+      : newPosition;
+    node.parentScale = node.parent
+      ? multipleScale(node.parent.scale, node.parent.parentScale)
+      : { x: 1, y: 1 };
     node.scale = scale;
     node.previousPosition = node.parent
       ? relativeRect(node.parent.previousPosition, previousPosition)

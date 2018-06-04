@@ -98,7 +98,9 @@ function FLIPScaleTranslate(mjuk, index) {
       ],
       to: [0, 0, 1, 1, 1, 1],
       update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-        const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${parentScaleX}, ${parentScaleY}) translate(${xForCenter}px, ${yForCenter}px)`;
+        const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${1 /
+          parentScaleX}, ${1 /
+          parentScaleY}) translate(${xForCenter}px, ${yForCenter}px)`;
         element.style.transform = ` ${parentCompensation} translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
       },
       done() {
@@ -158,8 +160,8 @@ const relativeRect = (outer, inner) => ({
 
 function multipleScale(parent, current) {
   const s = {
-    x: current.x / parent.x,
-    y: current.y / parent.y
+    x: current.x * parent.x,
+    y: current.y * parent.y
   };
   return s;
 }
