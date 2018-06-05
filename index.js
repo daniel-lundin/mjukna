@@ -76,9 +76,9 @@ function FLIPScaleTranslate(mjuk, index) {
 
   const xForCenter = newPosition.left + newPosition.width / 2; //parent.newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2; //parent.newPosition.height / 2;
-  const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${
-    parentScale.x
-  }, ${parentScale.y}) translate(${xForCenter}px, ${yForCenter}px)`;
+  const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${1 /
+    parentScale.x}, ${1 /
+    parentScale.y}) translate(${xForCenter}px, ${yForCenter}px)`;
 
   element.style.transform = `${parentCompensation} translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
   const progress = [element, void 0, () => {}];
