@@ -1,38 +1,14 @@
 const { repeat } = require("./utils");
+const { createMatris, fromCSS } = require("matris");
 const PNG = require("node-png").PNG;
 
 const whitespace = len => "".padStart(len);
 
-function parseTranslate(transform) {
-  const translateRegEx = /translate\((-?.*)px, (-?.*)px\)/;
-  if (!translateRegEx.test(transform)) {
-    return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
-  }
-  const [x, y] = transform.match(translateRegEx).slice(1, 3);
-  return { x: +x, y: +y, scaleX: 1, scaleY: 1 };
-}
-
-function parseScale(transform) {
-  const scaleRegEx = /scale\((.*), (.*)\)/;
-  if (!scaleRegEx.test(transform)) {
-    return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
-  }
-  const [x, y] = transform.match(scaleRegEx).slice(1, 3);
-  return { x: 0, y: 0, scaleX: +x, scaleY: +y };
-}
-
-function parseTransform(transform) {
-  if (transform.includes("scale")) return parseScale(transform);
-  if (transform.includes("translate")) return parseTranslate(transform);
-  return [];
-}
-
 function getTransforms(style) {
   if (!style.transform) {
-    return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
+    return createMatris(); // Identity
   }
-  const parts = style.transform.split(")").map(part => `${part})`);
-  return parts.map(parseTransform);
+  return fromCSS(style.transform);
 }
 
 function addClientRects(clientRect1, clientRect2) {
@@ -76,46 +52,36 @@ class Element {
     return this.children.find(e => e === element || e.contains(element));
   }
 
-  getBoundingClientRect() {
-    // const {
-    //   x: translateX,
-    //   y: translateY,
-    //   scaleX,
-    //   scaleY
-    // } = getTransforms(this.style);
-    const transforms = getTransforms(this.style);
+  applyTransform(matris, x, y) {
+    return [
+      // matris[0] * x + matris[1] * y + matris[3],
+      // matris[4] * x + matris[5] * y + matris[7]
+      matris[0] * x + matris[4] * y + matris[12],
+      matris[1] * x + matris[5] * y + matris[13]
+    ];
+  }
 
-    const { left, right, top, bottom } = transforms.reduce(
-      (acc, { x, y, scaleX, scaleY }) => {
-        return {
-          left: acc.left + x,
-          right: acc.right + y,
-          top: acc.top + y,
-          bottom: acc.bottom + y
-        };
-      },
-      {
-        left: this._getLeft(),
-        top: this._getTop(),
-        right: this._getLeft() + this.style.width,
-        bottom: this._getLeft() + this.style.height
-      }
+  getBoundingClientRect() {
+    const transform = getTransforms(this.style);
+
+    const [left, top] = this.applyTransform(
+      transform,
+      this._getLeft(),
+      this._getTop()
     );
-    const width = this.style.width * scaleX;
-    const height = this.style.height * scaleY;
-    const centerX = this._getLeft() + this.style.width / 2 + translateX;
-    const centerY = this._getTop() + this.style.height / 2 + translateY;
-    const left = centerX - width / 2;
-    const right = centerX + width / 2;
-    const top = centerY - height / 2;
+    const [right, bottom] = this.applyTransform(
+      transform,
+      this._getLeft() + this.style.width,
+      this._getTop() + this.style.height
+    );
 
     const clientRect = {
       top,
-      bottom: top + height,
+      bottom,
       left,
       right,
-      width,
-      height
+      width: right - left,
+      height: bottom - top
     };
     if (this._parent) {
       return addClientRects(clientRect, this._parent.getBoundingClientRect());

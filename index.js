@@ -5,7 +5,7 @@ import {
   translate,
   clear,
   asCSS
-} from "https://unpkg.com/matris@0.0.4/index.js?module";
+} from "https://unpkg.com/matris@0.0.5/index.mjs?module";
 // import { tween } from "./spring-array.js";
 let mjuka = [];
 let observer;

@@ -5,7 +5,7 @@ import {
   translate,
   clear,
   asCSS
-} from "https://unpkg.com/matris@0.0.4/index.js?module";
+} from "https://unpkg.com/matris@0.0.5/index.mjs?module";
 // import { tween } from "./spring-array.js";
 let mjuka = [];
 let observer;
@@ -82,13 +82,8 @@ function FLIPScaleTranslate(mjuk, index) {
   const xScaleCompensation = mjuk.scale.x;
   const yScaleCompensation = mjuk.scale.y;
 
-  const xForCenter = newPosition.left + newPosition.width / 2; //parent.newPosition.width / 2;
-  const yForCenter = newPosition.top + newPosition.height / 2; //parent.newPosition.height / 2;
-  // const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${1 /
-  //   parentScale.x}, ${1 /
-  //   parentScale.y}) translate(${xForCenter}px, ${yForCenter}px)`;
-
-  // element.style.transform = `${parentCompensation} translate(${xCenterDiff}px, ${yCenterDiff}px) scale(${xScaleCompensation}, ${yScaleCompensation})`;
+  const xForCenter = newPosition.left + newPosition.width / 2;
+  const yForCenter = newPosition.top + newPosition.height / 2;
 
   clear(matris);
   // Parent compensation
@@ -117,11 +112,6 @@ function FLIPScaleTranslate(mjuk, index) {
       ],
       to: [0, 0, 1, 1, 1, 1],
       update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-        // const parentCompensation = `translate(${-xForCenter}px, ${-yForCenter}px) scale(${1 /
-        //   parentScaleX}, ${1 /
-        //   parentScaleY}) translate(${xForCenter}px, ${yForCenter}px)`;
-        // element.style.transform = ` ${parentCompensation} translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`;
-
         clear(matris);
         // Parent compensation
         translate(matris, -xForCenter, -yForCenter);

@@ -83,7 +83,10 @@ feature("basics", scenario => {
 
     then("elements should stay in place", () => {
       elements.forEach((element, index) => {
-        assert.deepStrictEqual(element.getBoundingClientRect(), startPositions[index]);
+        assert.deepStrictEqual(
+          element.getBoundingClientRect(),
+          startPositions[index]
+        );
       });
     });
 
