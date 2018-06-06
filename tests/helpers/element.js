@@ -3,29 +3,36 @@ const PNG = require("node-png").PNG;
 
 const whitespace = len => "".padStart(len);
 
-function getTranslateOffsets(style) {
+function parseTranslate(transform) {
   const translateRegEx = /translate\((-?.*)px, (-?.*)px\)/;
-  if (!translateRegEx.test(style.transform)) {
-    return { x: 0, y: 0 };
+  if (!translateRegEx.test(transform)) {
+    return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
   }
-  const [x, y] = style.transform.match(translateRegEx).slice(1, 3);
-  return { x: +x, y: +y };
+  const [x, y] = transform.match(translateRegEx).slice(1, 3);
+  return { x: +x, y: +y, scaleX: 1, scaleY: 1 };
 }
 
-function getScaleTransform(style) {
+function parseScale(transform) {
   const scaleRegEx = /scale\((.*), (.*)\)/;
-  if (!scaleRegEx.test(style.transform)) {
-    return { scaleX: 1, scaleY: 1 };
+  if (!scaleRegEx.test(transform)) {
+    return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
   }
-  const [x, y] = style.transform.match(scaleRegEx).slice(1, 3);
-  return { scaleX: +x, scaleY: +y };
+  const [x, y] = transform.match(scaleRegEx).slice(1, 3);
+  return { x: 0, y: 0, scaleX: +x, scaleY: +y };
 }
 
-function getTransformOffsets(style) {
+function parseTransform(transform) {
+  if (transform.includes("scale")) return parseScale(transform);
+  if (transform.includes("translate")) return parseTranslate(transform);
+  return [];
+}
+
+function getTransforms(style) {
   if (!style.transform) {
     return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
   }
-  return Object.assign({}, getTranslateOffsets(style), getScaleTransform(style));
+  const parts = style.transform.split(")").map(part => `${part})`);
+  return parts.map(parseTransform);
 }
 
 function addClientRects(clientRect1, clientRect2) {
@@ -70,8 +77,30 @@ class Element {
   }
 
   getBoundingClientRect() {
-    const { x: translateX, y: translateY, scaleX, scaleY } = getTransformOffsets(this.style);
+    // const {
+    //   x: translateX,
+    //   y: translateY,
+    //   scaleX,
+    //   scaleY
+    // } = getTransforms(this.style);
+    const transforms = getTransforms(this.style);
 
+    const { left, right, top, bottom } = transforms.reduce(
+      (acc, { x, y, scaleX, scaleY }) => {
+        return {
+          left: acc.left + x,
+          right: acc.right + y,
+          top: acc.top + y,
+          bottom: acc.bottom + y
+        };
+      },
+      {
+        left: this._getLeft(),
+        top: this._getTop(),
+        right: this._getLeft() + this.style.width,
+        bottom: this._getLeft() + this.style.height
+      }
+    );
     const width = this.style.width * scaleX;
     const height = this.style.height * scaleY;
     const centerX = this._getLeft() + this.style.width / 2 + translateX;
@@ -103,7 +132,10 @@ class Element {
         }
         if (isInline(elements[index - 1]) && isInline(element)) {
           const [maxHeight, columnCount] = heights[heights.length - 1];
-          heights[heights.length - 1] = [Math.max(maxHeight, element.style.height), columnCount + 1];
+          heights[heights.length - 1] = [
+            Math.max(maxHeight, element.style.height),
+            columnCount + 1
+          ];
           return heights;
         }
         return heights.concat([[element.style.height, 1]]);
@@ -154,7 +186,9 @@ class Element {
   }
 
   dump(level = 0) {
-    const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(this.style)}}>\n`;
+    const str = `${whitespace(level)} <${this.type} style={${JSON.stringify(
+      this.style
+    )}}>\n`;
     return this.children.reduce((s, c) => (s += c.dump(level + 1)), str);
   }
 
