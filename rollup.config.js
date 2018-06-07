@@ -12,7 +12,11 @@ export default {
   plugins: [
     terser(),
     babel({
-      exclude: "node_modules/**"
+      exclude: "node_modules/**",
+      babelrc: false,
+      plugins: [
+        ["module-rewrite", { replaceFunc: "./utils/replace-module-paths.js" }]
+      ]
     }),
     resolve({
       module: true,
