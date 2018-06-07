@@ -1,8 +1,8 @@
 {
   "name": "mjukna",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "animate layout changes",
-  "main": "index.js",
+  "main": "dist/index.js",
   "kuta": {
     "files": [
       "tests/features/**.js"
@@ -16,9 +16,9 @@
     "prepare-demo": "mkdir -p demos && find demo-src/ -type f ! -name index.js | xargs -J % cp % demos && cp index.js demos/",
     "gh-pages": "npm run prepare-demo && gh-pages -d demos",
     "prepublishOnly": "npm run build",
-    "build": "babel index.js --out-dir dist"
+    "build": "rollup -c rollup.config.js"
   },
-  "module": "dist/index.js",
+  "module": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daniel-lundin/mjukt.git"
@@ -38,6 +38,10 @@
     "kuta": "^1.7.4",
     "matris": "0.0.6",
     "node-png": "^0.4.3",
+    "rollup": "^0.60.1",
+    "rollup-plugin-babel": "^3.0.4",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-terser": "^1.0.1",
     "spring-array": "^2.0.0"
   },
   "dependencies": {},
