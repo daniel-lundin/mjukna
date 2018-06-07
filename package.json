@@ -21,14 +21,14 @@
   "module": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daniel-lundin/mjukt.git"
+    "url": "git+https://github.com/daniel-lundin/mjukna.git"
   },
   "author": "Daniel Lundin <d-dog@d-dog.se>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/daniel-lundin/mjukt/issues"
+    "url": "https://github.com/daniel-lundin/mjukna/issues"
   },
-  "homepage": "https://github.com/daniel-lundin/mjukt#readme",
+  "homepage": "https://github.com/daniel-lundin/mjukna#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-module-rewrite": "^0.2.0",
