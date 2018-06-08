@@ -9,7 +9,8 @@
     ],
     "requires": [
       "babel-register"
-    ]
+    ],
+    "timeout": 10000
   },
   "scripts": {
     "test": "kuta",
@@ -38,6 +39,7 @@
     "kuta": "^1.7.4",
     "matris": "0.0.6",
     "node-png": "^0.4.3",
+    "puppeteer": "^1.5.0",
     "rollup": "^0.60.1",
     "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-node-resolve": "^3.3.0",
