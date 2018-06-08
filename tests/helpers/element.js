@@ -1,16 +1,28 @@
 const { repeat } = require("./utils");
-const { createMatris, fromCSS, translate } = require("matris");
+const { createMatris, fromCSS, translate, multiply } = require("matris");
 const PNG = require("node-png").PNG;
 
 const whitespace = len => "".padStart(len);
 
 function getTransforms(element) {
   const { width, height, transform } = element.style;
+  console.log({ width, height });
   if (!transform) {
     return createMatris(); // Identity
   }
   // Default transform origin to center of element for now
-  return translate(fromCSS(transform), -width / 2, -height / 2);
+  const transformOriginPre = createMatris();
+  translate(transformOriginPre, -width / 2, -height / 2);
+  const transformOriginPost = createMatris();
+  translate(transformOriginPost, width / 2, height / 2);
+  const cssMatris = fromCSS(transform);
+
+  const tmp1 = createMatris();
+  const tmp2 = createMatris();
+  multiply(cssMatris, transformOriginPre, tmp1);
+
+  multiply(transformOriginPost, tmp1, tmp2);
+  return tmp2;
 }
 
 function addClientRects(clientRect1, clientRect2) {
@@ -56,19 +68,22 @@ class Element {
 
   applyTransform(matris, x, y) {
     return [
-      matris[0] * x + matris[1] * y + matris[3],
-      matris[4] * x + matris[5] * y + matris[7]
+      matris[0] * x + matris[4] * y + matris[12],
+      matris[1] * x + matris[5] * y + matris[13]
     ];
   }
 
   getBoundingClientRect() {
     const transform = getTransforms(this);
+    console.log("got transform", transform);
 
     const [left, top] = this.applyTransform(
       transform,
       this._getLeft(),
       this._getTop()
     );
+    console.log("left", this._getLeft(), " bacame", left);
+    console.log("top", this._getTop(), " bacame", top);
     const [right, bottom] = this.applyTransform(
       transform,
       this._getLeft() + this.style.width,

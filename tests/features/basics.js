@@ -5,7 +5,7 @@ const { mjukna } = require("../../index.js");
 const { repeat } = require("../helpers/utils");
 const { rafUntilStill } = require("../helpers/wait");
 
-feature("basics", scenario => {
+feature.only("basics", scenario => {
   scenario("adding elements", ({ before, after, given, when, then, and }) => {
     const scope = {};
 
@@ -107,46 +107,46 @@ feature("basics", scenario => {
     });
   });
 
-  scenario("removing elements", ({ before, after, given, when, then, and }) => {
-    const scope = {};
+  // scenario("removing elements", ({ before, after, given, when, then, and }) => {
+  //   const scope = {};
 
-    before(() => {
-      dumdom.init();
-    });
+  //   before(() => {
+  //     dumdom.init();
+  //   });
 
-    after(() => {
-      dumdom.reset();
-    });
+  //   after(() => {
+  //     dumdom.reset();
+  //   });
 
-    given("an element and a mjukt element", () => {
-      scope.firstElement = document.createElement("div");
-      document.appendChild(scope.firstElement);
-      const div = document.createElement("div");
-      document.appendChild(div);
-      scope.element = div;
-      scope.previousPosition = div.getBoundingClientRect();
-    });
+  //   given("an element and a mjukt element", () => {
+  //     scope.firstElement = document.createElement("div");
+  //     document.appendChild(scope.firstElement);
+  //     const div = document.createElement("div");
+  //     document.appendChild(div);
+  //     scope.element = div;
+  //     scope.previousPosition = div.getBoundingClientRect();
+  //   });
 
-    when("an element is removed", () => {
-      mjukna(scope.element);
-      document.removeChild(scope.firstElement);
-      document.triggerMutationObserver();
-    });
+  //   when("an element is removed", () => {
+  //     mjukna(scope.element);
+  //     document.removeChild(scope.firstElement);
+  //     document.triggerMutationObserver();
+  //   });
 
-    then("element should be in the same place", () => {
-      const position = scope.element.getBoundingClientRect();
-      assert.deepStrictEqual(scope.previousPosition, position);
-    });
+  //   then("element should be in the same place", () => {
+  //     const position = scope.element.getBoundingClientRect();
+  //     assert.deepStrictEqual(scope.previousPosition, position);
+  //   });
 
-    and("eventually move in to its new place", async () => {
-      await rafUntilStill(scope.element);
-      const newPosition = scope.element.getBoundingClientRect();
-      const expected = {
-        top: 0,
-        bottom: 100
-      };
-      assert.deepStrictEqual(newPosition.top, expected.top);
-      assert.deepStrictEqual(newPosition.bottom, expected.bottom);
-    });
-  });
+  //   and("eventually move in to its new place", async () => {
+  //     await rafUntilStill(scope.element);
+  //     const newPosition = scope.element.getBoundingClientRect();
+  //     const expected = {
+  //       top: 0,
+  //       bottom: 100
+  //     };
+  //     assert.deepStrictEqual(newPosition.top, expected.top);
+  //     assert.deepStrictEqual(newPosition.bottom, expected.bottom);
+  //   });
+  // });
 });
