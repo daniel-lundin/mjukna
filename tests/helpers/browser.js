@@ -1,0 +1,44 @@
+const { getMjuknaCode } = require("./utils.js");
+
+async function injectHelpers(page) {
+  await page.evaluate(() => {
+    window.dumpClientRect = element => {
+      const cr = element.getBoundingClientRect();
+      return {
+        top: cr.top,
+        left: cr.left,
+        bottom: cr.bottom,
+        right: cr.right
+      };
+    };
+
+    window.elementStill = function(element) {
+      return element.style.transform === "";
+    };
+
+    window.waitForRAFs = function(times) {
+      if (times === 0) return Promise.resolve();
+      return new Promise(resolve => {
+        requestAnimationFrame(() => {
+          window.waitForRAFs(times - 1).then(() => {
+            resolve();
+          });
+        });
+      });
+    };
+
+    window.byId = id => document.getElementById(id);
+  });
+}
+
+async function setupNewPage(browser) {
+  const page = await browser.newPage();
+  const mjuknaCode = await getMjuknaCode();
+  await page.evaluate(mjuknaCode);
+  await injectHelpers(page);
+  return page;
+}
+
+module.exports = {
+  setupNewPage
+};
