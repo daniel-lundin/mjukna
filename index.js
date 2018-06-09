@@ -21,7 +21,7 @@ const DEFAULT_DECELERATION = 0.65;
 
 let inProgress = [];
 
-export function mjukna(
+export default function mjukna(
   elements,
   {
     tension = DEFAULT_TENSION,

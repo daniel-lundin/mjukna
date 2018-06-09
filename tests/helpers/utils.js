@@ -1,4 +1,8 @@
+const path = require("path");
 const assert = require("assert");
+const rollup = require("rollup");
+const rollupConfig = require(path.join(__dirname, "../../rollup.config.js"))
+  .default;
 
 const sleep = time => new Promise(resolve => setTimeout(resolve, time));
 
@@ -9,6 +13,12 @@ function deepEquals(a, b) {
   } catch (e) {
     return false;
   }
+}
+
+async function getMjuknaCode() {
+  const bundle = await rollup.rollup(rollupConfig);
+  const { code } = await bundle.generate(rollupConfig);
+  return code;
 }
 
 const assertEqualPositions = (pos1, pos2) => {
@@ -23,5 +33,6 @@ module.exports = {
   deepEquals,
   assertEqualPositions,
   sleep,
-  repeat
+  repeat,
+  getMjuknaCode
 };

@@ -1,172 +1,157 @@
+/* global waitForRAFs, byId, dumpClientRect, elementStill */
+
 const assert = require("assert");
+const puppeteer = require("puppeteer");
 const { feature } = require("kuta/lib/bdd");
-const dumdom = require("../helpers/dumdom");
 const { mjukna } = require("../../index.js");
-const { assertEqualPositions, sleep } = require("../helpers/utils");
-const { rafUntilStill } = require("../helpers/wait");
+const { assertEqualPositions } = require("../helpers/utils");
 
-feature("interruptions", scenario => {
-  scenario("mutations while animations in progess", ({ before, after, given, when, then, and }) => {
-    const scope = {};
+const { setupNewPage } = require("../helpers/browser.js");
 
-    before(() => dumdom.init());
-    after(() => dumdom.reset());
+feature.only("interruptions", scenario => {
+  let browser;
 
-    given("a mjukt element", () => {
-      const div = document.createElement("div");
-      div.style.display = "inline-block";
-      document.appendChild(div);
-      scope.element = div;
-      mjukna(div);
-    });
-
-    when("an inline-block element is added", () => {
-      mjukna(scope.element);
-      scope.firstAddition = document.createElement("div");
-
-      scope.firstAddition.style.display = "inline-block";
-      document.prepend(scope.firstAddition);
-      document.triggerMutationObserver();
-    });
-
-    and("a few rAFs happen", async () => {
-      dumdom.triggerRAF();
-      scope.previousPosition = scope.element.getBoundingClientRect();
-    });
-
-    when("a new element is added", async () => {
-      mjukna(scope.element);
-      scope.secondAddition = document.createElement("div");
-
-      document.prepend(scope.secondAddition);
-      document.triggerMutationObserver();
-    });
-
-    then("the mjukt element should stay in place", async () => {
-      const newPosition = scope.element.getBoundingClientRect();
-      assertEqualPositions(newPosition, scope.previousPosition);
-    });
-
-    and("the element should move into its final place", async () => {
-      await rafUntilStill(scope.element);
-      const finalPosition = scope.element.getBoundingClientRect();
-      assert.deepStrictEqual(finalPosition.left, 100);
-      assert.deepStrictEqual(finalPosition.top, 100);
-    });
+  scenario.before(async () => {
+    browser = await puppeteer.launch({ headless: false });
   });
 
-  scenario("scaling element while scale not completed", ({ before, after, given, when, then, and }) => {
-    const scope = {};
+  scenario.after(() => browser.close());
 
-    before(() => dumdom.init());
-    after(() => dumdom.reset());
+  scenario(
+    "mutations while animations in progess",
+    ({ before, given, when, then, and }) => {
+      const scope = {};
+      let page;
 
-    given("a mjukt element", () => {
-      const div = document.createElement("div");
-      document.appendChild(div);
-      scope.element = div;
-      mjukna(div, { scale: true });
-    });
+      before(async () => {
+        page = await setupNewPage(browser);
+      });
 
-    when("when element is resized", () => {
-      mjukna(scope.element, { scale: true });
-      scope.element.style.width = scope.element.style.height = 200;
-      document.triggerMutationObserver();
-    });
+      given("a mjukt inline-block element", async () => {
+        scope.initialPosition = await page.evaluate(() => {
+          const div = document.createElement("div");
+          div.style.width = "50px";
+          div.style.height = "50px";
+          div.setAttribute("id", "initial-element");
+          div.style.display = "inline-block";
+          document.body.appendChild(div);
+          mjukna(div);
+          return dumpClientRect(div);
+        });
+      });
 
-    and("a few rAFs happen", async () => {
-      dumdom.triggerRAF();
-      await sleep(0);
-      scope.previousPosition = scope.element.getBoundingClientRect();
-    });
+      when("an inline-block element is added", () => {
+        return page.evaluate(() => {
+          const div = document.createElement("div");
+          div.style.width = "50px";
+          div.style.height = "50px";
+          div.setAttribute("id", "added-element");
+          div.style.display = "inline-block";
+          document.body.prepend(div);
+        });
+      });
 
-    when("element is resized again", async () => {
-      mjukna(scope.element, { scale: true });
-      scope.element.style.width = scope.element.style.height = 300;
-      document.triggerMutationObserver();
-    });
+      and("a few rAFs happen", async () => {
+        scope.intermediatePosition = await page.evaluate(async () => {
+          await waitForRAFs(3);
+          return dumpClientRect(byId("initial-element"));
+        });
+      });
 
-    then("the mjukt element should stay in place", async () => {
-      const newPosition = scope.element.getBoundingClientRect();
-      assertEqualPositions(newPosition, scope.previousPosition);
-    });
+      when("the added element is removed", async () => {
+        return page.evaluate(() => {
+          const initalElement = byId("initial-element");
+          const added = byId("added-element");
+          mjukna(initalElement);
+          document.body.removeChild(added);
+        });
+      });
 
-    and("the element should move into its final place", async () => {
-      await rafUntilStill(scope.element);
-      const finalPosition = scope.element.getBoundingClientRect();
-      assert.deepStrictEqual(finalPosition.top, 0);
-      assert.deepStrictEqual(finalPosition.left, 0);
-      assert.deepStrictEqual(finalPosition.right, 300);
-      assert.deepStrictEqual(finalPosition.bottom, 300);
-    });
-  });
+      then("the mjukt element should stay in place", async () => {
+        const newPosition = await page.evaluate(() => {
+          const initalElement = byId("initial-element");
+          return dumpClientRect(initalElement);
+        });
+        assertEqualPositions(newPosition, scope.intermediatePosition);
+      });
 
-  scenario("scaling up and down and up", ({ before, after, given, when, then, and }) => {
-    const scope = {};
+      and("the element should move into its final place", async () => {
+        await page.waitForFunction(() => {
+          return elementStill(byId("initial-element"));
+        });
 
-    before(() => dumdom.init());
-    after(() => dumdom.reset());
+        const finalPosition = await page.evaluate(() => {
+          return dumpClientRect(byId("initial-element"));
+        });
+        assert.deepStrictEqual(finalPosition, scope.initialPosition);
+      });
+    }
+  );
 
-    given("a mjukt element", () => {
-      const div = document.createElement("div");
-      document.appendChild(div);
-      scope.element = div;
-      mjukna(div, { scale: true });
-    });
+  scenario(
+    "scaling element while scale not completed",
+    ({ before, given, when, then, and }) => {
+      const scope = {};
+      let page;
 
-    when("the element is enlarged", () => {
-      mjukna(scope.element, { scale: true });
-      scope.element.style.height = 200;
-      document.triggerMutationObserver();
-    });
+      before(async () => {
+        page = await setupNewPage(browser);
+      });
 
-    then("the element should still be 100 height", () => {
-      const { height, top } = scope.element.getBoundingClientRect();
-      assert.deepStrictEqual(height, 100);
-      assert.deepStrictEqual(top, 0);
-    });
+      given("a mjukt element", async () => {
+        scope.initialPosition = await page.evaluate(() => {
+          const div = document.createElement("div");
+          div.setAttribute("id", "element");
+          div.style.width = "100px";
+          div.style.height = "100px";
+          document.body.appendChild(div);
+          mjukna(div);
+          return dumpClientRect(div);
+        });
+      });
 
-    and("a rAF happens", async () => {
-      dumdom.triggerRAF();
-      dumdom.triggerRAF();
-      dumdom.triggerRAF();
-      scope.previousPosition = scope.element.getBoundingClientRect();
-    });
+      when("when element is resized", () => {
+        return page.evaluate(() => {
+          const div = byId("element");
+          div.style.width = "100px";
+          div.style.height = "100px";
+        });
+      });
 
-    when("the element is turned small again", () => {
-      mjukna(scope.element, { scale: true });
-      scope.element.style.height = 100;
-      document.triggerMutationObserver();
-    });
+      and("a few rAFs happen", async () => {
+        scope.intermediatePosition = await page.evaluate(async () => {
+          await waitForRAFs(3);
+          return dumpClientRect(byId("element"));
+        });
+      });
 
-    then("the element should stay in place", async () => {
-      const newPosition = scope.element.getBoundingClientRect();
-      assert.deepStrictEqual(newPosition.height, scope.previousPosition.height);
-      assertEqualPositions(newPosition.top, scope.previousPosition.top);
-    });
+      when("when element is resized again", () => {
+        return page.evaluate(() => {
+          const div = byId("element");
+          mjukna(div);
+          div.style.width = "100px";
+          div.style.height = "100px";
+        });
+      });
 
-    when("a rAF go by", () => {
-      dumdom.triggerRAF();
-      dumdom.triggerRAF();
-      dumdom.triggerRAF();
-      scope.previousPosition = scope.element.getBoundingClientRect();
-    });
+      then("the mjukt element should stay in place", async () => {
+        const newPosition = await page.evaluate(() => {
+          const initalElement = byId("element");
+          return dumpClientRect(initalElement);
+        });
+        assertEqualPositions(newPosition, scope.intermediatePosition);
+      });
 
-    when("the element is enlarged again", () => {
-      mjukna(scope.element, { scale: true });
-      scope.element.style.height = 200;
-      document.triggerMutationObserver();
-    });
+      and("the element should move into its final place", async () => {
+        await page.waitForFunction(() => {
+          return elementStill(byId("element"));
+        });
 
-    then("the mjukt element should stay in place", async () => {
-      const newPosition = scope.element.getBoundingClientRect();
-      assertEqualPositions(newPosition, scope.previousPosition);
-    });
-
-    and("eventually be full sized", async () => {
-      await rafUntilStill(scope.element);
-      const finalPosition = scope.element.getBoundingClientRect();
-      assert.deepStrictEqual(finalPosition.height, 200);
-    });
-  });
+        const finalPosition = await page.evaluate(() => {
+          return dumpClientRect(byId("element"));
+        });
+        assert.deepStrictEqual(finalPosition, scope.initialPosition);
+      });
+    }
+  );
 });
