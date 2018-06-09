@@ -8,7 +8,7 @@ const { assertEqualPositions } = require("../helpers/utils");
 
 const { setupNewPage } = require("../helpers/browser.js");
 
-feature.only("interruptions", scenario => {
+feature("interruptions", scenario => {
   let browser;
 
   scenario.before(async () => {
