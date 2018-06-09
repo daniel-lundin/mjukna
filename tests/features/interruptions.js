@@ -12,7 +12,7 @@ feature.only("interruptions", scenario => {
   let browser;
 
   scenario.before(async () => {
-    browser = await puppeteer.launch({ headless: false });
+    browser = await puppeteer.launch();
   });
 
   scenario.after(() => browser.close());
