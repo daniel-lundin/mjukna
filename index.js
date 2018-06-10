@@ -20,6 +20,7 @@ const DEFAULT_TENSION = 0.1;
 const DEFAULT_DECELERATION = 0.65;
 
 let inProgress = [];
+let completionResolver = () => {};
 
 export default function mjukna(
   elements,
@@ -30,23 +31,26 @@ export default function mjukna(
   } = {}
 ) {
   init();
-  [].concat(elements).forEach(element => {
-    // Stop any running animations for element
-    inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
-      if (e === element) {
-        clearInterval(staggerTimer);
-        stopper();
-      }
-      return e !== element;
-    });
+  return new Promise(resolve => {
+    completionResolver = resolve;
+    [].concat(elements).forEach(element => {
+      // Stop any running animations for element
+      inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
+        if (e === element) {
+          clearInterval(staggerTimer);
+          stopper();
+        }
+        return e !== element;
+      });
 
-    const item = {
-      element,
-      config: { tension, deceleration, staggerBy },
-      previousPosition: element.getBoundingClientRect(),
-      stop: () => {}
-    };
-    mjuka.push(item);
+      const item = {
+        element,
+        config: { tension, deceleration, staggerBy },
+        previousPosition: element.getBoundingClientRect(),
+        stop: () => {}
+      };
+      mjuka.push(item);
+    });
   });
 }
 
@@ -99,33 +103,36 @@ function FLIPScaleTranslate(mjuk, index) {
 
   const runner =
     staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
-  progress[1] = runner(() => {
-    progress[2] = tween({
-      from: [
-        xCenterDiff,
-        yCenterDiff,
-        xScaleCompensation,
-        yScaleCompensation,
-        parentScale.x,
-        parentScale.y
-      ],
-      to: [0, 0, 1, 1, 1, 1],
-      update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-        clear(matris);
-        // Parent compensation
-        translate(matris, -xForCenter, -yForCenter);
-        scale(matris, 1 / parentScaleX, 1 / parentScaleY);
-        translate(matris, xForCenter, yForCenter);
-        // Actual FLIP
-        translate(matris, x, y);
-        scale(matris, scaleX, scaleY);
-        element.style.transform = asCSS(matris);
-      },
-      done() {
-        element.style.transform = "";
-      },
-      tension,
-      deceleration
+  return new Promise(resolve => {
+    progress[1] = runner(() => {
+      progress[2] = tween({
+        from: [
+          xCenterDiff,
+          yCenterDiff,
+          xScaleCompensation,
+          yScaleCompensation,
+          parentScale.x,
+          parentScale.y
+        ],
+        to: [0, 0, 1, 1, 1, 1],
+        update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
+          clear(matris);
+          // Parent compensation
+          translate(matris, -xForCenter, -yForCenter);
+          scale(matris, 1 / parentScaleX, 1 / parentScaleY);
+          translate(matris, xForCenter, yForCenter);
+          // Actual FLIP
+          translate(matris, x, y);
+          scale(matris, scaleX, scaleY);
+          element.style.transform = asCSS(matris);
+        },
+        done() {
+          element.style.transform = "";
+          resolve();
+        },
+        tension,
+        deceleration
+      });
     });
   });
 }
@@ -220,18 +227,7 @@ function updateElements() {
   const tree = mjuka.reduce((acc, mjuk) => buildTree(acc, mjuk), []);
   const flatTree = flatten(withRelativeValues(tree));
 
-  flatTree.forEach((node, index) => {
-    // TODO: Needs to take parent scaling into account
-    // if (positionsEqual(node.newPosition, node.previousPosition)) {
-    //   console.log("skipping", node);
-    //   return;
-    // }
-
-    FLIPScaleTranslate(node, index);
-  });
+  const animations = flatTree.map(FLIPScaleTranslate);
+  Promise.all(animations).then(completionResolver);
   mjuka = [];
 }
-
-// function positionsEqual(pos1, pos2) {
-//   return pos1.top === pos2.top && pos1.left === pos2.left && pos1.right === pos2.right && pos1.bottom === pos2.bottom;
-// }
