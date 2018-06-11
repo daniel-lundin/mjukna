@@ -1,6 +1,6 @@
 {
   "name": "mjukna",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "animate layout changes",
   "main": "dist/main.js",
   "browser": "dist/browser.js",
