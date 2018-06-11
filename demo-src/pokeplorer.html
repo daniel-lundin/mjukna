@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     <style>
       body {
@@ -11,18 +12,22 @@
         position: relative;
       }
       .card {
-        display: inline-flex;
+        display: inline-block;
         align-items: center;
         justify-content: center;
         width: 120px;
         height: 120px;
         margin: 10px;
+        height: auto;
         background: white;
         flex-direction: column;
         border: 1px solid #ccc;
       }
       .card .name {
         font-size: 18px;
+      }
+      .card .description {
+        display: none;
       }
       .card img {
         width: 80px;
@@ -31,11 +36,11 @@
 
       .card.active {
         /* position: absolute; */
-        top: calc(50% - 100px);
-        left: calc(50% - 100px);
+        /* top: calc(50% - 100px); */
+        /* left: calc(50% - 100px); */
         padding: 10px;
         width: 300px;
-        height: 140px;
+        height: auto;
         align-items: flex-start;
         justify-content: space-around;
         flex-direction: row;
@@ -44,6 +49,7 @@
       .card.active img {
         width: 120px;
         height: 120px;
+        float: left;
       }
       .card.active .name {
         font-size: 36px;
