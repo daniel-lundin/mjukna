@@ -17,7 +17,7 @@ function deepEquals(a, b) {
 
 async function getMjuknaCode() {
   const bundle = await rollup.rollup(rollupConfig);
-  const { code } = await bundle.generate(rollupConfig);
+  const { code } = await bundle.generate({ format: "iife", name: "mjukna" });
   return code;
 }
 

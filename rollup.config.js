@@ -4,11 +4,23 @@ import resolve from "rollup-plugin-node-resolve";
 
 export default {
   input: "index.js",
-  output: {
-    file: "dist/main.js",
-    format: "umd",
-    name: "mjukna"
-  },
+  output: [
+    {
+      file: "dist/browser.js",
+      format: "iife",
+      name: "mjukna"
+    },
+    {
+      file: "dist/main.js",
+      format: "cjs",
+      name: "mjukna"
+    },
+    {
+      file: "dist/module.js",
+      format: "es",
+      name: "mjukna"
+    }
+  ],
   plugins: [
     terser(),
     babel({

@@ -2,7 +2,9 @@
   "name": "mjukna",
   "version": "0.0.7",
   "description": "animate layout changes",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
+  "browser": "dist/browser.js",
+  "module": "dist/module.js",
   "kuta": {
     "files": [
       "tests/features/**.js"
@@ -19,7 +21,6 @@
     "prepublishOnly": "npm run build",
     "build": "rollup -c rollup.config.js"
   },
-  "module": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daniel-lundin/mjukna.git"
@@ -37,16 +38,17 @@
     "eslint": "^4.19.1",
     "gh-pages": "^1.1.0",
     "kuta": "^1.7.4",
-    "matris": "0.0.7",
     "node-png": "^0.4.3",
     "puppeteer": "^1.5.0",
     "rollup": "^0.60.1",
     "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-terser": "^1.0.1",
-    "spring-array": "^2.0.0"
+    "rollup-plugin-terser": "^1.0.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "spring-array": "^2.0.0",
+    "matris": "0.0.7"
+  },
   "files": [
     "dist"
   ]
