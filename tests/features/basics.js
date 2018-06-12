@@ -19,7 +19,12 @@ feature("basics", scenario => {
     const scope = {};
 
     before(async () => {
-      page = await setupNewPage(browser);
+      try {
+        page = await setupNewPage(browser);
+      } catch (err) {
+        console.log("setupnewPage error", err);
+        throw err;
+      }
     });
 
     given("a paragraph element", async () => {
