@@ -9,7 +9,12 @@ feature("basics", scenario => {
   let browser;
 
   scenario.before(async () => {
-    browser = await puppeteer.launch({ headless: false });
+    try {
+      browser = await puppeteer.launch({ headless: false });
+    } catch (err) {
+      console.log("puppeteer launch error", err);
+      throw err;
+    }
   });
 
   scenario.after(() => browser.close());
@@ -19,12 +24,7 @@ feature("basics", scenario => {
     const scope = {};
 
     before(async () => {
-      try {
-        page = await setupNewPage(browser);
-      } catch (err) {
-        console.log("setupnewPage error", err);
-        throw err;
-      }
+      page = await setupNewPage(browser);
     });
 
     given("a paragraph element", async () => {
