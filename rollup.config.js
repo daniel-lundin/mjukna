@@ -14,11 +14,6 @@ export default {
       file: "dist/main.js",
       format: "cjs",
       name: "mjukna"
-    },
-    {
-      file: "dist/module.js",
-      format: "es",
-      name: "mjukna"
     }
   ],
   plugins: [

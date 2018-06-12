@@ -4,7 +4,6 @@
   "description": "animate layout changes",
   "main": "dist/main.js",
   "browser": "dist/browser.js",
-  "module": "dist/module.js",
   "kuta": {
     "files": [
       "tests/features/**.js"
