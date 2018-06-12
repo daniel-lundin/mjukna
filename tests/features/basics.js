@@ -9,12 +9,7 @@ feature("basics", scenario => {
   let browser;
 
   scenario.before(async () => {
-    try {
-      browser = await puppeteer.launch({ headless: false });
-    } catch (err) {
-      console.log("puppeteer launch error", err);
-      throw err;
-    }
+    browser = await puppeteer.launch();
   });
 
   scenario.after(() => browser.close());
