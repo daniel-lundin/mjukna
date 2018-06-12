@@ -44,9 +44,11 @@ export default function mjukna(
       });
 
       const item = {
-        element,
+        element: element.element,
         config: { tension, deceleration, staggerBy },
-        previousPosition: element.getBoundingClientRect(),
+        previousPosition: element.anchor
+          ? element.anchor().getBoundingClientRect()
+          : element.element.getBoundingClientRect(),
         stop: () => {}
       };
       mjuka.push(item);
