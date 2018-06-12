@@ -33,25 +33,26 @@ export default function mjukna(
   init();
   return new Promise(resolve => {
     completionResolver = resolve;
-    [].concat(elements).forEach(element => {
+    [].concat(elements).forEach(item => {
       // Stop any running animations for element
+      const getElement = item.anchor ? item.element : () => item;
       inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
-        if (e === element) {
+        if (e === getElement()) {
           clearInterval(staggerTimer);
           stopper();
         }
-        return e !== element;
+        return e !== getElement();
       });
 
-      const item = {
-        element: element.element,
+      const mjuk = {
+        getElement,
         config: { tension, deceleration, staggerBy },
-        previousPosition: element.anchor
-          ? element.anchor().getBoundingClientRect()
-          : element.element.getBoundingClientRect(),
+        previousPosition: item.anchor
+          ? item.anchor().getBoundingClientRect()
+          : getElement().getBoundingClientRect(),
         stop: () => {}
       };
-      mjuka.push(item);
+      mjuka.push(mjuk);
     });
   });
 }
@@ -226,7 +227,9 @@ function flatten(tree, items = []) {
 }
 
 function updateElements() {
-  const tree = mjuka.reduce((acc, mjuk) => buildTree(acc, mjuk), []);
+  const tree = mjuka
+    .map(mjuk => Object.assign(mjuk, { mjuk, element: mjuk.getElement() }))
+    .reduce((acc, mjuk) => buildTree(acc, mjuk), []);
   const flatTree = flatten(withRelativeValues(tree));
 
   const animations = flatTree.map(FLIPScaleTranslate);

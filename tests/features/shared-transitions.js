@@ -5,7 +5,7 @@ const { feature } = require("kuta/lib/bdd");
 
 const { setupNewPage } = require("../helpers/browser.js");
 
-feature.only("shared transitions", scenario => {
+feature("shared transitions", scenario => {
   let browser;
 
   scenario.before(async () => {
@@ -49,7 +49,7 @@ feature.only("shared transitions", scenario => {
           div.style.width = "200px";
           mjukna({
             anchor: () => byId("anchor-element"),
-            element: div
+            element: () => div
           });
           document.body.appendChild(div);
 
