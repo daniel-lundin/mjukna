@@ -1,4 +1,4 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dictum nisl et ligula commodo sollicitudin. Cras volutpat consectetur lorem, et lobortis purus dictum sit amet. Maecenas eget eros id lacus egestas maximus.";
@@ -7,75 +7,34 @@ function makeItMjukna() {
   const elements = document.querySelectorAll("span, article, img, .card-title");
   mjukna([...elements]);
 }
+const $ = document.querySelectorAll.bind(document);
+const article = document.querySelector("article");
+
 function setupListeners() {
-  const fontsizeButtons = document.querySelectorAll(".font-size");
-  fontsizeButtons.forEach(element => {
-    element.addEventListener("click", function() {
+  [...$("input[name='font-size']")].forEach(element => {
+    element.addEventListener("change", evt => {
       makeItMjukna();
-      fontsizeButtons.forEach(e => e.classList.remove("active"));
-      this.classList.add("active");
-
-      const elements = [...document.querySelectorAll("span")];
-      elements.forEach(e => {
-        e.classList.remove("small");
-        e.classList.remove("medium");
-        e.classList.remove("large");
-        e.classList.add(this.dataset.value);
-      });
+      article.classList.remove("font-small");
+      article.classList.remove("font-medium");
+      article.classList.remove("font-large");
+      article.classList.add(evt.target.value);
     });
   });
-
-  const boxButtons = document.querySelectorAll(".box-size");
-  boxButtons.forEach(element => {
-    element.addEventListener("click", function() {
+  [...$("input[name='box-size']")].forEach(element => {
+    element.addEventListener("change", evt => {
       makeItMjukna();
-      boxButtons.forEach(e => e.classList.remove("active"));
-      this.classList.add("active");
-      const box = document.querySelector("article");
-      box.classList.remove("medium");
-      box.classList.remove("big");
-      box.classList.remove("small");
-      box.classList.add(this.dataset.value);
+      article.style.width = evt.target.value;
     });
   });
-  function resetImageStyle() {
-    document.querySelectorAll(".image-style").forEach(e => {
-      e.classList.remove("active");
-    });
-  }
-  document
-    .getElementById("float-image-left")
-    .addEventListener("click", function() {
+  [...$("input[name='image-style']")].forEach(element => {
+    element.addEventListener("change", evt => {
       makeItMjukna();
-      resetImageStyle();
-      const image = document.querySelector("img");
-      image.style.float = "left";
-      image.style.width = "50%";
-      image.style.margin = "10px";
-      this.classList.add("active");
+      article.classList.remove("image-left");
+      article.classList.remove("image-block");
+      article.classList.remove("image-right");
+      article.classList.add(evt.target.value);
     });
-  document
-    .getElementById("unfloat-image")
-    .addEventListener("click", function() {
-      makeItMjukna();
-      resetImageStyle();
-      const image = document.querySelector("img");
-      image.style.float = "initial";
-      image.style.width = "100%";
-      image.style.margin = "0";
-      this.classList.add("active");
-    });
-  document
-    .getElementById("float-image-right")
-    .addEventListener("click", function() {
-      makeItMjukna();
-      resetImageStyle();
-      const image = document.querySelector("img");
-      image.style.float = "right";
-      image.style.width = "50%";
-      image.style.margin = "10px";
-      this.classList.add("active");
-    });
+  });
 }
 function setup() {
   setupListeners();

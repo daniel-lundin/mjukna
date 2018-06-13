@@ -1,8 +1,8 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 function makeItMjukt() {
   [...document.querySelectorAll(".box")].forEach(element => {
-    mjukna(element, { scale: true, staggerBy: 20 });
+    mjukna(element, { staggerBy: 20 });
   });
 }
 
