@@ -4,8 +4,8 @@ const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In dictum nisl et ligula commodo sollicitudin. Cras volutpat consectetur lorem, et lobortis purus dictum sit amet. Maecenas eget eros id lacus egestas maximus.";
 
 function makeItMjukna() {
-  const elements = document.querySelectorAll("span, article, img, .card-title");
-  mjukna([...elements]);
+  const elements = document.querySelectorAll("span, article, img");
+  mjukna([...elements], { tension: 0.1, decelaration: 0.7, staggerBy: 5 });
 }
 const $ = document.querySelectorAll.bind(document);
 const article = document.querySelector("article");
