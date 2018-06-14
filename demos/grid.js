@@ -1,7 +1,6 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 const random = (min, max) => Math.floor(Math.random() * (max - min) + min);
-const colors = ["tomato", "crimson", "aliceblue", "#bada55", "#c0ff3"];
 
 const animals = document.querySelectorAll(".animal");
 const emojis = document.querySelectorAll(".animal span");

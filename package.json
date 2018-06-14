@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "kuta",
-    "prepare-demo": "mkdir -p demos && find demo-src/ -type f ! -name index.js | xargs -J % cp % demos && cp index.js demos/",
+    "prepare-demos": "npm run build && cp dist/browser.js demos/mjukna.js",
     "gh-pages": "npm run prepare-demo && gh-pages -d demos",
     "prepublishOnly": "npm run build",
     "build": "rollup -c rollup.config.js"

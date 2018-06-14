@@ -1,4 +1,4 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 function randomCat() {
   const x = 50 + Math.floor(Math.random() * 100);

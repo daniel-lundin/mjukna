@@ -1,5 +1,4 @@
-// import { mjukna } from "./index.js";
-import mjukna from "https://unpkg.com/mjukna@0.0.10/dist/module.js?module";
+/* global mjukna */
 
 function avatarURL(name) {
   return `https://img.pokemondb.net/artwork/${name.toLowerCase()}.jpg`;
