@@ -27,7 +27,9 @@ export default function mjukna(
   {
     tension = DEFAULT_TENSION,
     deceleration = DEFAULT_DECELERATION,
-    staggerBy = 0
+    staggerBy = 0,
+    enterAnimation = false,
+    exitAnimation = false
   } = {}
 ) {
   init();
@@ -46,7 +48,13 @@ export default function mjukna(
 
       const mjuk = {
         getElement,
-        config: { tension, deceleration, staggerBy },
+        config: {
+          tension,
+          deceleration,
+          staggerBy,
+          enterAnimation,
+          exitAnimation
+        },
         previousPosition: item.anchor
           ? item.anchor().getBoundingClientRect()
           : getElement().getBoundingClientRect(),
@@ -57,14 +65,155 @@ export default function mjukna(
   });
 }
 
+function exitAnimation(mjuk) {
+  const { previousPosition } = mjuk;
+  const element = mjuk.getElement();
+  document.body.appendChild(element);
+  element.style.position = "absolute";
+
+  const newPosition = element.getBoundingClientRect();
+  const xDiff = newPosition.left - previousPosition.left;
+  const yDiff = newPosition.top - previousPosition.top;
+  element.style.transform = `translate(${-xDiff}px, ${-yDiff}px)`;
+
+  tween({
+    from: [1, 1],
+    to: [0.3, 0],
+    update([scale, opacity]) {
+      element.style.transform = `translate(${-xDiff}px, ${-yDiff}px) scale(${scale})`;
+      element.style.opacity = opacity;
+    },
+    done() {
+      document.body.removeChild(element);
+    },
+    tension: DEFAULT_TENSION,
+    deceleration: DEFAULT_DECELERATION
+  });
+}
+
 function init(root = document) {
-  observer = new MutationObserver(() => {
+  observer = new MutationObserver(mutations => {
     if (mjuka.length === 0) return;
-    updateElements();
+    const removedNodes = mutations
+      .filter(({ type }) => type === "childList")
+      .reduce((acc, curr) => {
+        return acc.concat(Array.from(curr.removedNodes));
+      }, []);
+
+    const [present, removed] = mjuka.reduce(
+      ([present, removed], mjuk) => {
+        const element = mjuk.getElement();
+        if (removedNodes.find(e => e === element)) {
+          return [present, removed.concat(mjuk)];
+        } else {
+          return [present.concat(mjuk), removed];
+        }
+      },
+      [[], []]
+    );
+    removed.forEach(exitAnimation);
+    updateElements(present);
   });
 
   observer.observe(root, observeConfig);
   return () => observer.disconnect();
+}
+
+function reParent(nodes, parent) {
+  nodes.forEach(node => {
+    node.parent = parent;
+  });
+  return nodes;
+}
+
+function updateElements(activeMjuka) {
+  const tree = activeMjuka
+    .map(mjuk => Object.assign(mjuk, { mjuk, element: mjuk.getElement() }))
+    .reduce((acc, mjuk) => buildTree(acc, mjuk), []);
+  const flatTree = flatten(withRelativeValues(tree));
+
+  const animations = flatTree.map(FLIPScaleTranslate);
+
+  mjuka = [];
+  Promise.all(animations).then(completionResolver);
+}
+
+function buildTree(nodes, mjuk, parent) {
+  mjuk.element.style.transform = "";
+
+  const foundParent = nodes.find(node => {
+    return node.element.contains(mjuk.element);
+  });
+
+  if (foundParent) {
+    return nodes.map(node => {
+      if (node === foundParent) {
+        return Object.assign(node, {
+          parent,
+          children: buildTree(foundParent.children, mjuk, foundParent)
+        });
+      } else {
+        return node;
+      }
+    });
+  } else {
+    const elementChildren = nodes.filter(node =>
+      mjuk.element.contains(node.element)
+    );
+    const nonChildren = nodes.filter(
+      node => !mjuk.element.contains(node.element)
+    );
+
+    const me = Object.assign(mjuk, { parent, children: elementChildren });
+    reParent(me.children, me);
+    return [...nonChildren, me];
+  }
+}
+const relativeRect = (outer, inner) => ({
+  left: inner.left - outer.left,
+  top: inner.top - outer.top,
+  width: inner.width,
+  height: inner.height
+});
+
+function multipleScale(parent, current) {
+  const s = {
+    x: current.x * parent.x,
+    y: current.y * parent.y
+  };
+  return s;
+}
+
+function withRelativeValues(tree) {
+  return tree.map(node => {
+    const { previousPosition } = node;
+    const newPosition = node.element.getBoundingClientRect();
+    const scale = {
+      x: previousPosition.width / newPosition.width,
+      y: previousPosition.height / newPosition.height
+    };
+
+    node.newPosition = node.parent
+      ? relativeRect(node.parent.newPosition, newPosition)
+      : newPosition;
+    node.parentScale = node.parent
+      ? multipleScale(node.parent.scale, node.parent.parentScale)
+      : { x: 1, y: 1 };
+    node.scale = scale;
+    node.previousPosition = node.parent
+      ? relativeRect(node.parent.previousPosition, previousPosition)
+      : previousPosition;
+    node.children = withRelativeValues(node.children);
+    return node;
+  });
+}
+
+function flatten(tree, items = []) {
+  tree.forEach(n => {
+    items.push(n);
+    flatten(n.children, items);
+  });
+  return items;
 }
 
 function FLIPScaleTranslate(mjuk, index) {
@@ -138,101 +287,4 @@ function FLIPScaleTranslate(mjuk, index) {
       });
     });
   });
-}
-
-function reParent(nodes, parent) {
-  nodes.forEach(node => {
-    node.parent = parent;
-  });
-  return nodes;
-}
-
-function buildTree(nodes, mjuk, parent) {
-  mjuk.element.style.transform = "";
-
-  const foundParent = nodes.find(node => {
-    return node.element.contains(mjuk.element);
-  });
-
-  if (foundParent) {
-    return nodes.map(node => {
-      if (node === foundParent) {
-        return Object.assign(node, {
-          parent,
-          children: buildTree(foundParent.children, mjuk, foundParent)
-        });
-      } else {
-        return node;
-      }
-    });
-  } else {
-    const elementChildren = nodes.filter(node =>
-      mjuk.element.contains(node.element)
-    );
-    const nonChildren = nodes.filter(
-      node => !mjuk.element.contains(node.element)
-    );
-
-    const me = Object.assign(mjuk, { parent, children: elementChildren });
-    reParent(me.children, me);
-    return [...nonChildren, me];
-  }
-}
-
-const relativeRect = (outer, inner) => ({
-  left: inner.left - outer.left,
-  top: inner.top - outer.top,
-  width: inner.width,
-  height: inner.height
-});
-
-function multipleScale(parent, current) {
-  const s = {
-    x: current.x * parent.x,
-    y: current.y * parent.y
-  };
-  return s;
-}
-
-function withRelativeValues(tree) {
-  return tree.map(node => {
-    const { previousPosition } = node;
-    const newPosition = node.element.getBoundingClientRect();
-    const scale = {
-      x: previousPosition.width / newPosition.width,
-      y: previousPosition.height / newPosition.height
-    };
-
-    node.newPosition = node.parent
-      ? relativeRect(node.parent.newPosition, newPosition)
-      : newPosition;
-    node.parentScale = node.parent
-      ? multipleScale(node.parent.scale, node.parent.parentScale)
-      : { x: 1, y: 1 };
-    node.scale = scale;
-    node.previousPosition = node.parent
-      ? relativeRect(node.parent.previousPosition, previousPosition)
-      : previousPosition;
-    node.children = withRelativeValues(node.children);
-    return node;
-  });
-}
-
-function flatten(tree, items = []) {
-  tree.forEach(n => {
-    items.push(n);
-    flatten(n.children, items);
-  });
-  return items;
-}
-
-function updateElements() {
-  const tree = mjuka
-    .map(mjuk => Object.assign(mjuk, { mjuk, element: mjuk.getElement() }))
-    .reduce((acc, mjuk) => buildTree(acc, mjuk), []);
-  const flatTree = flatten(withRelativeValues(tree));
-
-  const animations = flatTree.map(FLIPScaleTranslate);
-  Promise.all(animations).then(completionResolver);
-  mjuka = [];
 }
