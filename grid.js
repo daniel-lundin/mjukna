@@ -1,22 +1,28 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 const random = (min, max) => Math.floor(Math.random() * (max - min) + min);
-const colors = ["tomato", "crimson", "aliceblue", "#bada55", "#c0ff3"];
 
 const animals = document.querySelectorAll(".animal");
 const emojis = document.querySelectorAll(".animal span");
 
 function makeItMjukna() {
-  // mjukna([...emojis, ...animals], { tension: 0.001, deceleration: 0.5 });
-  mjukna([...animals, ...emojis]);
+  return mjukna([...animals, ...emojis], {
+    tension: 0.05,
+    deceleration: 0.7
+  });
 }
 
-setInterval(() => {
-  makeItMjukna();
+async function go() {
+  const animation = makeItMjukna();
   animals.forEach(animal => {
     const from = random(1, 10);
     const to = random(from, 10);
 
     animal.style.gridColumn = `${from} / ${to}`;
+    animal.style.gridRow = `${from} / ${to}`;
   });
-}, 2500);
+  await animation;
+  requestAnimationFrame(go);
+}
+
+go();

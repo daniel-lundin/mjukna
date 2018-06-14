@@ -1,4 +1,4 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 function avatarURL(name) {
   return `https://img.pokemondb.net/artwork/${name.toLowerCase()}.jpg`;
@@ -31,13 +31,17 @@ function buildGrid() {
   pokes.forEach(([name, desc]) => {
     const card = document.createElement("div");
     card.className = "card";
-    const pokename = document.createElement("div");
+    const pokename = document.createElement("h2");
     pokename.className = "name";
     pokename.innerText = name;
+    const pokeDescription = document.createElement("p");
+    pokeDescription.innerText = desc;
+    pokeDescription.className = "description";
     const image = new Image();
     image.src = avatarURL(name);
     card.appendChild(image);
     card.appendChild(pokename);
+    card.appendChild(pokeDescription);
     root.appendChild(card);
     cards.push(card);
     images.push(image);

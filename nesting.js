@@ -1,4 +1,4 @@
-import { mjukna } from "./index.js";
+/* global mjukna */
 
 const root = document.querySelector(".root");
 const inner = document.querySelectorAll(".inner");

@@ -10,8 +10,24 @@
       height: 40vh;
       background: #e87d31;
     }
+
     label {
-      display: initial;
+      position: relative;
+      display: inline-block;
+    }
+
+    input[type="radio"] {
+      position: absolute;
+      visibility: hidden;
+    }
+
+    input[type="radio"] + div {
+      padding: 4px;
+      background: #cecece;
+    }
+
+    input[type="radio"]:checked + div {
+      background: #00c719;
     }
 
     .box {
@@ -36,54 +52,56 @@
     </style>
   </head>
   <body>
+    <h1>Flexplorer</h1>
     <fieldset>
       <legend>Align items</legend>
       <label for="flex-start">
-        <input type="radio" value="flex-start" id="flex-start" name="align-items" checked>flex-start
+        <input type="radio" value="flex-start" id="flex-start" name="align-items" checked><div>flex-start</div>
       </label>
       <label for="flex-end">
-        <input type="radio" value="flex-end" id="flex-end" name="align-items">flex-end
+        <input type="radio" value="flex-end" id="flex-end" name="align-items"><div>flex-end</div>
       </label>
       <label for="center">
-        <input type="radio" value="center" id="center" name="align-items">center
+        <input type="radio" value="center" id="center" name="align-items"><div>center</div>
       </label>
       <label for="baseline">
-        <input type="radio" value="baseline" id="baseline" name="align-items">baseline
+        <input type="radio" value="baseline" id="baseline" name="align-items"><div>baseline</div>
       </label>
       <label for="stretch">
-        <input type="radio" value="stretch" id="stretch" name="align-items">stretch
+        <input type="radio" value="stretch" id="stretch" name="align-items"><div>stretch</div>
       </label>
     </fieldset>
 
     <fieldset>
-      <legend>Align items</legend>
+      <legend>Justify content</legend>
       <label for="j-flex-start">
-        <input type="radio" value="flex-start" id="j-flex-start" name="justify-content">flex-start
+        <input type="radio" value="flex-start" id="j-flex-start" name="justify-content"><div>flex-start</div>
       </label>
       <label for="j-flex-end">
-        <input type="radio" value="flex-end" id="j-flex-end" name="justify-content">flex-end
+        <input type="radio" value="flex-end" id="j-flex-end" name="justify-content"><div>flex-end</div>
       </label>
       <label for="j-center">
-        <input type="radio" value="center" id="j-center" name="justify-content">center
+        <input type="radio" value="center" id="j-center" name="justify-content"><div>center</div>
       </label>
       <label for="j-space-between">
-        <input type="radio" value="space-between" id="j-space-between" name="justify-content">space-between
+        <input type="radio" value="space-between" id="j-space-between" name="justify-content"><div>space-between</div>
       </label>
       <label for="j-space-around">
-        <input type="radio" value="space-around" id="j-space-around" name="justify-content">space-around
+        <input type="radio" value="space-around" id="j-space-around" name="justify-content"><div>space-around</div>
       </label>
       <label for="j-space-evenly">
-        <input type="radio" value="space-evenly" id="j-space-evenly" name="justify-content">space-evenly
+        <input type="radio" value="space-evenly" id="j-space-evenly" name="justify-content">
+        <div>space-evenly</div>
       </label>
     </fieldset>
 
     <fieldset>
       <legend>Flex direction</legend>
       <label for="direction-row">
-        <input type="radio" value="row" id="direction-row" name="flex-direction" checked>row
+        <input type="radio" value="row" id="direction-row" name="flex-direction" checked><div>row</div>
       </label>
       <label for="direction-column">
-        <input type="radio" value="column" id="direction-column" name="flex-direction">column
+        <input type="radio" value="column" id="direction-column" name="flex-direction"><div>column</div>
       </label>
     <fieldset>
 
@@ -93,7 +111,8 @@
       <div class="box"></div>
       <div class="box"></div>
     </div>
-    <script type="module" src="./flexplorer.js"></script>
+    <script src="./mjukna.js"></script>
+    <script src="./flexplorer.js"></script>
   </body>
 </html>
 
