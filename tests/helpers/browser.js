@@ -8,7 +8,9 @@ async function injectHelpers(page) {
         top: cr.top,
         left: cr.left,
         bottom: cr.bottom,
-        right: cr.right
+        right: cr.right,
+        width: cr.width,
+        height: cr.height
       };
     };
 
