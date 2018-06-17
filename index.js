@@ -22,6 +22,13 @@ const DEFAULT_DECELERATION = 0.65;
 let inProgress = [];
 let completionResolver = () => {};
 
+function enableObserver() {
+  if (!observer) {
+    init();
+  }
+  observer.observe(document, observeConfig);
+}
+
 export default function mjukna(
   elements,
   {
@@ -32,7 +39,7 @@ export default function mjukna(
     exitAnimation = false
   } = {}
 ) {
-  init();
+  enableObserver();
   return new Promise(resolve => {
     completionResolver = resolve;
     [].concat(elements).forEach(item => {
@@ -65,6 +72,26 @@ export default function mjukna(
   });
 }
 
+function enterAnimation(element) {
+  element.style.opacity = 0;
+  element.style.transform = "scale(0.4)";
+
+  tween({
+    from: [0, 0.4],
+    to: [1, 1],
+    update: ([opacity, scale]) => {
+      element.style.opacity = opacity;
+      element.style.transform = `scale(${scale})`;
+    },
+    done() {
+      element.style.opacity = 1;
+      element.style.transform = "";
+    },
+    tension: DEFAULT_TENSION,
+    deceleration: DEFAULT_DECELERATION
+  });
+}
+
 function exitAnimation(mjuk) {
   const { previousPosition } = mjuk;
   const element = mjuk.getElement();
@@ -91,32 +118,42 @@ function exitAnimation(mjuk) {
   });
 }
 
-function init(root = document) {
+function init() {
   observer = new MutationObserver(mutations => {
-    if (mjuka.length === 0) return;
-    const removedNodes = mutations
+    observer.disconnect();
+
+    const [addedNodes, removedNodes] = mutations
       .filter(({ type }) => type === "childList")
-      .reduce((acc, curr) => {
-        return acc.concat(Array.from(curr.removedNodes));
-      }, []);
+      .reduce(
+        ([added, removed], curr) => {
+          return [
+            added.concat(Array.from(curr.addedNodes)),
+            removed.concat(Array.from(curr.removedNodes))
+          ];
+        },
+        [[], []]
+      );
 
     const [present, removed] = mjuka.reduce(
       ([present, removed], mjuk) => {
         const element = mjuk.getElement();
+
         if (removedNodes.find(e => e === element)) {
           return [present, removed.concat(mjuk)];
-        } else {
-          return [present.concat(mjuk), removed];
         }
+        return [present.concat(mjuk), removed];
       },
       [[], []]
     );
+
+    const added = addedNodes.filter(
+      node => !mjuka.find(m => node === m.getElement())
+    );
+
+    added.forEach(enterAnimation);
     removed.forEach(exitAnimation);
     updateElements(present);
   });
-
-  observer.observe(root, observeConfig);
-  return () => observer.disconnect();
 }
 
 function reParent(nodes, parent) {
