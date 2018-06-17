@@ -45,8 +45,7 @@
     "rollup-plugin-terser": "^1.0.1"
   },
   "dependencies": {
-    "spring-array": "^2.0.0",
-    "matris": "0.0.7"
+    "spring-array": "^2.0.0"
   },
   "files": [
     "dist"

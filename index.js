@@ -1,15 +1,7 @@
 import tween from "https://unpkg.com/spring-array@1.2.4/src/index.js?module";
-import {
-  createMatris,
-  scale,
-  translate,
-  clear,
-  asCSS
-} from "https://unpkg.com/matris@0.0.7/index.mjs?module";
+
 let mjuka = [];
 let observer;
-
-const matris = createMatris();
 
 const observeConfig = {
   childList: true,
@@ -252,6 +244,12 @@ function flatten(tree, items = []) {
   });
   return items;
 }
+function translatedScale(x, y, sX, sY) {
+  return `translate(${-x}px, ${-y}px) scale(${sX}, ${sY}) translate(${x}px, ${y}px) `;
+}
+function translateScale(x, y, sX, sY) {
+  return `translate(${x}px, ${y}px) scale(${sX}, ${sY}) `;
+}
 
 function FLIPScaleTranslate(mjuk, index) {
   const {
@@ -277,15 +275,28 @@ function FLIPScaleTranslate(mjuk, index) {
   const xForCenter = newPosition.left + newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2;
 
-  clear(matris);
-  // Parent compensation
-  translate(matris, -xForCenter, -yForCenter);
-  scale(matris, 1 / parentScale.x, 1 / parentScale.y);
-  translate(matris, xForCenter, yForCenter);
-  // Actual FLIP
-  translate(matris, xCenterDiff, yCenterDiff);
-  scale(matris, xScaleCompensation, yScaleCompensation);
-  element.style.transform = asCSS(matris);
+  // clear(matris);
+  // // Parent compensation
+  // translate(matris, -xForCenter, -yForCenter);
+  // scale(matris, 1 / parentScale.x, 1 / parentScale.y);
+  // translate(matris, xForCenter, yForCenter);
+  // // Actual FLIP
+  // translate(matris, xCenterDiff, yCenterDiff);
+  // scale(matris, xScaleCompensation, yScaleCompensation);
+  // element.style.transform = asCSS(matris);
+  element.style.transform =
+    translatedScale(
+      xForCenter,
+      yForCenter,
+      1 / parentScale.x,
+      1 / parentScale.y
+    ) +
+    translateScale(
+      xCenterDiff,
+      yCenterDiff,
+      xScaleCompensation,
+      yScaleCompensation
+    );
 
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
@@ -305,15 +316,13 @@ function FLIPScaleTranslate(mjuk, index) {
         ],
         to: [0, 0, 1, 1, 1, 1],
         update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-          clear(matris);
-          // Parent compensation
-          translate(matris, -xForCenter, -yForCenter);
-          scale(matris, 1 / parentScaleX, 1 / parentScaleY);
-          translate(matris, xForCenter, yForCenter);
-          // Actual FLIP
-          translate(matris, x, y);
-          scale(matris, scaleX, scaleY);
-          element.style.transform = asCSS(matris);
+          element.style.transform =
+            translatedScale(
+              xForCenter,
+              yForCenter,
+              1 / parentScaleX,
+              1 / parentScaleY
+            ) + translateScale(x, y, scaleX, scaleY);
         },
         done() {
           element.style.transform = "";
