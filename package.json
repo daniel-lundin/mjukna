@@ -1,6 +1,6 @@
 {
   "name": "mjukna",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "animate layout changes",
   "main": "dist/main.js",
   "browser": "dist/browser.js",
@@ -33,16 +33,11 @@
   },
   "homepage": "https://github.com/daniel-lundin/mjukna#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-module-rewrite": "^0.2.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "eslint": "^4.19.1",
     "gh-pages": "^1.1.0",
     "kuta": "^1.7.4",
-    "node-png": "^0.4.3",
     "puppeteer": "^1.5.0",
     "rollup": "^0.60.1",
-    "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^1.0.1"
   },

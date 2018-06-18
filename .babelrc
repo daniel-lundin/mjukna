@@ -1,6 +1,0 @@
-{
-  "plugins": [
-    ["module-rewrite", { "replaceFunc": "./utils/replace-module-paths.js" }],
-    "transform-es2015-modules-commonjs"
-  ]
-}

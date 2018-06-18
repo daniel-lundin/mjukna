@@ -1,4 +1,4 @@
-import tween from "https://unpkg.com/spring-array@1.2.4/src/index.js?module";
+import tween from "spring-array";
 
 let mjuka = [];
 let observer;
