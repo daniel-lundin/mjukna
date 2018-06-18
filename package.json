@@ -18,7 +18,9 @@
     "prepare-demos": "npm run build && cp dist/browser.js demos/mjukna.js",
     "gh-pages": "npm run prepare-demos && gh-pages -d demos",
     "prepublishOnly": "npm run build",
-    "build": "rollup -c rollup.config.js"
+    "build:web": "rollup -c rollup.config.js --environment MINIFY -o dist/browser.js -f iife --name mjukna",
+    "build:node": "rollup -c rollup.config.js -o dist/main.js -f cjs",
+    "build": "npm run build:web && npm run build:node"
   },
   "repository": {
     "type": "git",

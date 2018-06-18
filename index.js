@@ -275,15 +275,6 @@ function FLIPScaleTranslate(mjuk, index) {
   const xForCenter = newPosition.left + newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2;
 
-  // clear(matris);
-  // // Parent compensation
-  // translate(matris, -xForCenter, -yForCenter);
-  // scale(matris, 1 / parentScale.x, 1 / parentScale.y);
-  // translate(matris, xForCenter, yForCenter);
-  // // Actual FLIP
-  // translate(matris, xCenterDiff, yCenterDiff);
-  // scale(matris, xScaleCompensation, yScaleCompensation);
-  // element.style.transform = asCSS(matris);
   element.style.transform =
     translatedScale(
       xForCenter,

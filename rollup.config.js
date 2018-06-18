@@ -4,20 +4,8 @@ import resolve from "rollup-plugin-node-resolve";
 
 export default {
   input: "index.js",
-  output: [
-    {
-      file: "dist/browser.js",
-      format: "iife",
-      name: "mjukna"
-    },
-    {
-      file: "dist/main.js",
-      format: "cjs",
-      name: "mjukna"
-    }
-  ],
   plugins: [
-    terser(),
+    process.env.MINIFY === "true" ? terser() : null,
     babel({
       exclude: "node_modules/**",
       babelrc: false,
@@ -28,7 +16,7 @@ export default {
     resolve({
       module: true,
       preferBuiltins: false,
-      modulesOnly: true // Default: false
+      modulesOnly: true
     })
-  ]
+  ].filter(p => p)
 };
