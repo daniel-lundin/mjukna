@@ -8,9 +8,6 @@
     "files": [
       "tests/features/**.js"
     ],
-    "requires": [
-      "babel-register"
-    ],
     "timeout": 10000
   },
   "scripts": {

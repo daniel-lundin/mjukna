@@ -1,7 +1,7 @@
-import { terser } from "rollup-plugin-terser";
-import resolve from "rollup-plugin-node-resolve";
+const { terser } = require("rollup-plugin-terser");
+const resolve = require("rollup-plugin-node-resolve");
 
-export default {
+module.exports = {
   input: "index.js",
   plugins: [
     process.env.MINIFY === "true" ? terser() : null,

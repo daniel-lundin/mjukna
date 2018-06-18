@@ -1,8 +1,7 @@
 const path = require("path");
 const assert = require("assert");
 const rollup = require("rollup");
-const rollupConfig = require(path.join(__dirname, "../../rollup.config.js"))
-  .default;
+const rollupConfig = require(path.join(__dirname, "../../rollup.config.js"));
 
 const sleep = time => new Promise(resolve => setTimeout(resolve, time));
 

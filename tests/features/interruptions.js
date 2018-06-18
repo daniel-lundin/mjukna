@@ -1,9 +1,8 @@
-/* global waitForRAFs, byId, dumpClientRect, elementStill */
+/* global mjukna, waitForRAFs, byId, dumpClientRect, elementStill */
 
 const assert = require("assert");
 const puppeteer = require("puppeteer");
 const { feature } = require("kuta/lib/bdd");
-const { mjukna } = require("../../index.js");
 const { assertEqualPositions } = require("../helpers/utils");
 
 const { setupNewPage } = require("../helpers/browser.js");
