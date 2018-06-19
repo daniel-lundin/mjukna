@@ -27,8 +27,8 @@ export default function mjukna(
     tension = DEFAULT_TENSION,
     deceleration = DEFAULT_DECELERATION,
     staggerBy = 0,
-    enterAnimation = false,
-    exitAnimation = false
+    enterFilter = () => false,
+    exitFilter = () => false
   } = {}
 ) {
   enableObserver();
@@ -51,8 +51,8 @@ export default function mjukna(
           tension,
           deceleration,
           staggerBy,
-          enterAnimation,
-          exitAnimation
+          enterFilter,
+          exitFilter
         },
         previousPosition: item.anchor
           ? item.anchor().getBoundingClientRect()
@@ -119,8 +119,16 @@ function init() {
       .reduce(
         ([added, removed], curr) => {
           return [
-            added.concat(Array.from(curr.addedNodes)),
-            removed.concat(Array.from(curr.removedNodes))
+            added.concat(
+              Array.from(curr.addedNodes).filter(
+                ({ nodeType }) => nodeType === 1
+              )
+            ),
+            removed.concat(
+              Array.from(curr.removedNodes).filter(
+                ({ nodeType }) => nodeType === 1
+              )
+            )
           ];
         },
         [[], []]
