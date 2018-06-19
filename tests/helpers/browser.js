@@ -31,6 +31,15 @@ async function injectHelpers(page) {
 
     window.byId = id => document.getElementById(id);
   });
+
+  const css = `
+div {
+  width: 100px;
+  height: 100px;
+  color: rebeccapurple;
+}`;
+
+  page.addStyleTag({ content: css });
 }
 
 async function setupNewPage(browser) {

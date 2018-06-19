@@ -1,4 +1,4 @@
-/* global mjukna, dumpClientRect, elementStill, waitForRAFs */
+/* global mjukna, dumpClientRect, waitForRAFs */
 const assert = require("assert");
 const puppeteer = require("puppeteer");
 const { feature } = require("kuta/lib/bdd");
@@ -14,7 +14,7 @@ feature("basics", scenario => {
 
   scenario.after(() => browser.close());
 
-  scenario("resizing container", ({ before, given, when, then, and, but }) => {
+  scenario("resizing container", ({ before, given, when, then, but }) => {
     let page;
     const scope = {};
 

@@ -53,25 +53,35 @@ feature("interruptions", scenario => {
       and("a few rAFs happen", async () => {
         scope.intermediatePosition = await page.evaluate(async () => {
           await waitForRAFs(3);
-          return dumpClientRect(byId("initial-element"));
         });
       });
 
       when("the added element is removed", async () => {
-        return page.evaluate(() => {
-          const initalElement = byId("initial-element");
-          const added = byId("added-element");
-          mjukna(initalElement);
-          document.body.removeChild(added);
-        });
+        const [intermediatePosition, postRemovePosition] = await page.evaluate(
+          () => {
+            const intermediatePosition = dumpClientRect(
+              byId("initial-element")
+            );
+            const initalElement = byId("initial-element");
+            const added = byId("added-element");
+            mjukna(initalElement);
+            document.body.removeChild(added);
+            return new Promise(resolve =>
+              requestAnimationFrame(() =>
+                resolve([intermediatePosition, dumpClientRect(initalElement)])
+              )
+            );
+          }
+        );
+        scope.intermediatePosition = intermediatePosition;
+        scope.postRemovePosition = postRemovePosition;
       });
 
       then("the mjukt element should stay in place", async () => {
-        const newPosition = await page.evaluate(() => {
-          const initalElement = byId("initial-element");
-          return dumpClientRect(initalElement);
-        });
-        assertEqualPositions(newPosition, scope.intermediatePosition);
+        assertEqualPositions(
+          scope.postRemovePosition,
+          scope.intermediatePosition
+        );
       });
 
       and("the element should move into its final place", async () => {

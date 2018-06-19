@@ -1,15 +1,19 @@
 import tween from "spring-array";
 
-let mjuka = [];
-let observer;
-
 const observeConfig = {
   childList: true,
   subtree: true,
   attributes: true
 };
 const DEFAULT_TENSION = 0.1;
-const DEFAULT_DECELERATION = 0.65;
+const DEFAULT_DECELERATION = 0.75;
+
+const maybeTimeout = (fn, timeout) =>
+  timeout === 0 ? fn() : setTimeout(fn, timeout);
+
+let mjuka = [];
+let config = {};
+let observer;
 
 let inProgress = [];
 let completionResolver = () => {};
@@ -34,6 +38,12 @@ export default function mjukna(
   enableObserver();
   return new Promise(resolve => {
     completionResolver = resolve;
+    config.tension = tension;
+    config.deceleration = deceleration;
+    config.staggerBy = staggerBy;
+    config.enterFilter = enterFilter;
+    config.exitFilter = exitFilter;
+
     [].concat(elements).forEach(item => {
       // Stop any running animations for element
       const getElement = item.anchor ? item.element : () => item;
@@ -47,13 +57,6 @@ export default function mjukna(
 
       const mjuk = {
         getElement,
-        config: {
-          tension,
-          deceleration,
-          staggerBy,
-          enterFilter,
-          exitFilter
-        },
         previousPosition: item.anchor
           ? item.anchor().getBoundingClientRect()
           : getElement().getBoundingClientRect(),
@@ -64,27 +67,29 @@ export default function mjukna(
   });
 }
 
-function enterAnimation(element) {
+function enterAnimation(element, getStaggerBy) {
   element.style.opacity = 0;
-  element.style.transform = "scale(0.4)";
+  element.style.transform = "scale(0.6)";
 
-  tween({
-    from: [0, 0.4],
-    to: [1, 1],
-    update: ([opacity, scale]) => {
-      element.style.opacity = opacity;
-      element.style.transform = `scale(${scale})`;
-    },
-    done() {
-      element.style.opacity = 1;
-      element.style.transform = "";
-    },
-    tension: DEFAULT_TENSION,
-    deceleration: DEFAULT_DECELERATION
-  });
+  maybeTimeout(() => {
+    tween({
+      from: [0, 0.4],
+      to: [1, 1],
+      update: ([opacity, scale]) => {
+        element.style.opacity = opacity;
+        element.style.transform = `scale(${scale})`;
+      },
+      done() {
+        element.style.opacity = 1;
+        element.style.transform = "";
+      },
+      tension: DEFAULT_TENSION,
+      deceleration: DEFAULT_DECELERATION
+    });
+  }, getStaggerBy());
 }
 
-function exitAnimation(mjuk) {
+function exitAnimation(mjuk, getStaggerBy) {
   const { previousPosition } = mjuk;
   const element = mjuk.getElement();
   document.body.appendChild(element);
@@ -95,24 +100,35 @@ function exitAnimation(mjuk) {
   const yDiff = newPosition.top - previousPosition.top;
   element.style.transform = `translate(${-xDiff}px, ${-yDiff}px)`;
 
-  tween({
-    from: [1, 1],
-    to: [0.3, 0],
-    update([scale, opacity]) {
-      element.style.transform = `translate(${-xDiff}px, ${-yDiff}px) scale(${scale})`;
-      element.style.opacity = opacity;
-    },
-    done() {
-      document.body.removeChild(element);
-    },
-    tension: DEFAULT_TENSION,
-    deceleration: DEFAULT_DECELERATION
-  });
+  maybeTimeout(() => {
+    tween({
+      from: [1, 1],
+      to: [0.3, 0],
+      update([scale, opacity]) {
+        element.style.transform = `translate(${-xDiff}px, ${-yDiff}px) scale(${scale})`;
+        element.style.opacity = opacity;
+      },
+      done() {
+        document.body.removeChild(element);
+      },
+      tension: DEFAULT_TENSION,
+      deceleration: DEFAULT_DECELERATION
+    });
+  }, getStaggerBy());
 }
 
 function init() {
   observer = new MutationObserver(mutations => {
     observer.disconnect();
+
+    const staggerMaker = (function*() {
+      let stagger = 0;
+      while (true) {
+        yield stagger;
+        stagger += config.staggerBy;
+      }
+    })();
+    const getStaggerBy = () => staggerMaker.next().value;
 
     const [addedNodes, removedNodes] = mutations
       .filter(({ type }) => type === "childList")
@@ -120,14 +136,14 @@ function init() {
         ([added, removed], curr) => {
           return [
             added.concat(
-              Array.from(curr.addedNodes).filter(
-                ({ nodeType }) => nodeType === 1
-              )
+              Array.from(curr.addedNodes)
+                .filter(({ nodeType }) => nodeType === 1)
+                .filter(config.enterFilter)
             ),
             removed.concat(
-              Array.from(curr.removedNodes).filter(
-                ({ nodeType }) => nodeType === 1
-              )
+              Array.from(curr.removedNodes)
+                .filter(({ nodeType }) => nodeType === 1)
+                .filter(config.exitFilter)
             )
           ];
         },
@@ -150,9 +166,9 @@ function init() {
       node => !mjuka.find(m => node === m.getElement())
     );
 
-    added.forEach(enterAnimation);
-    removed.forEach(exitAnimation);
-    updateElements(present);
+    removed.forEach(element => exitAnimation(element, getStaggerBy));
+    updateElements(present, getStaggerBy);
+    added.forEach(element => enterAnimation(element, getStaggerBy));
   });
 }
 
@@ -163,13 +179,15 @@ function reParent(nodes, parent) {
   return nodes;
 }
 
-function updateElements(activeMjuka) {
+function updateElements(activeMjuka, getStaggerBy) {
   const tree = activeMjuka
     .map(mjuk => Object.assign(mjuk, { mjuk, element: mjuk.getElement() }))
     .reduce((acc, mjuk) => buildTree(acc, mjuk), []);
   const flatTree = flatten(withRelativeValues(tree));
 
-  const animations = flatTree.map(FLIPScaleTranslate);
+  const animations = flatTree.map(mjuk =>
+    FLIPScaleTranslate(mjuk, getStaggerBy)
+  );
 
   mjuka = [];
   Promise.all(animations).then(completionResolver);
@@ -259,14 +277,9 @@ function translateScale(x, y, sX, sY) {
   return `translate(${x}px, ${y}px) scale(${sX}, ${sY}) `;
 }
 
-function FLIPScaleTranslate(mjuk, index) {
-  const {
-    parentScale,
-    element,
-    previousPosition,
-    newPosition,
-    config: { tension, deceleration, staggerBy }
-  } = mjuk;
+function FLIPScaleTranslate(mjuk, getStaggerBy) {
+  const { parentScale, element, previousPosition, newPosition } = mjuk;
+  const { tension, deceleration } = config;
   const xCenterDiff =
     previousPosition.left +
     previousPosition.width / 2 -
@@ -300,10 +313,8 @@ function FLIPScaleTranslate(mjuk, index) {
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 
-  const runner =
-    staggerBy === 0 ? fn => fn() : fn => setTimeout(fn, index * staggerBy);
   return new Promise(resolve => {
-    progress[1] = runner(() => {
+    progress[1] = maybeTimeout(() => {
       progress[2] = tween({
         from: [
           xCenterDiff,
@@ -330,6 +341,6 @@ function FLIPScaleTranslate(mjuk, index) {
         tension,
         deceleration
       });
-    });
+    }, getStaggerBy());
   });
 }
