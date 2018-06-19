@@ -6,7 +6,7 @@ const observeConfig = {
   attributes: true
 };
 const DEFAULT_TENSION = 0.1;
-const DEFAULT_DECELERATION = 0.75;
+const DEFAULT_DECELERATION = 0.6;
 
 const maybeTimeout = (fn, timeout) =>
   timeout === 0 ? fn() : setTimeout(fn, timeout);
