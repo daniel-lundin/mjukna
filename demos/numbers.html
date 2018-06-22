@@ -2,28 +2,31 @@
 <html>
   <head>
     <style>
-html,body {
+html, body {
   font: caption;
   height: 100%;
   margin: 0;
 }
+
 .container {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-    height: 100%;
+  height: 100%;
 }
 
 .detailed-number {
   flex: 1;
   background: rebeccapurple;
 }
+
 .detailed-number h1 {
   text-align: center;
   font-size: 72px;
 }
+
 .detailed-number h1 span {
   display: inline-block;
 }
@@ -42,6 +45,7 @@ html,body {
   background: green;
   font-size: 48px;
 }
+.cell span { display: inline-block; }
     </style>
   </head>
   <body>
@@ -49,12 +53,7 @@ html,body {
       <div class="detailed-number">
       </div>
     <div class="numbers">
-      <div class="cell"><span>1</span></div>
-      <div class="cell"><span>2</span></div>
-      <div class="cell"><span>3</span></div>
-      <div class="cell"><span>4</span></div>
-
-      <button class="cell" id="add-button">Add</button>
+      <button class="cell" id="add-button"><span>Add</span></button>
     </div>
     </div>
     <script src="./mjukna.js"></script>

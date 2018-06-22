@@ -94,6 +94,8 @@ function exitAnimation(mjuk, getStaggerBy) {
   const element = mjuk.getElement();
   document.body.appendChild(element);
   element.style.position = "absolute";
+  element.style.width = `${previousPosition.width}px`;
+  element.style.height = `${previousPosition.height}px`;
 
   const newPosition = element.getBoundingClientRect();
   const xDiff = newPosition.left - previousPosition.left;
