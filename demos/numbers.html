@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
     <style>
 html, body {
-  font: caption;
+  font-family: 'Montserrat', sans-serif;
   height: 100%;
   margin: 0;
 }
 
 .container {
+  position: relative;
   width: 100%;
-  max-width: 600px;
   margin: 0 auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100%;
 }
 
 .detailed-number {
   flex: 1;
-  background: rebeccapurple;
 }
 
 .detailed-number h1 {
@@ -33,28 +34,57 @@ html, body {
 
 .numbers {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 10px;
+  display: flex;
+  flex-direction: column;
+
 }
 
 .cell {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: green;
-  font-size: 48px;
+  font-size: 20vh;
 }
+.cell p {
+  font-size: 2vh;
+  margin: 2vw;
+}
+
 .cell span { display: inline-block; }
+.cell.active {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  width: 50%;
+  left: 0;
+  bottom: 0;
+  flex-direction: column;
+}
+
+.cell:nth-child(1) { background: #f47f69; }
+.cell:nth-child(2) { background: #0d1ac6; }
+.cell:nth-child(3) { background: #999446; }
+.cell:nth-child(4) { background: #7beaa9; }
+.cell:nth-child(5) { background: #6af578; }
+.cell:nth-child(6) { background: #2be3c8; }
+.cell:nth-child(7) { background: #fb6945; }
+.cell:nth-child(8) { background: #56d200; }
+.cell:nth-child(9) { background: #990c0c; }
+.cell:nth-child(10) { background: #4dab42; }
+
     </style>
   </head>
   <body>
     <div class="container">
       <div class="detailed-number">
       </div>
-    <div class="numbers">
-      <button class="cell" id="add-button"><span>Add</span></button>
-    </div>
+      <div class="numbers">
+        <div class="cell"><span>01</span></div>
+        <div class="cell"><span>02</span></div>
+        <div class="cell"><span>03</span></div>
+        <div class="cell"><span>04</span></div>
+      </div>
     </div>
     <script src="./mjukna.js"></script>
     <script src="./numbers.js"></script>
