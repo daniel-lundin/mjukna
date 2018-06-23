@@ -3,8 +3,20 @@
   <head>
     <style>
 
+body, html {
+  font: caption;
+}
     nav {
-      background: #232323;
+      background: #313131;
+    }
+    nav ul li {
+      font-size: 24px;
+      margin: 0 10px;
+    }
+
+    a {
+      color: #ccc;
+      text-transform: uppercase;
     }
 
     h1 {
@@ -71,7 +83,9 @@
     <nav class="initial">
       <img src="./m.png" alt="logo">
       <h1>mjukna</h1>
+      <p>Layout animations for the web</p>
       <button class="button button-primary" id="start">Dive in!</button>
+      <ul id="menu"></ul>
     </nav>
     <div class="container">
       <section id="intro">

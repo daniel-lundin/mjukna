@@ -16,7 +16,7 @@ function buildMenu() {
     ["#nesting", "Nesting"]
   ];
 
-  const ul = document.createElement("ul");
+  const ul = document.getElementById("menu");
   items.forEach(([anchor, title]) => {
     const li = document.createElement("li");
     const a = document.createElement("a");
@@ -25,7 +25,6 @@ function buildMenu() {
     li.appendChild(a);
     ul.appendChild(li);
   });
-  return ul;
 }
 
 function toggleMenu() {
@@ -43,8 +42,11 @@ function setupListeners() {
     nav.classList.remove("initial");
     nav.classList.add("docked");
     await animation;
-    mjukna([nav]);
-    nav.appendChild(buildMenu());
+    mjukna([nav], {
+      enterFilter: el => console.log("el", el) || true,
+      staggerBy: 40
+    });
+    buildMenu();
     img.addEventListener("click", toggleMenu);
   });
 }
