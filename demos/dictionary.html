@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700" rel="stylesheet">
+
+
+
+    <style>
+      html, body {
+        font-family: 'Lora', serif;
+        font-size: 22px;
+        line-height: 1.6;
+        color: #111;
+        background: #eee;
+      }
+
+      .container {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      strong {
+        font-weight: bold;
+      }
+      dialog {
+        max-width: 400px;
+        position: relative;
+        border: none;
+        transition: color 1s;
+        color: black;
+        background: transparent;
+        border: 1px solid #ccc;
+      }
+      dialog h5 {
+        font-size: 36px;
+        margin: 0;
+      }
+      dialog h5 span {
+        display: inline-block;
+      }
+
+      dialog .backdrop {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #eee;
+      }
+      dialog::backdrop {
+        background: none;
+      }
+      dialog p, dialog button, dialog h5 {
+        position: relative;
+        z-index: 1;
+      }
+      dialog strong {
+        display: inline-block;
+        font-weight: bold;
+        color: #111;
+      }
+      dialog h5 {
+        color: #111;
+      }
+      dialog.stealth {
+        color: transparent;
+      }
+      dialog.stealth button {
+        opacity: 0;
+      }
+      main strong {
+        cursor: pointer;
+      }
+      button {
+        padding: 10px 36px;
+        background: #111;
+        color: #eee;
+        font-family: 'Lora';
+        font-size: 22px;
+        transition: opacity 1s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <dialog class="stealth">
+        <div class="backdrop"></div>
+        <h5></h5>
+        <p></p>
+        <button>Close</button>
+      </dialog>
+      <main>
+      <h1>Fourier Transform</h1>
+      <p>The Fourier transform (FT) decomposes a <strong>function</strong> of time (a signal) into the frequencies that make it up, in a way similar to how a musical chord can be expressed as the frequencies (or pitches) of its constituent notes. The Fourier transform of a function of time is itself a complex-valued function of frequency, whose <strong>absolute value</strong> represents the amount of that frequency present in the original function, and whose complex argument is the phase offset of the basic sinusoid in that frequency.</p>
+      </p>The Fourier transform is called the frequency domain representation of the original signal. The term Fourier transform refers to both the frequency domain representation and the mathematical operation that associates the frequency domain representation to a function of time. The Fourier transform is not limited to functions of time, but in order to have a unified language, the domain of the original function is commonly referred to as the time domain. For many functions of practical interest, one can define an operation that reverses this: the inverse Fourier transformation, also called Fourier synthesis, of a frequency domain representation combines the contributions of all the different frequencies to recover the original function of time.
+      </main>
+    </div>
+    <script src="./mjukna.js"></script>
+    <script src="./dictionary.js"></script>
+  </body>
+</html>
+
+
+
+
