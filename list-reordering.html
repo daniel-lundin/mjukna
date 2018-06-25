@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+    <style>
+      html, body {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 22px;
+        line-height: 1.6;
+        color: #111;
+        background: #eee;
+      }
+
+      .container {
+        display: flex;
+      }
+
+      button {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 22px;
+        padding: 5px 20px;
+      }
+
+      h5 {
+        font-size: 48px;
+        margin: 0;
+        display: inline-block;
+      }
+      ul {
+        padding: 0;
+      }
+
+      ul li {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        background: #ffd960;
+        margin: 2px;
+        text-transform: uppercase;
+      }
+      li span {
+        display: inline-block;
+      }
+
+      #todo li {
+        padding: 12px;
+        font-size: 28px;
+      }
+
+      @media (max-width:700px) {
+        .container {
+          flex-direction: column;
+        }
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="list-container">
+        <h5>TODO</h5>
+        <div>
+          <button data-list="todo" class="sort">Sort</button>
+          <button data-list="todo" class="shuffle">Shuffle</button>
+        </div>
+        <ul id="todo">
+          <li><input type="checkbox"><span>Buy milk</span></li>
+          <li><input type="checkbox"><span>Repair watch</span></li>
+          <li><input type="checkbox"><span>Mow the lawn</span></li>
+          <li><input type="checkbox"><span>Work out</span></li>
+        </ul>
+      </div>
+      <div class="list-container">
+        <h5>DONE</h5>
+        <div>
+          <button data-list="done" class="sort">Sort</button>
+          <button data-list="done" class="shuffle">Shuffle</button>
+        </div>
+        <ul id="done">
+          <li><input type="checkbox" checked><span>Go on a walk.</span></li>
+          <li><input type="checkbox" checked><span>Organize something.</span></li>
+          <li><input type="checkbox" checked><span>Do laundry.</span></li>
+          <li><input type="checkbox" checked><span>Paint your nails</span></li>
+          <li><input type="checkbox" checked><span>Update your résumé</span></li>
+          <li><input type="checkbox" checked><span>Take a bubble bath</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="./mjukna.js"></script>
+    <script src="./list-reordering.js"></script>
+  </body>
+</html>
+
+
+
+
+
