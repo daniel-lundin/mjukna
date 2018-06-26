@@ -2,7 +2,7 @@ const { terser } = require("rollup-plugin-terser");
 const resolve = require("rollup-plugin-node-resolve");
 
 module.exports = {
-  input: "index.js",
+  input: "src/index.js",
   plugins: [
     process.env.MINIFY === "true" ? terser() : null,
     resolve({

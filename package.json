@@ -3,6 +3,7 @@
   "version": "0.2.2",
   "description": "animate layout changes",
   "main": "dist/main.js",
+  "source": "src/index.js",
   "browser": "dist/browser.js",
   "kuta": {
     "files": [
