@@ -1,4 +1,7 @@
 import tween from "spring-array";
+import { createMatrix } from "./matrix.js";
+
+const m = createMatrix();
 
 const observeConfig = {
   childList: true,
@@ -272,12 +275,6 @@ function flatten(tree, items = []) {
   });
   return items;
 }
-function translatedScale(x, y, sX, sY) {
-  return `translate(${-x}px, ${-y}px) scale(${sX}, ${sY}) translate(${x}px, ${y}px) `;
-}
-function translateScale(x, y, sX, sY) {
-  return `translate(${x}px, ${y}px) scale(${sX}, ${sY}) `;
-}
 
 function FLIPScaleTranslate(mjuk, getStaggerBy) {
   const { parentScale, element, previousPosition, newPosition } = mjuk;
@@ -298,19 +295,14 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
   const xForCenter = newPosition.left + newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2;
 
-  element.style.transform =
-    translatedScale(
-      xForCenter,
-      yForCenter,
-      1 / parentScale.x,
-      1 / parentScale.y
-    ) +
-    translateScale(
-      xCenterDiff,
-      yCenterDiff,
-      xScaleCompensation,
-      yScaleCompensation
-    );
+  element.style.transform = m
+    .clear()
+    .t(-xForCenter, -yForCenter)
+    .s(1 / parentScale.x, 1 / parentScale.y)
+    .t(xForCenter, yForCenter)
+    .t(xCenterDiff, yCenterDiff)
+    .s(xScaleCompensation, yScaleCompensation)
+    .css();
 
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
@@ -328,13 +320,14 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
         ],
         to: [0, 0, 1, 1, 1, 1],
         update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-          element.style.transform =
-            translatedScale(
-              xForCenter,
-              yForCenter,
-              1 / parentScaleX,
-              1 / parentScaleY
-            ) + translateScale(x, y, scaleX, scaleY);
+          element.style.transform = m
+            .clear()
+            .t(-xForCenter, -yForCenter)
+            .s(1 / parentScaleX, 1 / parentScaleY)
+            .t(xForCenter, yForCenter)
+            .t(x, y)
+            .s(scaleX, scaleY)
+            .css();
         },
         done() {
           element.style.transform = "";

@@ -12,7 +12,9 @@ feature("shared transitions", scenario => {
     browser = await puppeteer.launch();
   });
 
-  scenario.after(() => browser.close());
+  scenario.after(() => {
+    return browser.close();
+  });
 
   scenario(
     "using other element as origin",

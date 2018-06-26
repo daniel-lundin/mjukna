@@ -44,6 +44,8 @@ div {
 
 async function setupNewPage(browser) {
   const page = await browser.newPage();
+  page.on("console", msg => console.log("PAGE LOG:", msg.text()));
+
   const mjuknaCode = await getMjuknaCode();
   await page.evaluate(mjuknaCode);
   await injectHelpers(page);
