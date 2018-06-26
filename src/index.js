@@ -72,6 +72,7 @@ export default function mjukna(
 
 function enterAnimation(element, getStaggerBy) {
   element.style.opacity = 0;
+  element.style.willChange = "transform, opacity";
   element.style.transform = "scale(0.6)";
 
   maybeTimeout(() => {
@@ -103,6 +104,7 @@ function exitAnimation(mjuk, getStaggerBy) {
   const newPosition = element.getBoundingClientRect();
   const xDiff = newPosition.left - previousPosition.left;
   const yDiff = newPosition.top - previousPosition.top;
+  element.style.willChange = "transform, opacity";
   element.style.transform = `translate(${-xDiff}px, ${-yDiff}px)`;
 
   maybeTimeout(() => {
@@ -295,6 +297,7 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
   const xForCenter = newPosition.left + newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2;
 
+  element.style.willChange = "transform";
   element.style.transform = m
     .clear()
     .t(-xForCenter, -yForCenter)

@@ -85,9 +85,11 @@ export function createMatrix() {
       return this;
     },
     css() {
-      const m = `matrix(${data[0]}, ${data[1]}, ${data[3]}, ${data[4]}, ${
-        data[2]
-      }, ${data[5]})`;
+      const m = `matrix(${data[0].toFixed(5)}, ${data[1].toFixed(
+        5
+      )}, ${data[3].toFixed(5)}, ${data[4].toFixed(5)}, ${data[2].toFixed(
+        5
+      )}, ${data[5].toFixed(5)})`;
       return m;
     },
     clear() {
