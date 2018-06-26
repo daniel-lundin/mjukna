@@ -27,9 +27,9 @@ function setupListeners() {
   checkboxes.forEach(checkbox => {
     checkbox.addEventListener("change", event => {
       if (event.target.checked) {
-        markDone(checkbox.parentNode);
+        markDone(checkbox.closest("li"));
       } else {
-        markUndone(checkbox.parentNode);
+        markUndone(checkbox.closest("li"));
       }
     });
   });
