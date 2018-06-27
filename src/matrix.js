@@ -85,30 +85,15 @@ export function createMatrix() {
       return this;
     },
     css() {
-      const m = `matrix(${data[0].toFixed(5)}, ${data[1].toFixed(
+      return `matrix(${data[0].toFixed(5)}, ${data[1].toFixed(
         5
       )}, ${data[3].toFixed(5)}, ${data[4].toFixed(5)}, ${data[2].toFixed(
         5
       )}, ${data[5].toFixed(5)})`;
-      return m;
     },
     clear() {
       identity(data);
       return this;
-    },
-    d() {
-      return data;
     }
   };
 }
-
-// const m = createMatrix();
-// console.log(
-//   m
-//     .t(-10, -10)
-//     .s(1, 1)
-//     .t(10, 10)
-//     .css()
-// );
-//
-// matrix(1, 0, 100, 0, 1, 0, 0, 0, 1);
