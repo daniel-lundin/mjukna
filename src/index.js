@@ -1,5 +1,6 @@
 import tween from "spring-array";
 import { createMatrix } from "./matrix.js";
+import { getEntryAnimation } from "./presets.js";
 
 const m = createMatrix();
 
@@ -28,24 +29,20 @@ function enableObserver() {
   observer.observe(document, observeConfig);
 }
 
-export default function mjukna(
-  elements,
-  {
-    tension = DEFAULT_TENSION,
-    deceleration = DEFAULT_DECELERATION,
-    staggerBy = 0,
-    enterFilter = () => false,
-    exitFilter = () => false
-  } = {}
-) {
+const FALSE = () => false;
+
+export default function mjukna(elements, options = {}) {
   enableObserver();
   return new Promise(resolve => {
     completionResolver = resolve;
-    config.tension = tension;
-    config.deceleration = deceleration;
-    config.staggerBy = staggerBy;
-    config.enterFilter = enterFilter;
-    config.exitFilter = exitFilter;
+    config = {
+      tension: options.tension || DEFAULT_TENSION,
+      deceleration: options.deceleration || DEFAULT_DECELERATION,
+      staggerBy: options.staggerBy || 0,
+      enterFilter: options.enterFilter || FALSE,
+      exitFilter: options.exitFilter || FALSE,
+      enterAnimation: options.enterAnimation
+    };
 
     [].concat(elements).forEach(item => {
       // Stop any running animations for element
@@ -71,22 +68,17 @@ export default function mjukna(
 }
 
 function enterAnimation(element, getStaggerBy) {
-  element.style.opacity = 0;
   element.style.willChange = "transform, opacity";
-  element.style.transform = "scale(0.6)";
+  const animation = getEntryAnimation(config.enterAnimation, element);
+  animation.start();
+  //element.style.transform = "scale(0.6)";
 
   maybeTimeout(() => {
     tween({
-      from: [0, 0.4],
-      to: [1, 1],
-      update: ([opacity, scale]) => {
-        element.style.opacity = opacity;
-        element.style.transform = `scale(${scale})`;
-      },
-      done() {
-        element.style.opacity = 1;
-        element.style.transform = "";
-      },
+      from: animation.from,
+      to: animation.to,
+      update: animation.update,
+      done: animation.done,
       tension: DEFAULT_TENSION,
       deceleration: DEFAULT_DECELERATION
     });
@@ -128,14 +120,12 @@ function init() {
   observer = new MutationObserver(mutations => {
     observer.disconnect();
 
-    const staggerMaker = (function*() {
-      let stagger = 0;
-      while (true) {
-        yield stagger;
-        stagger += config.staggerBy;
-      }
-    })();
-    const getStaggerBy = () => staggerMaker.next().value;
+    let stagger = 0;
+    const getStaggerBy = () => {
+      const current = stagger;
+      stagger += config.staggerBy;
+      return current;
+    };
 
     const [addedNodes, removedNodes] = mutations
       .filter(({ type }) => type === "childList")

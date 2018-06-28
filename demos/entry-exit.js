@@ -2,8 +2,22 @@
 const addButton = document.getElementById("add");
 const removeButton = document.getElementById("remove");
 
+const enters = [
+  "squeeze",
+  "squeezeLeft",
+  "squeezeRight",
+  "squeezeBottom",
+  "squeezeTop",
+  "fade"
+];
+
+const randomEnter = () => enters[Math.floor(Math.random() * enters.length)];
+
 function makeItMjukna() {
-  mjukna([...document.querySelectorAll(".box"), addButton, removeButton]);
+  mjukna([...document.querySelectorAll(".box"), addButton, removeButton], {
+    enterFilter: () => true,
+    enterAnimation: randomEnter()
+  });
 }
 const colors = ["#AA3939", "#FFAAAA", "#D46A6A", "#801515", "#550000"];
 
