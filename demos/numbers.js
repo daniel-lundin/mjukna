@@ -12,7 +12,11 @@ function makeItMjukna() {
   const headings = [...document.querySelectorAll(".cell span")];
 
   return mjukna([...cells, ...headings], {
-    enterFilter: () => true
+    enterFilter: () => true,
+    spring: {
+      stiffness: 10,
+      damping: 0.5
+    }
   });
 }
 

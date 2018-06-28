@@ -1,6 +1,7 @@
 import tween from "spring-array";
 import { createMatrix } from "./matrix.js";
-import { getEntryAnimation } from "./presets.js";
+import { getEnterAnimation, getExitAnimation } from "./presets.js";
+import { buildTree, flatten, withRelativeValues } from "./whiteboard.js";
 
 const m = createMatrix();
 
@@ -9,8 +10,6 @@ const observeConfig = {
   subtree: true,
   attributes: true
 };
-const DEFAULT_TENSION = 0.1;
-const DEFAULT_DECELERATION = 0.6;
 
 const maybeTimeout = (fn, timeout) =>
   timeout === 0 ? fn() : setTimeout(fn, timeout);
@@ -36,12 +35,11 @@ export default function mjukna(elements, options = {}) {
   return new Promise(resolve => {
     completionResolver = resolve;
     config = {
-      tension: options.tension || DEFAULT_TENSION,
-      deceleration: options.deceleration || DEFAULT_DECELERATION,
+      spring: options.spring,
       staggerBy: options.staggerBy || 0,
       enterFilter: options.enterFilter || FALSE,
-      exitFilter: options.exitFilter || FALSE,
-      enterAnimation: options.enterAnimation
+      enterAnimation: options.enterAnimation,
+      exitAnimation: options.exitAnimation
     };
 
     [].concat(elements).forEach(item => {
@@ -69,19 +67,21 @@ export default function mjukna(elements, options = {}) {
 
 function enterAnimation(element, getStaggerBy) {
   element.style.willChange = "transform, opacity";
-  const animation = getEntryAnimation(config.enterAnimation, element);
+  const animation = getEnterAnimation(config.enterAnimation, element);
   animation.start();
-  //element.style.transform = "scale(0.6)";
 
   maybeTimeout(() => {
-    tween({
-      from: animation.from,
-      to: animation.to,
-      update: animation.update,
-      done: animation.done,
-      tension: DEFAULT_TENSION,
-      deceleration: DEFAULT_DECELERATION
-    });
+    tween(
+      Object.assign(
+        {
+          from: animation.from,
+          to: animation.to,
+          update: animation.update,
+          done: animation.end
+        },
+        config.spring
+      )
+    );
   }, getStaggerBy());
 }
 
@@ -97,22 +97,31 @@ function exitAnimation(mjuk, getStaggerBy) {
   const xDiff = newPosition.left - previousPosition.left;
   const yDiff = newPosition.top - previousPosition.top;
   element.style.willChange = "transform, opacity";
-  element.style.transform = `translate(${-xDiff}px, ${-yDiff}px)`;
+
+  const animation = getExitAnimation(
+    config.exitAnimation,
+    element,
+    xDiff,
+    yDiff
+  );
+
+  animation.end();
 
   maybeTimeout(() => {
-    tween({
-      from: [1, 1],
-      to: [0.3, 0],
-      update([scale, opacity]) {
-        element.style.transform = `translate(${-xDiff}px, ${-yDiff}px) scale(${scale})`;
-        element.style.opacity = opacity;
-      },
-      done() {
-        document.body.removeChild(element);
-      },
-      tension: DEFAULT_TENSION,
-      deceleration: DEFAULT_DECELERATION
-    });
+    tween(
+      Object.assign(
+        {
+          from: animation.to,
+          to: animation.from,
+          update: animation.update,
+          done() {
+            animation.start();
+            document.body.removeChild(element);
+          }
+        },
+        config.spring
+      )
+    );
   }, getStaggerBy());
 }
 
@@ -127,53 +136,24 @@ function init() {
       return current;
     };
 
-    const [addedNodes, removedNodes] = mutations
+    const addedNodes = mutations
       .filter(({ type }) => type === "childList")
-      .reduce(
-        ([added, removed], curr) => {
-          return [
-            added.concat(
-              Array.from(curr.addedNodes)
-                .filter(({ nodeType }) => nodeType === 1)
-                .filter(config.enterFilter)
-            ),
-            removed.concat(
-              Array.from(curr.removedNodes)
-                .filter(({ nodeType }) => nodeType === 1)
-                .filter(config.exitFilter)
-            )
-          ];
-        },
-        [[], []]
-      );
-
-    const [present, removed] = mjuka.reduce(
-      ([present, removed], mjuk) => {
-        const element = mjuk.getElement();
-
-        if (removedNodes.find(e => e === element)) {
-          return [present, removed.concat(mjuk)];
-        }
-        return [present.concat(mjuk), removed];
-      },
-      [[], []]
-    );
+      .map(mutation => Array.from(mutation.addedNodes))
+      .reduce((acc, curr) => acc.concat(curr), [])
+      .filter(({ nodeType }) => nodeType === 1)
+      .filter(e => config.enterFilter(e));
 
     const added = addedNodes.filter(
       node => !mjuka.find(m => node === m.getElement())
     );
 
+    const removed = mjuka.filter(mjuk => !mjuk.getElement().parentNode);
+    const present = mjuka.filter(mjuk => mjuk.getElement().parentNode);
+
     removed.forEach(element => exitAnimation(element, getStaggerBy));
     updateElements(present, getStaggerBy);
     added.forEach(element => enterAnimation(element, getStaggerBy));
   });
-}
-
-function reParent(nodes, parent) {
-  nodes.forEach(node => {
-    node.parent = parent;
-  });
-  return nodes;
 }
 
 function updateElements(activeMjuka, getStaggerBy) {
@@ -190,87 +170,8 @@ function updateElements(activeMjuka, getStaggerBy) {
   Promise.all(animations).then(completionResolver);
 }
 
-function buildTree(nodes, mjuk, parent) {
-  mjuk.element.style.transform = "";
-
-  const foundParent = nodes.find(node => {
-    return node.element.contains(mjuk.element);
-  });
-
-  if (foundParent) {
-    return nodes.map(node => {
-      if (node === foundParent) {
-        return Object.assign(node, {
-          parent,
-          children: buildTree(foundParent.children, mjuk, foundParent)
-        });
-      } else {
-        return node;
-      }
-    });
-  } else {
-    const elementChildren = nodes.filter(node =>
-      mjuk.element.contains(node.element)
-    );
-    const nonChildren = nodes.filter(
-      node => !mjuk.element.contains(node.element)
-    );
-
-    const me = Object.assign(mjuk, { parent, children: elementChildren });
-    reParent(me.children, me);
-    return [...nonChildren, me];
-  }
-}
-const relativeRect = (outer, inner) => ({
-  left: inner.left - outer.left,
-  top: inner.top - outer.top,
-  width: inner.width,
-  height: inner.height
-});
-
-function multipleScale(parent, current) {
-  const s = {
-    x: current.x * parent.x,
-    y: current.y * parent.y
-  };
-  return s;
-}
-
-function withRelativeValues(tree) {
-  return tree.map(node => {
-    const { previousPosition } = node;
-    const newPosition = node.element.getBoundingClientRect();
-    const scale = {
-      x: previousPosition.width / newPosition.width,
-      y: previousPosition.height / newPosition.height
-    };
-
-    node.newPosition = node.parent
-      ? relativeRect(node.parent.newPosition, newPosition)
-      : newPosition;
-    node.parentScale = node.parent
-      ? multipleScale(node.parent.scale, node.parent.parentScale)
-      : { x: 1, y: 1 };
-    node.scale = scale;
-    node.previousPosition = node.parent
-      ? relativeRect(node.parent.previousPosition, previousPosition)
-      : previousPosition;
-    node.children = withRelativeValues(node.children);
-    return node;
-  });
-}
-
-function flatten(tree, items = []) {
-  tree.forEach(n => {
-    items.push(n);
-    flatten(n.children, items);
-  });
-  return items;
-}
-
 function FLIPScaleTranslate(mjuk, getStaggerBy) {
   const { parentScale, element, previousPosition, newPosition } = mjuk;
-  const { tension, deceleration } = config;
   const xCenterDiff =
     previousPosition.left +
     previousPosition.width / 2 -
@@ -302,33 +203,36 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
 
   return new Promise(resolve => {
     progress[1] = maybeTimeout(() => {
-      progress[2] = tween({
-        from: [
-          xCenterDiff,
-          yCenterDiff,
-          xScaleCompensation,
-          yScaleCompensation,
-          parentScale.x,
-          parentScale.y
-        ],
-        to: [0, 0, 1, 1, 1, 1],
-        update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
-          element.style.transform = m
-            .clear()
-            .t(-xForCenter, -yForCenter)
-            .s(1 / parentScaleX, 1 / parentScaleY)
-            .t(xForCenter, yForCenter)
-            .t(x, y)
-            .s(scaleX, scaleY)
-            .css();
-        },
-        done() {
-          element.style.transform = "";
-          resolve();
-        },
-        tension,
-        deceleration
-      });
+      progress[2] = tween(
+        Object.assign(
+          {
+            from: [
+              xCenterDiff,
+              yCenterDiff,
+              xScaleCompensation,
+              yScaleCompensation,
+              parentScale.x,
+              parentScale.y
+            ],
+            to: [0, 0, 1, 1, 1, 1],
+            update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
+              element.style.transform = m
+                .clear()
+                .t(-xForCenter, -yForCenter)
+                .s(1 / parentScaleX, 1 / parentScaleY)
+                .t(xForCenter, yForCenter)
+                .t(x, y)
+                .s(scaleX, scaleY)
+                .css();
+            },
+            done() {
+              element.style.transform = "";
+              resolve();
+            }
+          },
+          config.spring
+        )
+      );
     }, getStaggerBy());
   });
 }

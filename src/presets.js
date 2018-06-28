@@ -1,7 +1,7 @@
 import { createMatrix } from "./matrix.js";
 const matrix = createMatrix();
 
-export function fadeIn(element) {
+function fadeIn(element) {
   return {
     from: [0, 0.8],
     to: [1, 1],
@@ -19,16 +19,26 @@ export function fadeIn(element) {
         .s(scale, scale)
         .css();
     },
-    done() {
+    end() {
       element.style.opacity = 1;
-      element.style.transform = "";
+      element.style.transform = matrix
+        .clear()
+        .s(1, 1)
+        .css();
     }
   };
 }
 
 function squeeze(
   element,
-  { xOffset = 0, yOffset = 0, xSqueeze = false, ySqueeze = false }
+  {
+    offsetX = 0,
+    offsetY = 0,
+    scaleOriginX = 0,
+    scaleOriginY = 0,
+    squeezeX = false,
+    squeezeY = false
+  }
 ) {
   return {
     from: [0],
@@ -36,50 +46,54 @@ function squeeze(
     start() {
       element.style.transform = matrix
         .clear()
-        .t(-xOffset, -yOffset)
-        .s(xSqueeze ? 0 : 1, ySqueeze ? 0 : 1)
-        .t(xOffset, yOffset)
+        .t(-offsetX, -offsetY)
+        .t(-scaleOriginX, -scaleOriginY)
+        .s(squeezeX ? 0 : 1, squeezeY ? 0 : 1)
+        .t(scaleOriginX, scaleOriginY)
         .css();
     },
     update([scale]) {
-      const css = matrix
+      element.style.transform = matrix
         .clear()
-        .t(-xOffset, -yOffset)
-        .s(xSqueeze ? scale : 1, ySqueeze ? scale : 1)
-        .t(xOffset, yOffset)
+        .t(-offsetX, -offsetY)
+        .t(-scaleOriginX, -scaleOriginY)
+        .s(squeezeX ? scale : 1, squeezeY ? scale : 1)
+        .t(scaleOriginX, scaleOriginY)
         .css();
-      element.style.transform = css;
     },
-    done() {
-      element.style.transform = "";
+    end() {
+      element.style.transform = matrix
+        .clear()
+        .t(-offsetX, -offsetY)
+        .css();
     }
   };
 }
 function squeezeInLeft(element) {
-  const xOffset = element.getBoundingClientRect().width / 2;
-  return squeeze(element, { xOffset, xSqueeze: true });
+  const scaleOriginX = element.getBoundingClientRect().width / 2;
+  return squeeze(element, { scaleOriginX, squeezeX: true });
 }
 
 function squeezeInRight(element) {
-  const xOffset = -element.getBoundingClientRect().width / 2;
-  return squeeze(element, { xOffset, xSqueeze: true });
+  const scaleOriginX = -element.getBoundingClientRect().width / 2;
+  return squeeze(element, { scaleOriginX, squeezeX: true });
 }
 
 function squeezeInTop(element) {
-  const yOffset = -element.getBoundingClientRect().height / 2;
-  return squeeze(element, { yOffset, ySqueeze: true });
+  const scaleOriginY = element.getBoundingClientRect().height / 2;
+  return squeeze(element, { scaleOriginY, squeezeY: true });
 }
 
 function squeezeInBottom(element) {
-  const yOffset = element.getBoundingClientRect().height / 2;
-  return squeeze(element, { yOffset, ySqueeze: true });
+  const scaleOriginY = -element.getBoundingClientRect().height / 2;
+  return squeeze(element, { scaleOriginY, squeezeY: true });
 }
 
 function squeezeIn(element) {
-  return squeeze(element, { xSqueeze: true, ySqueeze: true });
+  return squeeze(element, { squeezeX: true, squeezeY: true });
 }
 
-const entryPresets = {
+const enterPresets = {
   squeeze: squeezeIn,
   squeezeLeft: squeezeInLeft,
   squeezeRight: squeezeInRight,
@@ -88,6 +102,66 @@ const entryPresets = {
   fade: fadeIn
 };
 
-export function getEntryAnimation(name, element) {
-  return (entryPresets[name] || fadeIn)(element);
+function squeezeOut(element, offsetX, offsetY) {
+  return squeeze(element, {
+    offsetX,
+    offsetY,
+    squeezeX: true,
+    squeezeY: true
+  });
+}
+
+function squeezeOutLeft(element, offsetX, offsetY) {
+  const scaleOriginX = element.getBoundingClientRect().width / 2;
+  return squeeze(element, {
+    offsetX,
+    offsetY,
+    scaleOriginX,
+    squeezeX: true
+  });
+}
+function squeezeOutRight(element, offsetX, offsetY) {
+  const scaleOriginX = -element.getBoundingClientRect().width / 2;
+  return squeeze(element, {
+    offsetX,
+    offsetY,
+    scaleOriginX,
+    squeezeX: true
+  });
+}
+
+function squeezeOutTop(element, offsetX, offsetY) {
+  const scaleOriginY = element.getBoundingClientRect().height / 2;
+  return squeeze(element, {
+    offsetX,
+    offsetY,
+    scaleOriginY,
+    squeezeY: true
+  });
+}
+
+function squeezeOutBottom(element, offsetX, offsetY) {
+  const scaleOriginY = -element.getBoundingClientRect().height / 2;
+  return squeeze(element, {
+    offsetX,
+    offsetY,
+    scaleOriginY,
+    squeezeY: true
+  });
+}
+
+const exitPresets = {
+  squeeze: squeezeOut,
+  squeezeLeft: squeezeOutLeft,
+  squeezeRight: squeezeOutRight,
+  squeezeTop: squeezeOutTop,
+  squeezeBottom: squeezeOutBottom
+};
+
+export function getEnterAnimation(name, element) {
+  return (enterPresets[name] || fadeIn)(element);
+}
+
+export function getExitAnimation(name, element, offsetX, offsetY) {
+  return (exitPresets[name] || squeeze)(element, offsetX, offsetY);
 }

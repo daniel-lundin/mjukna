@@ -9,7 +9,11 @@ const descriptions = {
     "A <strong>chord</strong>, in music, is any harmonic set of pitches consisting of two or more (usually three or more) notes (also called pitches) that are heard as if sounding simultaneously"
 };
 
+const imageText =
+  "By wrapping each word in a span-tag we can animate an image going from static to float. Click the image above to toggle it between floating and static. Adding staggerBy will give the animation a more fluid feeling. All we're doing is toggling a class on the image element.";
+
 const dialog = document.querySelector("dialog");
+const main = document.querySelector("main");
 
 async function describeWord(anchor, word) {
   const animation = mjukna([
@@ -26,7 +30,8 @@ async function describeWord(anchor, word) {
   await animation;
   dialog.classList.remove("stealth");
 }
-function setupListeners() {
+
+function setup() {
   const words = document.querySelectorAll("strong");
 
   words.forEach(word => {
@@ -42,6 +47,21 @@ function setupListeners() {
     dialog.classList.add("hidden");
     dialog.classList.add("stealth");
   });
+
+  const paragraph = document.createElement("p");
+  imageText.split(" ").forEach(word => {
+    const span = document.createElement("span");
+    span.innerText = word;
+    paragraph.appendChild(span);
+    paragraph.appendChild(document.createTextNode(" "));
+  });
+  main.appendChild(paragraph);
+  document.querySelector("img").addEventListener("click", function() {
+    mjukna([...document.querySelectorAll("img, span")], {
+      staggerBy: 5
+    });
+    this.classList.toggle("float");
+  });
 }
 
-setupListeners();
+setup();
