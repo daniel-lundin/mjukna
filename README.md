@@ -23,15 +23,23 @@ mjukna([list,of,dom-elements], options);
 
 ### Enter/exit
 
-Mjukna keeps track of all elements that are added and removed from the DOM. If you want mjukna to do enter/exit transitions for them, set the appropriate `enterFilter` and/or `exitFilter`
+Mjukna keeps track of all elements that are added to the DOM. If you want mjukna to do enter transitions for them, set the appropriate `enterFilter`
 
 ```js
 
 mjukna([], {
   enterFilter: (element) => element.classList.contains('list-item'),
-  exitFilter: (element) => element.classList.contains('list-item'),
 })
 ```
+
+A predefined set of enter/exit animations are available through the by setting the `enterAnimation` and `exitAnimation` properties in options:
+
+ - squeeze
+ - squeezeLeft
+ - squeezeRight
+ - squeezeTop
+ - squeezeBottom
+
 
 This will animate all elements that has the class list-item
 
@@ -40,6 +48,13 @@ This will animate all elements that has the class list-item
 Elements that contain other elements will be distorted...
 
 ```js
-const all = document.querySelectorAll.bind(document);
-mjukna([...all('.list-item'), ...all('list-item-header')])
+mjukna([...document.qierySelectorAll('.list-item, .list-item-header'])
 ```
+
+### DEMOS (WIP)
+
+ - [numbers](https://daniel-lundin.github.io/mjukna/numbers.html)
+ - [typography](https://daniel-lundin.github.io/mjukna/dictionary.html)
+ - [list reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
+
+
