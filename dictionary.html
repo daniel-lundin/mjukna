@@ -59,7 +59,7 @@
       }
       dialog p, dialog button, dialog h5 {
         position: relative;
-        z-index: 1;
+        z-index: 2;
       }
       dialog strong {
         display: inline-block;
@@ -79,6 +79,9 @@
       dialog.stealth button {
         opacity: 0;
       }
+      main {
+        padding-bottom: 200px;
+      }
       main strong {
         cursor: pointer;
       }
@@ -90,21 +93,38 @@
         font-size: 22px;
         transition: opacity 1s;
       }
+
+      p span {
+        display: inline-block;
+      }
+
+      img {
+        position: relative;
+        z-index: 1;
+        width: 60%;
+        margin: 0 auto;
+      }
+      img.float {
+        float: left;
+        width: 30%;
+        margin: 10px;
+      }
     </style>
   </head>
   <body>
     <div class="container">
+      <main>
+        <h1>Fourier Transform</h1>
+        <p>The Fourier transform (FT) decomposes a <strong>function</strong> of time (a signal) into the frequencies that make it up, in a way similar to how a musical <strong>chord</strong> can be expressed as the frequencies (or pitches) of its constituent notes. The Fourier transform of a function of time is itself a complex-valued function of frequency, whose <strong>absolute value</strong> represents the amount of that frequency present in the original function, and whose complex argument is the phase offset of the basic sinusoid in that frequency.</p>
+        </p>
+        <img src="fourier.gif" alt="Fourier transform">
+      </main>
       <dialog open class="hidden stealth">
         <div class="backdrop"></div>
         <h5></h5>
         <p></p>
         <button>Close</button>
       </dialog>
-      <main>
-        <h1>Fourier Transform</h1>
-        <p>The Fourier transform (FT) decomposes a <strong>function</strong> of time (a signal) into the frequencies that make it up, in a way similar to how a musical <strong>chord</strong> can be expressed as the frequencies (or pitches) of its constituent notes. The Fourier transform of a function of time is itself a complex-valued function of frequency, whose <strong>absolute value</strong> represents the amount of that frequency present in the original function, and whose complex argument is the phase offset of the basic sinusoid in that frequency.</p>
-        </p>
-      </main>
     </div>
     <script src="./mjukna.js"></script>
     <script src="./dictionary.js"></script>
