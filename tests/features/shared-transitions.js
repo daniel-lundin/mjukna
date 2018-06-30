@@ -9,11 +9,10 @@ feature("shared transitions", scenario => {
   let browser;
 
   scenario.before(async () => {
-    browser = await puppeteer.launch({ headless: false });
+    browser = await puppeteer.launch();
   });
 
-  scenario.after(async () => {
-    await new Promise(resolve => setTimeout(resolve, 20000));
+  scenario.after(() => {
     return browser.close();
   });
 
