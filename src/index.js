@@ -44,9 +44,7 @@ export default function mjukna(elements, options = {}) {
 
     [].concat(elements).forEach(item => {
       // Stop any running animations for element
-      const getElement = item.anchor
-        ? item.element
-        : item.target ? () => item.element : () => item;
+      const getElement = item.anchor ? item.element : () => item;
       inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
         if (e === getElement()) {
           clearInterval(staggerTimer);
@@ -60,10 +58,6 @@ export default function mjukna(elements, options = {}) {
         previousPosition: item.anchor
           ? item.anchor.getBoundingClientRect()
           : getElement().getBoundingClientRect(),
-        previousParent: item.anchor
-          ? item.anchor.parentNode
-          : getElement().parentNode,
-        target: item.target,
         stop: () => {}
       };
       mjuka.push(mjuk);
@@ -96,67 +90,14 @@ function enterAnimation(element, getStaggerBy) {
   );
 }
 
-function targetedLeave(mjuk) {
-  const { target, previousPosition } = mjuk;
-  const element = mjuk.getElement();
-
-  const elementRect = element.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const baseOffsetX = previousPosition.left - elementRect.left;
-  const baseOffsetY = previousPosition.top - elementRect.top;
-
-  const xScale = targetRect.width / elementRect.width;
-  const yScale = targetRect.height / elementRect.height;
-  const xOffset =
-    targetRect.left +
-    targetRect.width / 2 -
-    (elementRect.left + elementRect.width / 2);
-  const yOffset =
-    targetRect.top +
-    targetRect.height / 2 -
-    (elementRect.top + elementRect.height / 2);
-
-  element.style.transform = m
-    .clear()
-    .t(-baseOffsetX, -baseOffsetY)
-    .css();
-
-  return new Promise(resolve =>
-    tween(
-      Object.assign(
-        {
-          from: [0, 0, 1, 1],
-          to: [xOffset, yOffset, xScale, yScale],
-          update([x, y, sx, sy]) {
-            element.style.transform = m
-              .clear()
-              .t(-baseOffsetX, -baseOffsetY)
-              .t(x, y)
-              .s(sx, sy)
-              .css();
-          },
-          done() {
-            element.parentNode.removeChild(element);
-            resolve();
-          }
-        },
-        config.spring
-      )
-    )
-  );
-}
-
 function exitAnimation(mjuk, getStaggerBy) {
   const { previousPosition } = mjuk;
   const element = mjuk.getElement();
-  mjuk.previousParent.appendChild(element);
+  document.body.appendChild(element);
   element.style.position = "absolute";
   element.style.width = `${previousPosition.width}px`;
   element.style.height = `${previousPosition.height}px`;
 
-  if (mjuk.target) {
-    return targetedLeave(mjuk);
-  }
   const newPosition = element.getBoundingClientRect();
   const xDiff = newPosition.left - previousPosition.left;
   const yDiff = newPosition.top - previousPosition.top;
@@ -181,7 +122,7 @@ function exitAnimation(mjuk, getStaggerBy) {
             update: animation.update,
             done() {
               animation.start();
-              mjuk.previousParent.removeChild(element);
+              document.body.removeChild(element);
               resolve();
             }
           },
