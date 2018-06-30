@@ -4,9 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link href="https://fonts.googleapis.com/css?family=Lora:400,700" rel="stylesheet">
-
-
-
     <style>
       html, body {
         font-family: 'Lora', serif;
@@ -21,13 +18,15 @@
         max-width: 600px;
         margin: 0 auto;
       }
+
       strong {
         font-weight: bold;
       }
+
       dialog {
-        max-width: 250px;
-        position: fixed;
-        top: 20%;
+        max-width: 80%;
+        position: absolute;
+        top: 10%;
         left: 0;
         right: 0;
         margin: 0 auto;
@@ -42,6 +41,7 @@
         font-size: 36px;
         margin: 0;
       }
+
       dialog h5 span {
         display: inline-block;
       }
@@ -54,28 +54,38 @@
         right: 0;
         background: #eee;
       }
+
       dialog::backdrop {
         background: none;
       }
+
       dialog p, dialog button, dialog h5 {
         position: relative;
         z-index: 2;
       }
+
       dialog strong {
         display: inline-block;
         font-weight: bold;
         color: #111;
       }
+
       dialog h5 {
         color: #111;
       }
+
       dialog.hidden {
         display: none;
       }
+
       dialog.stealth {
-        color: transparent;
-        border: none;
+        border: 1px solid transparent;
       }
+
+      dialog.stealth p {
+        color: transparent;
+      }
+
       dialog.stealth button {
         opacity: 0;
       }
@@ -106,8 +116,8 @@
       }
       img.float {
         float: left;
-        width: 30%;
-        margin: 10px;
+        width: 50%;
+        margin: 0 10px 10px 0;
       }
     </style>
   </head>
@@ -118,13 +128,13 @@
         <p>The Fourier transform (FT) decomposes a <strong>function</strong> of time (a signal) into the frequencies that make it up, in a way similar to how a musical <strong>chord</strong> can be expressed as the frequencies (or pitches) of its constituent notes. The Fourier transform of a function of time is itself a complex-valued function of frequency, whose <strong>absolute value</strong> represents the amount of that frequency present in the original function, and whose complex argument is the phase offset of the basic sinusoid in that frequency.</p>
         </p>
         <img src="fourier.gif" alt="Fourier transform">
+        <dialog open class="hidden stealth">
+          <div class="backdrop"></div>
+          <h5></h5>
+          <p></p>
+          <button>Close</button>
+        </dialog>
       </main>
-      <dialog open class="hidden stealth">
-        <div class="backdrop"></div>
-        <h5></h5>
-        <p></p>
-        <button>Close</button>
-      </dialog>
     </div>
     <script src="./mjukna.js"></script>
     <script src="./dictionary.js"></script>

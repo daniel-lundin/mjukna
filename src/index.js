@@ -44,7 +44,9 @@ export default function mjukna(elements, options = {}) {
 
     [].concat(elements).forEach(item => {
       // Stop any running animations for element
-      const getElement = item.anchor ? item.element : () => item;
+      const getElement = item.anchor
+        ? item.element
+        : item.target ? () => item.element : () => item;
       inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
         if (e === getElement()) {
           clearInterval(staggerTimer);
@@ -56,8 +58,12 @@ export default function mjukna(elements, options = {}) {
       const mjuk = {
         getElement,
         previousPosition: item.anchor
-          ? item.anchor().getBoundingClientRect()
+          ? item.anchor.getBoundingClientRect()
           : getElement().getBoundingClientRect(),
+        previousParent: item.anchor
+          ? item.anchor.parentNode
+          : getElement().parentNode,
+        target: item.target,
         stop: () => {}
       };
       mjuka.push(mjuk);
@@ -70,29 +76,87 @@ function enterAnimation(element, getStaggerBy) {
   const animation = getEnterAnimation(config.enterAnimation, element);
   animation.start();
 
-  maybeTimeout(() => {
+  return new Promise(resolve =>
+    maybeTimeout(() => {
+      tween(
+        Object.assign(
+          {
+            from: animation.from,
+            to: animation.to,
+            update: animation.update,
+            done: () => {
+              animation.end();
+              resolve();
+            }
+          },
+          config.spring
+        )
+      );
+    }, getStaggerBy())
+  );
+}
+
+function targetedLeave(mjuk) {
+  const { target, previousPosition } = mjuk;
+  const element = mjuk.getElement();
+
+  const elementRect = element.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const baseOffsetX = previousPosition.left - elementRect.left;
+  const baseOffsetY = previousPosition.top - elementRect.top;
+
+  const xScale = targetRect.width / elementRect.width;
+  const yScale = targetRect.height / elementRect.height;
+  const xOffset =
+    targetRect.left +
+    targetRect.width / 2 -
+    (elementRect.left + elementRect.width / 2);
+  const yOffset =
+    targetRect.top +
+    targetRect.height / 2 -
+    (elementRect.top + elementRect.height / 2);
+
+  element.style.transform = m
+    .clear()
+    .t(-baseOffsetX, -baseOffsetY)
+    .css();
+
+  return new Promise(resolve =>
     tween(
       Object.assign(
         {
-          from: animation.from,
-          to: animation.to,
-          update: animation.update,
-          done: animation.end
+          from: [0, 0, 1, 1],
+          to: [xOffset, yOffset, xScale, yScale],
+          update([x, y, sx, sy]) {
+            element.style.transform = m
+              .clear()
+              .t(-baseOffsetX, -baseOffsetY)
+              .t(x, y)
+              .s(sx, sy)
+              .css();
+          },
+          done() {
+            element.parentNode.removeChild(element);
+            resolve();
+          }
         },
         config.spring
       )
-    );
-  }, getStaggerBy());
+    )
+  );
 }
 
 function exitAnimation(mjuk, getStaggerBy) {
   const { previousPosition } = mjuk;
   const element = mjuk.getElement();
-  document.body.appendChild(element);
+  mjuk.previousParent.appendChild(element);
   element.style.position = "absolute";
   element.style.width = `${previousPosition.width}px`;
   element.style.height = `${previousPosition.height}px`;
 
+  if (mjuk.target) {
+    return targetedLeave(mjuk);
+  }
   const newPosition = element.getBoundingClientRect();
   const xDiff = newPosition.left - previousPosition.left;
   const yDiff = newPosition.top - previousPosition.top;
@@ -107,22 +171,25 @@ function exitAnimation(mjuk, getStaggerBy) {
 
   animation.end();
 
-  maybeTimeout(() => {
-    tween(
-      Object.assign(
-        {
-          from: animation.to,
-          to: animation.from,
-          update: animation.update,
-          done() {
-            animation.start();
-            document.body.removeChild(element);
-          }
-        },
-        config.spring
-      )
-    );
-  }, getStaggerBy());
+  return new Promise(resolve =>
+    maybeTimeout(() => {
+      tween(
+        Object.assign(
+          {
+            from: animation.to,
+            to: animation.from,
+            update: animation.update,
+            done() {
+              animation.start();
+              mjuk.previousParent.removeChild(element);
+              resolve();
+            }
+          },
+          config.spring
+        )
+      );
+    }, getStaggerBy())
+  );
 }
 
 function init() {
@@ -136,8 +203,11 @@ function init() {
       return current;
     };
 
-    const addedNodes = mutations
-      .filter(({ type }) => type === "childList")
+    const childListMutations = mutations.filter(
+      ({ type }) => type === "childList"
+    );
+
+    const addedNodes = childListMutations
       .map(mutation => Array.from(mutation.addedNodes))
       .reduce((acc, curr) => acc.concat(curr), [])
       .filter(({ nodeType }) => nodeType === 1)
@@ -150,9 +220,12 @@ function init() {
     const removed = mjuka.filter(mjuk => !mjuk.getElement().parentNode);
     const present = mjuka.filter(mjuk => mjuk.getElement().parentNode);
 
-    removed.forEach(element => exitAnimation(element, getStaggerBy));
-    updateElements(present, getStaggerBy);
-    added.forEach(element => enterAnimation(element, getStaggerBy));
+    Promise.all(
+      []
+        .concat(removed.map(mjuk => exitAnimation(mjuk, getStaggerBy)))
+        .concat(updateElements(present, getStaggerBy))
+        .concat(added.map(element => enterAnimation(element, getStaggerBy)))
+    ).then(completionResolver);
   });
 }
 
@@ -167,11 +240,11 @@ function updateElements(activeMjuka, getStaggerBy) {
   );
 
   mjuka = [];
-  Promise.all(animations).then(completionResolver);
+  return Promise.all(animations);
 }
 
 function FLIPScaleTranslate(mjuk, getStaggerBy) {
-  const { parentScale, element, previousPosition, newPosition } = mjuk;
+  const { parentScale, element, scale, previousPosition, newPosition } = mjuk;
   const xCenterDiff =
     previousPosition.left +
     previousPosition.width / 2 -
@@ -182,8 +255,8 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
     previousPosition.height / 2 -
     (newPosition.top + newPosition.height / 2);
 
-  const xScaleCompensation = mjuk.scale.x;
-  const yScaleCompensation = mjuk.scale.y;
+  const xScaleCompensation = scale.x;
+  const yScaleCompensation = scale.y;
 
   const xForCenter = newPosition.left + newPosition.width / 2;
   const yForCenter = newPosition.top + newPosition.height / 2;

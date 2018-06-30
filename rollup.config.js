@@ -4,7 +4,7 @@ const resolve = require("rollup-plugin-node-resolve");
 module.exports = {
   input: "src/index.js",
   plugins: [
-    process.env.MINIFY === "true" ? terser() : null,
+    // process.env.MINIFY === "true" ? terser() : null,
     resolve({
       module: true,
       preferBuiltins: false,

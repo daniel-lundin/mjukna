@@ -6,7 +6,7 @@ const descriptions = {
   "absolute value":
     "The <strong>absolute value</strong> or modulus |x| of a real number x is the non-negative value of x without regard to its sign.",
   chord:
-    "A <strong>chord</strong>, in music, is any harmonic set of pitches consisting of two or more (usually three or more) notes (also called pitches) that are heard as if sounding simultaneously"
+    "A <strong>chord</strong>, in music, is any harmonic set of pitches consisting of two or more (usually three or more) notes (also called pitches) that are heard as if sounding simultaneously."
 };
 
 const imageText =
@@ -15,12 +15,31 @@ const imageText =
 const dialog = document.querySelector("dialog");
 const main = document.querySelector("main");
 
+let _transitionResolver;
+let dialogTransition = new Promise(resolve => {
+  _transitionResolver = resolve;
+});
+
+dialog.addEventListener("transitionend", () => {
+  _transitionResolver();
+
+  dialogTransition = new Promise(resolve => {
+    _transitionResolver = resolve;
+  });
+});
+
+let currentWord;
+
 async function describeWord(anchor, word) {
+  if (currentWord) return;
+
+  currentWord = anchor;
+  dialog.classList.add("stealth");
   const animation = mjukna([
-    { anchor: () => anchor, element: () => dialog.querySelector("strong") },
-    { anchor: () => anchor, element: () => dialog.querySelector("h5 span") },
+    { anchor, element: () => dialog.querySelector("strong") },
+    { anchor, element: () => dialog.querySelector("h5 span") },
     {
-      anchor: () => anchor,
+      anchor,
       element: () => dialog.querySelector(".backdrop")
     }
   ]);
@@ -43,9 +62,9 @@ function setup() {
     });
   });
 
-  dialog.querySelector("button").addEventListener("click", () => {
+  dialog.querySelector("button").addEventListener("click", async () => {
     dialog.classList.add("hidden");
-    dialog.classList.add("stealth");
+    currentWord = null;
   });
 
   const paragraph = document.createElement("p");
