@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+
+body, html {
+  font: caption;
+}
+    nav {
+      background: whitesmoke;
+      text-transform: uppercase;
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+    }
+    nav ul li {
+      font-size: 18px;
+      margin: 0 10px;
+      display: block;
+    }
+    span {
+      display: inline-block;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 30px;
+    }
+
+    nav {
+      width: 200px;
+      margin: 10px;
+      padding: 5px;
+      flex-direction: column;
+      align-items: center;
+      display: flex;
+    }
+
+    nav.fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      width: 100%;
+      margin: 0;
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    nav.fixed li {
+      display: inline-block;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      margin-top: 60px;
+      display: flex;
+    }
+
+    button {
+      background: none;
+      border: 2px solid moccasin;
+      border-radius: 6px;
+      color: moccasin;
+      padding: 5px 10px;
+      font-size: 24px;
+
+    }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="fixed">
+        <h1><span>mjukna</span></h1>
+        <ul id="menu">
+          <li><span>INTRO</span></li>
+          <li><span>API</span></li>
+          <li><span>CONTACT</span></li>
+        </ul>
+      </nav>
+      <main id="intro">
+        <h2><span>Introduction</span></h2>
+        <p><span>This</span> <span>example</span> <span>is</span> <span>made</span> <span>possible</span> <span>with</span> <span>4</span> <span>lines</span> <span>of</span> <span>code</span></p>
+        <button id="toggle">Toggle</button>
+      </main>
+    </div>
+    <script src="./mjukna.js"></script>
+    <script src="./nav.js"></script>
+  </body>
+</html>
+
+
+
+
+
