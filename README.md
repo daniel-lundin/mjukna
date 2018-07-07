@@ -72,6 +72,7 @@ mjukna([...document.qierySelectorAll('.list-item, .list-item-header'])
 ### DEMOS (WIP)
 
  - [numbers](https://daniel-lundin.github.io/mjukna/numbers.html)
+ - [guitars](https://daniel-lundin.github.io/mjukna/guitars.html)
  - [typography](https://daniel-lundin.github.io/mjukna/dictionary.html)
  - [list reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 
