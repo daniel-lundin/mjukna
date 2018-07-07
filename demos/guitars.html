@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
+    <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    body, html {
+      font: caption;
+    }
+
+    h1 {
+      margin: 10px 0;
+      text-align: center;
+    }
+    h2 {
+      font-family: 'Playfair Display';
+      font-size: 28px;
+    }
+    h3 {
+      color: #a09897;
+      transition: color 0.1s;
+    }
+    span {
+      display: inline-block;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 30vh 0;
+      grid-column-gap: 10px;
+      grid-row-gap: 50px;
+    }
+
+    .grid-item {
+      height: 50vh;
+    }
+    .product {
+      position: relative;
+    }
+    .product:hover {
+      cursor: pointer;
+    }
+
+    .product:hover h3 {
+      color: #d35066;
+    }
+
+    .grid-item img {
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      margin-left: -25%;
+      max-height: 45vh;
+    }
+
+    .grid-item .background {
+      height: 30vh;
+      background-color: #f5f0ef;
+    }
+    .grid-item:nth-child(2n) .product {
+      margin-top: 20%;
+    }
+
+    .detail-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+    }
+
+    .detail-view .header {
+      position: relative;
+      flex: 2;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .detail-view .header span {
+      z-index: 1;
+      position: relative;
+      font-size: 72px;
+      margin-left: 10vh;
+    }
+    .detail-view .close {
+      position: absolute;
+      top: 5vh;
+      right: 5vh;
+      font-size: 26px;
+      cursor: pointer;
+      font-family: 'Playfair Display';
+    }
+
+    .detail-view .content {
+      flex: 3;
+      background-color: #f5f0ef;
+      display: flex;
+			flex-direction: column;
+			padding-left: 10vh;
+			justify-content: space-evenly;
+
+    }
+
+    .detail-view .content h3 {
+			transition: color 0.3s;
+      font-size: 28px;
+      color: #f5f0ef;
+    }
+    .detail-view.active .content h3 {
+			color: #000;
+		}
+
+    .detail-view .content .price {
+			transition: color 0.3s;
+      color: #f5f0ef;
+			font-size: 48px;
+		}
+
+    .detail-view.active .content .price {
+      color: #d35066;
+    }
+
+    .detail-view .content .description {
+			transition: color 0.3s;
+      width: 50vh;
+			font-size: 24px;
+      color: #f5f0ef;
+    }
+    .detail-view.active .content .description {
+      color: black;
+		}
+
+    .detail-view img {
+      position: absolute;
+      height: 80vh;
+      right: 10vh;
+      top: 10vh;
+    }
+
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      <h1>Guitars</h1>
+      <div class="grid">
+      </div>
+    </div>
+    <script src="./mjukna.js"></script>
+    <script src="./guitardata.js"></script>
+    <script src="./dom-helpers.js"></script>
+    <script src="./guitars.js"></script>
+  </body>
+</html>
+
+
+
