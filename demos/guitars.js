@@ -29,12 +29,12 @@ function onProductClick(index) {
   const detailView = h.div({ class: "detail-view" }, [
     h.div({ class: "header" }, [
       h.h2({}, h.span({}, guitar.title)),
-      h.div({ class: "close", onClick: () => onDetailClose(index) }, "X")
+      h.button({ class: "close", onClick: () => onDetailClose(index) }, "X")
     ]),
     h.div({ class: "content" }, [
       h.h3({}, guitar.subtitle),
       h.div({ class: "price" }, `$${guitar.price}`),
-      h.div({ class: "description" }, guitar.description)
+      h.p({ class: "description" }, guitar.description)
     ]),
     h.img({
       src: guitar.img,

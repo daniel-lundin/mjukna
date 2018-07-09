@@ -9,6 +9,10 @@
       margin: 0;
     }
 
+		:root {
+			--background-color: #f5f0ef;
+		}
+
     body, html {
       font: caption;
     }
@@ -20,11 +24,18 @@
     h2 {
       font-family: 'Playfair Display';
       font-size: 28px;
+			margin: 8px 0 4px;
     }
     h3 {
       color: #a09897;
       transition: color 0.1s;
     }
+    p.info {
+      text-align: center;
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
     span {
       display: inline-block;
     }
@@ -39,7 +50,8 @@
       grid-template-columns: 1fr 1fr;
       padding: 30vh 0;
       grid-column-gap: 10px;
-      grid-row-gap: 50px;
+      grid-row-gap: 80px;
+			margin: 0 2vw;
     }
 
     .grid-item {
@@ -98,36 +110,45 @@
     }
     .detail-view .close {
       position: absolute;
-      top: 5vh;
-      right: 5vh;
+      top: 5vh; right: 5vh;
       font-size: 26px;
       cursor: pointer;
+			z-index: 2;
       font-family: 'Playfair Display';
+      width: 40px;
+      height: 40px;
+      background: black;
+      color: white;
+      border-radius: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .detail-view .content {
       flex: 3;
-      background-color: #f5f0ef;
-      display: flex;
-			flex-direction: column;
+      background-color: var(--background-color);
 			padding-left: 10vh;
-			justify-content: space-evenly;
-
     }
 
     .detail-view .content h3 {
 			transition: color 0.3s;
       font-size: 28px;
-      color: #f5f0ef;
+      color: var(--background-color);
+			letter-spacing: 3px;
+			margin: 20px 0;
     }
+
     .detail-view.active .content h3 {
 			color: #000;
 		}
 
     .detail-view .content .price {
 			transition: color 0.3s;
-      color: #f5f0ef;
+      color: var(--background-color);
 			font-size: 48px;
+			margin: 40px 0;
+			font-weight: bold;
 		}
 
     .detail-view.active .content .price {
@@ -137,8 +158,9 @@
     .detail-view .content .description {
 			transition: color 0.3s;
       width: 50vh;
-			font-size: 24px;
-      color: #f5f0ef;
+			font-size: 18px;
+			font-weight: bold;
+      color: var(--background-color);
     }
     .detail-view.active .content .description {
       color: black;
@@ -151,12 +173,49 @@
       top: 10vh;
     }
 
+		@media screen and (max-width: 700px) {
+
+ 			h2 {
+				font-size: 18px;
+			}
+
+ 			h3 {
+				font-size: 12px;
+  			letter-spacing: 2px;
+			}
+			.detail-view .header span {
+				font-size: 32px;
+				margin-left: 3vh;
+			}
+
+			.detail-view .content {
+				padding-left: 3vh;
+			}
+
+			.detail-view .content h3 {
+				font-size: 20px;
+			}
+
+			.detail-view .content .price {
+				font-size: 28px;
+			}
+    .detail-view .content .description {
+      width: 70%;
+			font-size: 16px;
+			font-weight: bold;
+    }
+			.detail-view img {
+				right: -20vw;
+			}
+		}
     </style>
   </head>
   <body>
 
     <div class="container">
-      <h1>Guitars</h1>
+      <h1>Shared element transitions</h1>
+      <p class="info">Loosely based on the Dribbble shot <a href="https://dribbble.com/shots/3879463-Surf-Project">Surf Project</a> by <a href="https://dribbble.com/filipslovacek">Filip Slováček</a>.</p>
+      <p class="info"><a href="guitars.js">View source</a></p>
       <div class="grid">
       </div>
     </div>
