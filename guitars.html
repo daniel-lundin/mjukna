@@ -14,7 +14,9 @@
 		}
 
     body, html {
-      font: caption;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
     }
 
     h1 {
@@ -24,12 +26,17 @@
     h2 {
       font-family: 'Playfair Display';
       font-size: 28px;
+      font-weight: bold;
 			margin: 8px 0 4px;
     }
+
     h3 {
       color: #a09897;
       transition: color 0.1s;
+      letter-spacing: 1px;
+      font-size: 14px;
     }
+
     p.info {
       text-align: center;
       font-size: 18px;
@@ -174,7 +181,6 @@
     }
 
 		@media screen and (max-width: 700px) {
-
  			h2 {
 				font-size: 18px;
 			}
@@ -214,7 +220,7 @@
 
     <div class="container">
       <h1>Shared element transitions</h1>
-      <p class="info">Loosely based on the Dribbble shot <a href="https://dribbble.com/shots/3879463-Surf-Project">Surf Project</a> by <a href="https://dribbble.com/filipslovacek">Filip Slováček</a>.</p>
+      <p class="info">Loosely based on codrops' <a href="https://tympanus.net/codrops/2017/11/08/expanding-grid-item-animation/">Expanding Grid Item Animation</a></p>
       <p class="info"><a href="guitars.js">View source</a></p>
       <div class="grid">
       </div>
