@@ -22,7 +22,7 @@ function createElement(type, props, children) {
 
   return element;
 }
-const tags = ["div", "img", "span", "h1", "h2", "h3"];
+const tags = ["p", "div", "img", "span", "h1", "h2", "h3", "button"];
 const h = tags.reduce((acc, tag) => {
   return Object.assign(acc, {
     [tag]: (props, children = []) => createElement(tag, props, children)
