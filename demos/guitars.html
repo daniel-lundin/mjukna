@@ -64,6 +64,9 @@
     .grid-item {
       height: 50vh;
     }
+    .grid-item.motion {
+      z-index: 1;
+    }
     .product {
       position: relative;
     }
@@ -83,6 +86,10 @@
       max-height: 45vh;
     }
 
+    .grid-item .placeholder {
+      height: 1vh;
+      background: white;
+    }
     .grid-item .background {
       height: 30vh;
       background-color: #f5f0ef;
@@ -99,14 +106,15 @@
       bottom: 0;
       display: flex;
       flex-direction: column;
-      background-color: white;
     }
 
     .detail-view .header {
       position: relative;
+      z-index: 3;
       flex: 2;
       display: flex;
       align-items: flex-end;
+      background-color: white;
     }
 
     .detail-view .header span {
@@ -115,6 +123,7 @@
       font-size: 72px;
       margin-left: 10vh;
     }
+
     .detail-view .close {
       position: absolute;
       top: 5vh; right: 5vh;
@@ -178,6 +187,7 @@
       height: 80vh;
       right: 10vh;
       top: 10vh;
+      z-index: 4;
     }
 
 		@media screen and (max-width: 700px) {
