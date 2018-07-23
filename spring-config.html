@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+      body {
+        font-size: 30px;
+        background: whitesmoke;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      button {
+        font-size: 24px;
+        display: block;
+        padding: 10px;
+        background: #0ea5cc;
+        margin: 10px 0;
+        border: none;
+      }
+
+      form > div {
+        margin: 10px 0;
+      }
+
+      label {
+        display: block;
+      }
+
+      input {
+        display: block;
+        font-size: 24px;
+      }
+
+      button span {
+        display: inline-block;
+      }
+
+      button.big {
+        padding: 40px 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <h1>Spring tester</h1>
+      <div>
+        <label for="stiffness">Stiffness</label>
+        <input id="stiffness" type="number" step="1" value="30">
+      </div>
+      <div>
+        <label for="damping">Damping</label>
+        <input id="damping" type="number" step="0.1" value="0.5">
+      </div>
+      <button><span>Test</span></button>
+    </form>
+    <script src="./mjukna.js"></script>
+    <script src="./spring-config.js"></script>
+  </body>
+</html>
+
+
+
+
