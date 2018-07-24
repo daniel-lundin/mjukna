@@ -33,7 +33,7 @@ async function injectHelpers(page) {
   });
 
   const css = `
-div {
+p,div {
   width: 100px;
   height: 100px;
   color: rebeccapurple;

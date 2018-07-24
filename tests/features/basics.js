@@ -24,12 +24,10 @@ feature("basics", scenario => {
 
     given("a paragraph element", async () => {
       scope.initialPosition = await page.evaluate(() => {
-        const p = document.createElement("p");
-        p.style.height = "100px";
-        p.style.background = "red";
-        document.body.appendChild(p);
-        mjukna([p]);
-        return Promise.resolve(dumpClientRect(p));
+        const div = document.createElement("div");
+        document.body.appendChild(div);
+        mjukna(div);
+        return Promise.resolve(dumpClientRect(div));
       });
     });
 
@@ -38,10 +36,10 @@ feature("basics", scenario => {
         const h1 = document.createElement("h1");
         h1.innerText = "A heading";
         document.body.prepend(h1);
-        const p = document.querySelector("p");
+        const div = document.querySelector("div");
 
         return new Promise(resolve => {
-          requestAnimationFrame(() => resolve(dumpClientRect(p)));
+          requestAnimationFrame(() => resolve(dumpClientRect(div)));
         });
       });
     });
@@ -52,7 +50,7 @@ feature("basics", scenario => {
 
     and("eventually move into it's new position", async () => {
       await page.waitForFunction(() => {
-        return elementStill(document.querySelector("p"));
+        return elementStill(document.querySelector("div"));
       });
     });
   });
@@ -70,9 +68,6 @@ feature("basics", scenario => {
         for (let i = 0; i < 3; ++i) {
           const div = document.createElement("div");
           div.style.display = "inline-block";
-          div.style.width = "100px";
-          div.style.height = "100px";
-          div.style.background = "red";
           document.body.appendChild(div);
         }
         const elements = Array.from(document.querySelectorAll("div"));

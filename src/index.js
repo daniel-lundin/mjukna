@@ -41,8 +41,10 @@ export default function mjukna(elements, options = {}) {
       enterAnimation: options.enterAnimation,
       exitAnimation: options.exitAnimation
     };
-
-    [].concat(elements).forEach(item => {
+    const iterable = Number.isInteger(elements.length)
+      ? elements
+      : [].concat(elements);
+    for (let item of iterable) {
       // Stop any running animations for element
       const getElement = item.anchor ? item.element : () => item;
       inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
@@ -61,7 +63,7 @@ export default function mjukna(elements, options = {}) {
         stop: () => {}
       };
       mjuka.push(mjuk);
-    });
+    }
   });
 }
 
