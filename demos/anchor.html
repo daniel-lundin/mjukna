@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+      html {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      .grid {
+        position: relative;
+        display: grid;
+        width: 100vw;
+        height: 100vh;
+        margin: 0 auto;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-column-gap: 2vw;
+        grid-row-gap: 2vw;
+      }
+
+      .box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #9ecce2;
+        font-size: 24px;
+      }
+
+      .box.active {
+        z-index: 1;
+      }
+
+      .box:nth-child(1) {
+        background: #89ff95;
+      }
+
+      .box:nth-child(2) {
+        background: #f8b2ff;
+      }
+      .box:nth-child(3) {
+        background: #fff6b5;
+      }
+      .box:nth-child(4) {
+        background: #cea2ef;
+      }
+      .box:nth-child(5) {
+        background: #a1fcd5;
+      }
+      .box:nth-child(6) {
+        background: #dab4f7;
+      }
+      .box:nth-child(7) {
+        background: #90cff4;
+      }
+      .box:nth-child(8) {
+        background: #d3ffad;
+      }
+      .box:nth-child(9) {
+        background: #daffb2;
+      }
+
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        z-index: 2;
+      }
+
+      .overlay span {
+        font-size: 48px;
+      }
+
+      span {
+        display: inline-block;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="grid">
+      <div class="box"><span>One</span></div>
+      <div class="box"><span>Two</span></div>
+      <div class="box"><span>Three</span></div>
+      <div class="box"><span>Four</span></div>
+      <div class="box"><span>Five</span></div>
+      <div class="box"><span>Six</span></div>
+      <div class="box"><span>Seven</span></div>
+      <div class="box"><span>Eight</span></div>
+      <div class="box"><span>Nine</span></div>
+    </div>
+    <script src="./mjukna.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/hotml@1.0.0/dist/browser.js"></script>
+    <script src="anchor.js">
+    </script>
+  </body>
+</html>
+
+
+
+
+
+

@@ -3,13 +3,18 @@
 [![Build Status](https://travis-ci.org/daniel-lundin/mjukna.svg?branch=master)](https://travis-ci.org/daniel-lundin/mjukna)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/mjukna/dist/browser.js?compression=gzip&color=blue)](https://unpkg.com/mjukna/dist/browser.js)
 
-Combines MutationObserver and FLIP-animations to automatically transition elements into new positions/sizes.
+Combines MutationObserver and FLIP-animations to automatically animate elements into new positions/sizes.
 
 *WIP*
 
 ## Background
 
-This library solves the problem of animating
+To ensure performant animations only `transform` and `opacity`.
+
+This library solves the problem of translating whatever CSS or DOM changes you make into the equivalent CSS transforms. This enables performant animations paddings, margins, flex-properties and even the `display`-property performantly.
+
+
+Takes advantage of the fact the you can make changes to the DOM, measure them and set new properties on elements before the anything is painted on screen.
 
 Examples include:
  - List reordering
@@ -21,7 +26,7 @@ This is not a library that tweens CSS-properties(we have plenty of those)
 
 ## Usage
 
-The API is quite simple. 
+The workflow is quite simple.:
 
  - Register a list of DOM-elements by calling `mjukna()`
  - mjukna` will save the current positions and wait for the next set of DOM updates.
@@ -44,21 +49,11 @@ Mjukna keeps track of all elements that are added to the DOM. If you want mjukna
 
 mjukna([], {
   enterFilter: element => element.classList.contains("list-item"),
-  enterAnimation: "squeeze"
-  exitAnimation: "fade"
 });
 ```
 
-This will animate all elements that has the class list-item
+#### Custom enter/exit animations
 
-A predefined set of enter/exit animations are available through the by setting the `enterAnimation` and `exitAnimation` properties in options:
-
- - fade
- - squeeze
- - squeezeLeft
- - squeezeRight
- - squeezeTop
- - squeezeBottom
 
 
 ### Nested elements
