@@ -1,6 +1,6 @@
 import tween from "spring-array";
 import { createMatrix } from "./matrix.js";
-import { getEnterAnimation, getExitAnimation } from "./presets.js";
+import { fadeIn, fadeOut } from "./presets.js";
 import { buildTree, flatten, withRelativeValues } from "./whiteboard.js";
 
 const m = createMatrix();
@@ -69,27 +69,13 @@ export default function mjukna(elements, options = {}) {
 
 function enterAnimation(element, getStaggerBy) {
   element.style.willChange = "transform, opacity";
-  const animation = getEnterAnimation(config.enterAnimation, element);
-  animation.start();
 
-  return new Promise(resolve =>
+  return new Promise(resolve => {
     maybeTimeout(() => {
-      tween(
-        Object.assign(
-          {
-            from: animation.from,
-            to: animation.to,
-            update: animation.update,
-            done: () => {
-              animation.end();
-              resolve();
-            }
-          },
-          config.spring
-        )
-      );
-    }, getStaggerBy())
-  );
+      if (config.enterAnimation) return config.enterAnimation(element, resolve);
+      fadeIn(element, resolve);
+    }, getStaggerBy());
+  });
 }
 
 function exitAnimation(mjuk, getStaggerBy) {
@@ -104,35 +90,19 @@ function exitAnimation(mjuk, getStaggerBy) {
   const xDiff = newPosition.left - previousPosition.left;
   const yDiff = newPosition.top - previousPosition.top;
   element.style.willChange = "transform, opacity";
+  element.style.top = `${yDiff}px`;
+  element.style.left = `${xDiff}px`;
 
-  const animation = getExitAnimation(
-    config.exitAnimation,
-    element,
-    xDiff,
-    yDiff
-  );
-
-  animation.end();
-
-  return new Promise(resolve =>
+  return new Promise(resolve => {
     maybeTimeout(() => {
-      tween(
-        Object.assign(
-          {
-            from: animation.to,
-            to: animation.from,
-            update: animation.update,
-            done() {
-              animation.start();
-              document.body.removeChild(element);
-              resolve();
-            }
-          },
-          config.spring
-        )
-      );
-    }, getStaggerBy())
-  );
+      const done = () => {
+        document.body.removeChild(element);
+        resolve();
+      };
+      if (config.exitAnimation) return config.exitAnimation(element, done);
+      fadeOut(element, done);
+    }, getStaggerBy());
+  });
 }
 
 function init() {

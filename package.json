@@ -18,7 +18,8 @@
     "prepublishOnly": "npm run build",
     "build:web": "rollup -c rollup.config.js --environment MINIFY -o dist/browser.js -f iife --name mjukna",
     "build:node": "rollup -c rollup.config.js -o dist/main.js -f cjs",
-    "build": "npm run build:web && npm run build:node"
+    "build": "npm run build:web && npm run build:node && npm run bundle-size",
+    "bundle-size": "echo \"Bundle size: `gzip -c dist/browser.js | wc -c`\""
   },
   "repository": {
     "type": "git",

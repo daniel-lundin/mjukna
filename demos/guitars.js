@@ -30,6 +30,7 @@ async function onDetailClose(index) {
   );
 
   detailView.parentNode.removeChild(detailView);
+  gridItem.querySelector("img").style.opacity = 1;
   await animation;
   gridItem.classList.remove("motion");
 }
@@ -73,6 +74,7 @@ function onProductClick(index) {
           mjuknaConfig
         );
         document.body.appendChild(detailView);
+        gridItem.querySelector("img").style.opacity = 0;
         await animation;
         detailView.classList.add("active");
       }
