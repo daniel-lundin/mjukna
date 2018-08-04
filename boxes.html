@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+      html {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
+      .box {
+        display: inline-block;
+        background: yellow;
+        font-size: 24px;
+        padding: 20px;
+      }
+
+      .block .box {
+        display: block;
+        width: 300px;
+        margin: 10px 0;
+        font-size: 32px;
+      }
+
+      span {
+        display: inline-block;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box"><span>First</span></div>
+      <div class="box"><span>Second</span></div>
+      <div class="box"><span>Third</span></div>
+    </div>
+    <script src="./mjukna.js"></script>
+    <script>
+      const container = document.querySelector('.container');
+      container.addEventListener('click', function() {
+        mjukna(document.querySelectorAll('.box, .box span'));
+        container.classList.toggle('block');
+      });
+    </script>
+  </body>
+</html>
+
+
+
+
+
