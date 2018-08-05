@@ -3,71 +3,66 @@
 [![Build Status](https://travis-ci.org/daniel-lundin/mjukna.svg?branch=master)](https://travis-ci.org/daniel-lundin/mjukna)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/mjukna/dist/browser.js?compression=gzip&color=blue)](https://unpkg.com/mjukna/dist/browser.js)
 
-Combines MutationObserver and FLIP-animations to automatically animate elements into new positions/sizes.
+Library for animating layout changes perfomantly using the [FLIP technique](https://aerotwist.com/blog/flip-your-animations/)
 
-*WIP*
+Use cases:
 
-## Background
-
-To ensure performant animations only `transform` and `opacity`.
-
-This library solves the problem of translating whatever CSS or DOM changes you make into the equivalent CSS transforms. This enables performant animations paddings, margins, flex-properties and even the `display`-property performantly.
-
-
-Takes advantage of the fact the you can make changes to the DOM, measure them and set new properties on elements before the anything is painted on screen.
-
-Examples include:
  - List reordering
- - Transition to/from float
+ - DOM node additions/removals
  - Shared element transitions
- - Animating flexbox properties(e.g. going from `flex-direction:` `row` to `column`)
+ - Animating "unanimatable" CSS properties(e.g. `display`, `flex-direction`, `grid-template-rows`)
 
-This is not a library that tweens CSS-properties(we have plenty of those)
+Highlights:
 
-## Usage
+ - Smallish footprint(~2kB gzipped)
+ - Handles nested DOM structures by compensation for parent transforms
+ - Automatically detects DOM changes by leveraging [MutationObservers](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)
 
-The workflow is quite simple.:
+## Installation
 
- - Register a list of DOM-elements by calling `mjukna()`
- - mjukna` will save the current positions and wait for the next set of DOM updates.
- - Perform some updates(reorder, add/remove classes, update inline-styles)
- - `mjukna` will measure the new positions/sizes of the registered elements and animate them to their new positions with a combination of performant `transforms`
+NPM:
+`npm install mjukna`
 
-```js
-import mjukna from 'mjukna';
+CDN:
+ - https://cdn.jsdelivr.net/npm/mjukna/dist/browser.js
+ - https://unpkg.com/mjukna@0.3.0/dist/browser.js 
 
-mjukna([list,of,dom-elements], options);
-
-// Do whatever dom-changes you like and watch them transition
-```
-
-### Enter/exit animations
-
-Mjukna keeps track of all elements that are added to the DOM. If you want mjukna to do enter transitions for them, set the appropriate `enterFilter`
+## Basic usage
 
 ```js
+// Register all list items
+mjukna(document.querySelectorAll('li'));
 
-mjukna([], {
-  enterFilter: element => element.classList.contains("list-item"),
-});
+// Remove the first one one
+document.querySelector('li').remove();
 ```
 
-#### Custom enter/exit animations
+Will result in:
+
+![basic usage](assets/basic.gif)
+
+## API
 
 
+## Shared element transitions
+
+TBD
+
+![shared usage](assets/anchoring.gif)
 
 ### Nested elements
 
 Elements that contain other elements will be distorted...
 
 ```js
-mjukna([...document.qierySelectorAll('.list-item, .list-item-header'])
+mjukna(document.querySelectorAll('.list-item, .list-item-header')
 ```
 
 ### DEMOS (WIP)
 
- - [numbers](https://daniel-lundin.github.io/mjukna/numbers.html)
- - [guitars](https://daniel-lundin.github.io/mjukna/guitars.html)
+ - [Shared element transition(basic)](https://daniel-lundin.github.io/mjukna/anchor.html)
+ - [Shared element transition(advanced)](https://daniel-lundin.github.io/mjukna/guitars.html)
+ - [Grid animations](https://daniel-lundin.github.io/mjukna/numbers.html)
  - [typography](https://daniel-lundin.github.io/mjukna/dictionary.html)
  - [list reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 

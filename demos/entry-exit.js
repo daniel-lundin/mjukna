@@ -20,8 +20,6 @@ function makeItMjukna() {
     [...document.querySelectorAll(".root .box"), addButton, removeButton],
     {
       enterFilter: () => true,
-      enterAnimation: randomPreset(),
-      exitAnimation: randomPreset(),
       spring: {
         stiffness: 10
         //damping: 0.3

@@ -1,6 +1,6 @@
 import tween from "spring-array";
 import { createMatrix } from "./matrix.js";
-import { fadeIn, fadeOut } from "./presets.js";
+import { fadeIn } from "./presets.js";
 import { buildTree, flatten, withRelativeValues } from "./whiteboard.js";
 
 const m = createMatrix();
@@ -38,8 +38,7 @@ export default function mjukna(elements, options = {}) {
       spring: options.spring,
       staggerBy: options.staggerBy || 0,
       enterFilter: options.enterFilter || FALSE,
-      enterAnimation: options.enterAnimation,
-      exitAnimation: options.exitAnimation
+      enterAnimation: options.enterAnimation
     };
     const iterable = Number.isInteger(elements.length)
       ? elements
@@ -78,33 +77,6 @@ function enterAnimation(element, getStaggerBy) {
   });
 }
 
-function exitAnimation(mjuk, getStaggerBy) {
-  const { previousPosition } = mjuk;
-  const element = mjuk.getElement();
-  document.body.appendChild(element);
-  element.style.position = "absolute";
-  element.style.width = `${previousPosition.width}px`;
-  element.style.height = `${previousPosition.height}px`;
-
-  const newPosition = element.getBoundingClientRect();
-  const xDiff = newPosition.left - previousPosition.left;
-  const yDiff = newPosition.top - previousPosition.top;
-  element.style.willChange = "transform, opacity";
-  element.style.top = `${yDiff}px`;
-  element.style.left = `${xDiff}px`;
-
-  return new Promise(resolve => {
-    maybeTimeout(() => {
-      const done = () => {
-        document.body.removeChild(element);
-        resolve();
-      };
-      if (config.exitAnimation) return config.exitAnimation(element, done);
-      fadeOut(element, done);
-    }, getStaggerBy());
-  });
-}
-
 function init() {
   observer = new MutationObserver(mutations => {
     observer.disconnect();
@@ -130,12 +102,10 @@ function init() {
       node => !mjuka.find(m => node === m.getElement())
     );
 
-    const removed = mjuka.filter(mjuk => !mjuk.getElement().parentNode);
     const present = mjuka.filter(mjuk => mjuk.getElement().parentNode);
 
     Promise.all(
       []
-        .concat(removed.map(mjuk => exitAnimation(mjuk, getStaggerBy)))
         .concat(updateElements(present, getStaggerBy))
         .concat(added.map(element => enterAnimation(element, getStaggerBy)))
     ).then(completionResolver);
