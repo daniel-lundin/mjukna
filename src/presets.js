@@ -1,5 +1,5 @@
 import { createMatrix } from "./matrix.js";
-import tween from "spring-array";
+import { tween } from "./spring.js";
 const matrix = createMatrix();
 
 function scaleCSS(value) {

@@ -40,9 +40,7 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^1.0.1"
   },
-  "dependencies": {
-    "spring-array": "^2.0.0"
-  },
+  "dependencies": {},
   "files": [
     "dist"
   ]

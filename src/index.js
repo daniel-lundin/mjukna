@@ -1,4 +1,4 @@
-import tween from "spring-array";
+import { tween } from "./spring.js";
 import { createMatrix } from "./matrix.js";
 import { fadeIn, fadeOut } from "./presets.js";
 import { buildTree, flatten, withRelativeValues } from "./whiteboard.js";
