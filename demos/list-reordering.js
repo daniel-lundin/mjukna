@@ -6,13 +6,13 @@ const done = byId("done");
 
 function markDone(element) {
   mjukna([...document.querySelectorAll("input, li, li span, h5, button")]);
-  element.parentNode.removeChild(element);
+  element.remove();
   done.prepend(element);
 }
 
 function markUndone(element) {
   mjukna([...document.querySelectorAll("input, li, li span, h5, button")]);
-  element.parentNode.removeChild(element);
+  element.remove();
   todo.appendChild(element);
 }
 

@@ -11,7 +11,7 @@ async function dismiss(overlay, target) {
     }
   ]);
 
-  grid.removeChild(overlay);
+  overlay.remove();
   await animation;
   target.classList.remove("active");
 }

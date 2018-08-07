@@ -26,6 +26,15 @@
         display: inline-block;
       }
 
+      ul {
+        width: 200px;
+      }
+      li {
+        text-align: center;
+        background-color: whitesmoke;
+        list-style: none;
+      }
+
     </style>
   </head>
   <body>
@@ -43,7 +52,7 @@
     <script src="./mjukna.js"></script>
     <script>
 setTimeout(() => {
-  mjukna(document.querySelectorAll('li'));
+  mjukna(document.querySelectorAll('li'), { staggerBy: 80 });
   document.querySelector('li').remove();
 }, 1000);
     </script>

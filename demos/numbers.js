@@ -27,7 +27,7 @@ async function unselectNumber() {
     active.style.zIndex = 1;
     active.classList.remove("active");
     const info = active.querySelector("p");
-    info.parentNode.removeChild(info);
+    info.remove();
     await animation;
     active.style.zIndex = "";
   }

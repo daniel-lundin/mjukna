@@ -9,21 +9,38 @@ function scaleCSS(value) {
     .css();
 }
 
-export function fadeIn(element, done) {
-  element.style.opacity = 0;
-  element.style.transform = scaleCSS(0.8);
+function fade(element, from, to, springConfig, done) {
+  element.style.opacity = from[0];
+  element.style.transform = scaleCSS(from[1]);
 
-  tween({
-    from: [0, 0.8],
-    to: [1, 1],
-    update([opacity, scale]) {
-      element.style.opacity = opacity;
-      element.style.transform = scaleCSS(scale);
-    },
-    done() {
-      element.style.opacity = 1;
-      element.style.transform = scaleCSS(1);
-      done();
-    }
-  });
+  tween(
+    Object.assign(
+      {
+        from,
+        to,
+        update([opacity, scale]) {
+          element.style.opacity = opacity;
+          element.style.transform = scaleCSS(scale);
+        },
+        done() {
+          element.style.opacity = to[0];
+          element.style.transform = scaleCSS(to[1]);
+          done();
+        }
+      },
+      springConfig
+    )
+  );
+}
+
+export function fadeIn(element, springConfig, done) {
+  const from = [0, 0.8];
+  const to = [1, 1];
+  fade(element, from, to, springConfig, done);
+}
+
+export function fadeOut(element, springConfig, done) {
+  const from = [1, 1];
+  const to = [0, 0.8];
+  fade(element, from, to, springConfig, done);
 }
