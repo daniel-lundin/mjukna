@@ -43,10 +43,53 @@ Will result in:
 
 ## API
 
+### ```mjukna(element(s), options)```
+
+#### Element
+
+Type: `Element` | iterable of `Element`s | Array of objects
+
+
+#### Options
+
+Type: `object`
+
+ - `staggerBy` - `Number` in milliseconds to delay each element with
+ - `enterFilter` - predicate `function` that gets called for each element added to the DOM. Return `true` to run enter animation.
+ - `enterAnimation` - Hook to run custom enter animations. The provided function will be called with to arguments, the element and a done callback.
+ - `exitAnimation` - Same as `enterAnimation` but for removed DOM nodes
+ - `spring` - Parameters for the spring physics
+
+Example including all available options:
+```js
+{
+  staggerBy: 20,
+  enterFilter: (element) => element.classList.contains('list-item'),
+  enterAnimation: (element, done) => externalLibFadeIn(element).then(done),
+  exitAnimation:(element, done) => externalLibFadeOut(element).then(done),
+  spring: {
+    stiffness: 10,
+    damping: 0.5
+  }
+}
+```
 
 ## Shared element transitions
 
-TBD
+When an element enters the DOM, an anchor element can be set as the origin for element. The added element will be transformed to the same size/position as the anchor element and then animated to its normal position.
+
+As an example, making a modal expand from a button might look something like this:
+
+```js
+mjukna({
+  anchor: document.querySelector('modal-button'),
+  element: () => document.querySelector('modal')
+})
+
+const modal = document.createElement('div');
+modal.classList.add('modal');
+document.body.appendChild(modal);
+```
 
 ![shared usage](assets/anchoring.gif)
 
@@ -63,7 +106,7 @@ mjukna(document.querySelectorAll('.list-item, .list-item-header')
  - [Shared element transition(basic)](https://daniel-lundin.github.io/mjukna/anchor.html)
  - [Shared element transition(advanced)](https://daniel-lundin.github.io/mjukna/guitars.html)
  - [Grid animations](https://daniel-lundin.github.io/mjukna/numbers.html)
- - [typography](https://daniel-lundin.github.io/mjukna/dictionary.html)
- - [list reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
+ - [Typography](https://daniel-lundin.github.io/mjukna/dictionary.html)
+ - [List reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 
 
