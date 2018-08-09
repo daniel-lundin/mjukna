@@ -1,6 +1,6 @@
 {
   "name": "mjukna",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "description": "animate layout changes",
   "main": "dist/main.js",
   "source": "src/index.js",
@@ -19,7 +19,8 @@
     "build:web": "rollup -c rollup.config.js --environment MINIFY -o dist/browser.js -f iife --name mjukna",
     "build:node": "rollup -c rollup.config.js -o dist/main.js -f cjs",
     "build": "npm run build:web && npm run build:node && npm run bundle-size",
-    "bundle-size": "echo \"Bundle size: `gzip -c dist/browser.js | wc -c`\""
+    "bundle-size": "echo \"Bundle size: `gzip -c dist/browser.js | wc -c`\"",
+    "bump": "bump --prompt --tag --push --lock"
   },
   "repository": {
     "type": "git",
@@ -38,7 +39,8 @@
     "puppeteer": "^1.5.0",
     "rollup": "^0.60.1",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-terser": "^1.0.1"
+    "rollup-plugin-terser": "^1.0.1",
+    "version-bump-prompt": "^4.1.0"
   },
   "dependencies": {},
   "files": [
