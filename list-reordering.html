@@ -21,6 +21,7 @@
         font-family: 'Montserrat', sans-serif;
         font-size: 22px;
         padding: 5px 20px;
+        border: 1px solid gray;
       }
 
       h5 {
@@ -34,11 +35,14 @@
 
       ul li {
         list-style: none;
-        display: flex;
         align-items: center;
         background: #ffd960;
         margin: 2px;
         text-transform: uppercase;
+      }
+      ul li label {
+        display: flex;
+        align-items: center;
       }
       li span {
         display: inline-block;
@@ -79,12 +83,12 @@
           <button data-list="done" class="shuffle">Shuffle</button>
         </div>
         <ul id="done">
-          <li><label><input type="checkbox" checked><span>Go on a walk.</span></label></li>
-          <li><label><input type="checkbox" checked><span>Organize something.</span></label></li>
-          <li><label><input type="checkbox" checked><span>Do laundry.</span></label></li>
+          <li><label><input type="checkbox" checked><span>Go on a walk</span></label></li>
+          <li><label><input type="checkbox" checked><span>Organize event</span></label></li>
+          <li><label><input type="checkbox" checked><span>Do laundry</span></label></li>
           <li><label><input type="checkbox" checked><span>Paint your nails</span></label></li>
           <li><label><input type="checkbox" checked><span>Update resume</span></label></li>
-          <li><label><input type="checkbox" checked><span>Take a bubble bath</span></label></li>
+          <li><label><input type="checkbox" checked><span>Bubble bath</span></label></li>
         </ul>
       </div>
     </div>

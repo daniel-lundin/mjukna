@@ -29,7 +29,7 @@ async function onDetailClose(index) {
     mjuknaConfig
   );
 
-  detailView.parentNode.removeChild(detailView);
+  detailView.remove();
   gridItem.querySelector("img").style.opacity = 1;
   await animation;
   gridItem.classList.remove("motion");

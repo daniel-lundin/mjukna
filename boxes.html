@@ -15,6 +15,10 @@
         padding: 20px;
       }
 
+      .padded {
+        padding: 20px 60px;
+      }
+
       .block .box {
         display: block;
         width: 300px;
@@ -26,21 +30,40 @@
         display: inline-block;
       }
 
+      ul {
+        width: 200px;
+      }
+      li {
+        text-align: center;
+        background-color: whitesmoke;
+        list-style: none;
+      }
+
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="box"><span>First</span></div>
-      <div class="box"><span>Second</span></div>
-      <div class="box"><span>Third</span></div>
+      <div class="box"><span>Text inside</span></div>
     </div>
+    <!-- <ul>
+      <li>One</li>
+      <li>Two</li>
+      <li>Three</li>
+      <li>Four</li>
+    </ul> -->
     <script src="./mjukna.js"></script>
     <script>
-      const container = document.querySelector('.container');
-      container.addEventListener('click', function() {
-        mjukna(document.querySelectorAll('.box, .box span'));
-        container.classList.toggle('block');
-      });
+const box = document.querySelector('.box');
+box.addEventListener('click', () => {
+  // mjukna(document.querySelectorAll('.box, .box span'));
+  mjukna(document.querySelectorAll('.box, .box span'), { spring: { stiffness: 2}});
+  box.classList.toggle('padded');
+});
+
+// setTimeout(() => {
+//   mjukna(document.querySelectorAll('li'), { staggerBy: 80 });
+//   document.querySelector('li').remove();
+// }, 1000);
     </script>
   </body>
 </html>

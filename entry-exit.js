@@ -4,30 +4,14 @@ const removeButton = document.getElementById("remove");
 
 const root = document.querySelector(".root");
 
-const presets = [
-  // "squeeze"
-  // "squeezeLeft"
-  // "squeezeRight"
-  // "squeezeBottom"
-  "squeezeTop"
-  // "fade"
-];
-
-const randomPreset = () => presets[Math.floor(Math.random() * presets.length)];
-
 function makeItMjukna() {
-  mjukna(
-    [...document.querySelectorAll(".root .box"), addButton, removeButton],
-    {
-      enterFilter: () => true,
-      enterAnimation: randomPreset(),
-      exitAnimation: randomPreset(),
-      spring: {
-        stiffness: 10
-        //damping: 0.3
-      }
+  mjukna(document.querySelectorAll(".root .box, #add, #remove"), {
+    enterFilter: () => true,
+    spring: {
+      stiffness: 2,
+      damping: 0.3
     }
-  );
+  });
 }
 const colors = ["#AA3939", "#FFAAAA", "#D46A6A", "#801515", "#550000"];
 
@@ -43,5 +27,5 @@ removeButton.addEventListener("click", () => {
   makeItMjukna();
 
   const div = document.querySelector(".box");
-  root.removeChild(div);
+  div.remove();
 });
