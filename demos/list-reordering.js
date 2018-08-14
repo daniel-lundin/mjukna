@@ -5,14 +5,14 @@ const todo = byId("todo");
 const done = byId("done");
 
 function markDone(element) {
-  mjukna([...document.querySelectorAll("input, li, li span, h5, button")]);
-  element.remove();
+  mjukna($("input, li, li span, h5, button"));
+  element.parentNode.removeChild(element);
   done.prepend(element);
 }
 
 function markUndone(element) {
-  mjukna([...document.querySelectorAll("input, li, li span, h5, button")]);
-  element.remove();
+  mjukna($("input, li, li span, h5, button"));
+  element.parentNode.removeChild(element);
   todo.appendChild(element);
 }
 
@@ -22,6 +22,7 @@ function shuffle(elements, result = []) {
     .concat(elements.splice(Math.floor(Math.random() * elements.length), 1))
     .concat(shuffle(elements, []));
 }
+
 function setupListeners() {
   const checkboxes = Array.from(document.querySelectorAll("input"));
   checkboxes.forEach(checkbox => {
@@ -37,7 +38,7 @@ function setupListeners() {
     button.addEventListener("click", function() {
       const ul = byId(this.dataset.list);
       const elements = shuffle(Array.from(ul.children));
-      mjukna([...$("li")], { staggerBy: 30 });
+      mjukna($("li"), { staggerBy: 30 });
       ul.innerHTML = "";
       elements.forEach(e => ul.appendChild(e));
     })

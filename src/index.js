@@ -124,22 +124,22 @@ function init() {
     const addedNodes = childListMutations
       .map(mutation => Array.from(mutation.addedNodes))
       .reduce((acc, curr) => acc.concat(curr), [])
-      .filter(({ nodeType }) => nodeType === 1)
-      .filter(e => config.enterFilter(e));
+      .filter(({ nodeType }) => nodeType === 1);
 
     const removed = [];
     for (const mutation of childListMutations) {
       for (const removedNode of mutation.removedNodes) {
         const mjuk = mjuka.find(mjuk => mjuk.getElement() === removedNode);
-        if (mjuk) {
+        const alsoAdded = addedNodes.includes(removedNode);
+        if (mjuk && !alsoAdded) {
           removed.push([mjuk, mutation.target]);
         }
       }
     }
 
-    const added = addedNodes.filter(
-      node => !mjuka.find(m => node === m.getElement())
-    );
+    const added = addedNodes
+      .filter(e => config.enterFilter(e))
+      .filter(node => !mjuka.find(m => node === m.getElement()));
     const present = mjuka.filter(mjuk => mjuk.getElement().parentNode);
 
     Promise.all(
