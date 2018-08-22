@@ -171,7 +171,7 @@ document.querySelector('.box').classList.add('big')
 
 ![multiline](assets/multiline.gif)
 
-### DEMOS (WIP)
+### DEMOS
 
  - [Shared element transition(basic)](https://daniel-lundin.github.io/mjukna/anchor.html)
  - [Shared element transition(advanced)](https://daniel-lundin.github.io/mjukna/guitars.html)
@@ -179,3 +179,6 @@ document.querySelector('.box').classList.add('big')
  - [List reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 
 
+### LICENSE
+
+[MIT](LICENSE.md)
