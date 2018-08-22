@@ -178,6 +178,9 @@ document.querySelector('.box').classList.add('big')
  - [Grid animations](https://daniel-lundin.github.io/mjukna/numbers.html)
  - [List reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 
+### Contact
+
+Say hi on [Twitter](https://twitter.com/danielundin)
 
 ### LICENSE
 
