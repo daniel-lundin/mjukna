@@ -95,18 +95,87 @@ document.body.appendChild(modal);
 
 ### Nested elements
 
-Elements that contain other elements will be distorted...
+One common problem when using FLIP animations is that nested content can get distorted, especially text content. This library solves this by keeping track of parent child relations and applies compensating transforms to child elements.
+
+Say an element with a text element should double in width while the text should change from left-align to right. This can be achieved with the following mjukna code:
+
+```css
+.box {
+  width: 200px;
+  background: chocolate;
+}
+
+.box h2 {
+  display: inline-block;
+}
+
+.box.big {
+  width: 400px;
+  text-align: right;
+}
+```
+
+```html
+<div class="box">
+  <h2>Brown Fox</h2>
+</div>
+```
 
 ```js
-mjukna(document.querySelectorAll('.list-item, .list-item-header')
+mjukna(document.querySelectorAll('.box, .box h2'));
+document.querySelector('.box').classList.add('big')
 ```
+
+Note that we need to register both the parent and the child.
+
+Also note that the example changes `width` and text-align, only the `transform`-property is changed by the library. That's the magic of FLIP :)
+
+![nesting](assets/nesting.gif)
+
+### A note about text content
+
+When animating text you need to keep two things in mind:
+
+ - The containing element must fully enclose the text(e.g. inline-block)
+ - If text in the first or the final position wraps multiple lines, each word needs to be wrapped in an inline-block element.
+
+
+Example:
+```css
+.box {
+  width: 70px;
+  background: chocolate;
+  text-align: center;
+}
+
+.box span {
+  display: inline-block;
+}
+
+.box.big {
+  width: 200px;
+  font-size: smaller;
+}
+```
+
+```html
+<div class="box">
+  <h2><span>One</span> <span>two</span> <span>three</span></h2>
+</div>
+```
+
+```js
+mjukna(document.querySelectorAll('.box, .box span'));
+document.querySelector('.box').classList.add('big')
+```
+
+![multiline](assets/multiline.gif)
 
 ### DEMOS (WIP)
 
  - [Shared element transition(basic)](https://daniel-lundin.github.io/mjukna/anchor.html)
  - [Shared element transition(advanced)](https://daniel-lundin.github.io/mjukna/guitars.html)
  - [Grid animations](https://daniel-lundin.github.io/mjukna/numbers.html)
- - [Typography](https://daniel-lundin.github.io/mjukna/dictionary.html)
  - [List reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 
 

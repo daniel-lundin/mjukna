@@ -8,7 +8,21 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       }
 
-      .box {
+.box {
+  width: 70px;
+  background: chocolate;
+  text-align: center;
+}
+
+.box span {
+  display: inline-block;
+}
+
+.box.big {
+  width: 200px;
+  font-size: smaller;
+}
+/*      .box {
         display: inline-block;
         background: yellow;
         font-size: 24px;
@@ -37,14 +51,12 @@
         text-align: center;
         background-color: whitesmoke;
         list-style: none;
-      }
+      }*/
 
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="box"><span>Text inside</span></div>
-    </div>
+    <div class="box"><h2><span>One</span> <span>two</span> <span>three</span></h2></div>
     <!-- <ul>
       <li>One</li>
       <li>Two</li>
@@ -53,12 +65,10 @@
     </ul> -->
     <script src="./mjukna.js"></script>
     <script>
-const box = document.querySelector('.box');
-box.addEventListener('click', () => {
-  // mjukna(document.querySelectorAll('.box, .box span'));
-  mjukna(document.querySelectorAll('.box, .box span'), { spring: { stiffness: 2}});
-  box.classList.toggle('padded');
-});
+setTimeout(() => {
+mjukna(document.querySelectorAll('.box, .box span'));
+document.querySelector('.box').classList.add('big')
+}, 2000);
 
 // setTimeout(() => {
 //   mjukna(document.querySelectorAll('li'), { staggerBy: 80 });
