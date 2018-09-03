@@ -1,10 +1,9 @@
 {
   "name": "mjukna",
-  "version": "1.0.2-beta.0",
+  "version": "1.0.2-beta.1",
   "description": "animate layout changes",
   "main": "dist/main.js",
   "source": "src/index.js",
-  "browser": "dist/browser.js",
   "module": "dist/main.m.js",
   "kuta": {
     "files": [
