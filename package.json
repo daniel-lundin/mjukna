@@ -5,6 +5,7 @@
   "main": "dist/main.js",
   "source": "src/index.js",
   "browser": "dist/browser.js",
+  "module": "dist/main.m.js",
   "kuta": {
     "files": [
       "tests/features/**.js"
@@ -18,7 +19,8 @@
     "prepublishOnly": "npm run build",
     "build:web": "rollup -c rollup.config.js --environment MINIFY -o dist/browser.js -f iife --name mjukna",
     "build:node": "rollup -c rollup.config.js -o dist/main.js -f cjs",
-    "build": "npm run build:web && npm run build:node && npm run bundle-size",
+    "build:module": "rollup -c rollup.config.js -o dist/main.m.js -f es",
+    "build": "npm run build:web && npm run build:node && npm run build:module && npm run bundle-size",
     "bundle-size": "echo \"Bundle size: `gzip -c dist/browser.js | wc -c`\"",
     "bump": "bump --prompt --tag --push --lock"
   },
