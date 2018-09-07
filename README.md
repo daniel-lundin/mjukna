@@ -18,6 +18,14 @@ Highlights:
  - Handles nested DOM structures by compensation for parent transforms
  - Automatically detects DOM changes by leveraging [MutationObservers](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)
 
+## Examples
+
+ - [Shared element transition(basic)](https://daniel-lundin.github.io/mjukna/anchor.html)
+ - [Shared element transition(advanced)](https://daniel-lundin.github.io/mjukna/guitars.html)
+ - [Personal site](https://www.d-dog.se)
+ - [Grid animations](https://daniel-lundin.github.io/mjukna/numbers.html)
+ - [List reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
+
 ## Installation
 
 NPM:
@@ -171,12 +179,6 @@ document.querySelector('.box').classList.add('big')
 
 ![multiline](assets/multiline.gif)
 
-### DEMOS
-
- - [Shared element transition(basic)](https://daniel-lundin.github.io/mjukna/anchor.html)
- - [Shared element transition(advanced)](https://daniel-lundin.github.io/mjukna/guitars.html)
- - [Grid animations](https://daniel-lundin.github.io/mjukna/numbers.html)
- - [List reordering](https://daniel-lundin.github.io/mjukna/list-reordering.html)
 
 ### Contact
 
