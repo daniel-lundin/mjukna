@@ -41,13 +41,13 @@ function relativeRect(outer, inner) {
   };
 }
 
-function multipleScale(parent, current) {
-  const s = {
-    x: current.x * parent.x,
-    y: current.y * parent.y
-  };
-  return s;
-}
+// function multipleScale(parent, current) {
+//   const s = {
+//     x: current.x * parent.x,
+//     y: current.y * parent.y
+//   };
+//   return s;
+// }
 
 export function withRelativeValues(tree) {
   return tree.map(node => {
@@ -61,9 +61,9 @@ export function withRelativeValues(tree) {
     node.newPosition = node.parent
       ? relativeRect(node.parent.newPosition, newPosition)
       : newPosition;
-    node.parentScale = node.parent
-      ? multipleScale(node.parent.scale, node.parent.parentScale)
-      : { x: 1, y: 1 };
+    //node.parentScale = node.parent
+    //  ? multipleScale(node.parent.scale, node.parent.parentScale)
+    //   : { x: 1, y: 1 };
     node.scale = scale;
     node.previousPosition = node.parent
       ? relativeRect(node.parent.previousPosition, previousPosition)

@@ -22,6 +22,10 @@
   width: 200px;
   font-size: smaller;
 }
+
+.box.moved {
+  margin-left: 40px;
+}
 /*      .box {
         display: inline-block;
         background: yellow;
@@ -65,10 +69,8 @@
     </ul> -->
     <script src="./mjukna.js"></script>
     <script>
-setTimeout(() => {
-mjukna(document.querySelectorAll('.box, .box span'));
-document.querySelector('.box').classList.add('big')
-}, 2000);
+mjukna(document.querySelectorAll('.box, .box span'), { staggerBy: 200 });
+document.querySelector('.box').classList.add('moved')
 
 // setTimeout(() => {
 //   mjukna(document.querySelectorAll('li'), { staggerBy: 80 });

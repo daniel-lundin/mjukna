@@ -169,8 +169,22 @@ function updateElements(activeMjuka, getStaggerBy) {
   return Promise.all(animations);
 }
 
+function calculateParentScale(mjuk) {
+  const scale = {
+    x: 1,
+    y: 1
+  };
+  let papa = mjuk.parent;
+  while (papa) {
+    scale.x *= papa.scale.x;
+    scale.y *= papa.scale.y;
+    papa = papa.parent;
+  }
+  return scale;
+}
+
 function FLIPScaleTranslate(mjuk, getStaggerBy) {
-  const { parentScale, element, scale, previousPosition, newPosition } = mjuk;
+  const { element, scale, previousPosition, newPosition } = mjuk;
   const xCenterDiff =
     previousPosition.left +
     previousPosition.width / 2 -
@@ -181,11 +195,13 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
     previousPosition.height / 2 -
     (newPosition.top + newPosition.height / 2);
 
+  const parentScale = calculateParentScale(mjuk);
+
   const xScaleCompensation = scale.x;
   const yScaleCompensation = scale.y;
 
-  const xForCenter = newPosition.left + newPosition.width / 2;
-  const yForCenter = newPosition.top + newPosition.height / 2;
+  const xForCenter = newPosition.width / 2;
+  const yForCenter = newPosition.height / 2;
 
   element.style.willChange = "transform";
   element.style.transform = m
@@ -215,6 +231,8 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
             ],
             to: [0, 0, 1, 1, 1, 1],
             update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
+              // mjuk.scale.x = scaleX;
+              // mjuk.scale.y = scaleY;
               element.style.transform = m
                 .clear()
                 .t(-xForCenter, -yForCenter)
