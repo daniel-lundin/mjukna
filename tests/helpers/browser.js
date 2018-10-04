@@ -37,14 +37,19 @@ p,div {
   width: 100px;
   height: 100px;
   color: rebeccapurple;
-}`;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+`;
 
   page.addStyleTag({ content: css });
 }
 
 async function setupNewPage(browser) {
   const page = await browser.newPage();
-  page.on("console", msg => console.log("PAGE LOG:", msg.text()));
+  page.on("console", msg => console.log("PAGE LOG:", msg.text())); // eslint-disable-line
 
   const mjuknaCode = await getMjuknaCode();
   await page.evaluate(mjuknaCode);

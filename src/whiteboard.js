@@ -32,14 +32,14 @@ export function buildTree(nodes, mjuk, parent) {
   }
 }
 
-function relativeRect(outer, inner) {
-  return {
-    left: inner.left - outer.left,
-    top: inner.top - outer.top,
-    width: inner.width,
-    height: inner.height
-  };
-}
+// function relativeRect(outer, inner) {
+//   return {
+//     left: inner.left - outer.left,
+//     top: inner.top - outer.top,
+//     width: inner.width,
+//     height: inner.height
+//   };
+// }
 
 // function multipleScale(parent, current) {
 //   const s = {
@@ -58,16 +58,31 @@ export function withRelativeValues(tree) {
       y: previousPosition.height / newPosition.height
     };
 
-    node.newPosition = node.parent
-      ? relativeRect(node.parent.newPosition, newPosition)
-      : newPosition;
+    node.newPosition = newPosition;
+    // node.parent
+    //   ? relativeRect(node.parent.newPosition, newPosition)
+    //   : newPosition;
     //node.parentScale = node.parent
     //  ? multipleScale(node.parent.scale, node.parent.parentScale)
     //   : { x: 1, y: 1 };
     node.scale = scale;
-    node.previousPosition = node.parent
-      ? relativeRect(node.parent.previousPosition, previousPosition)
-      : previousPosition;
+
+    node.leftDiff = node.currentLeftDiff =
+      previousPosition.left - newPosition.left;
+    node.topDiff = node.currentTopDiff = previousPosition.top - newPosition.top;
+
+    node.xCenterDiff = node.currentXDiff =
+      previousPosition.left +
+      previousPosition.width / 2 -
+      (newPosition.left + newPosition.width / 2);
+    node.yCenterDiff = node.currentYDiff =
+      previousPosition.top +
+      previousPosition.height / 2 -
+      (newPosition.top + newPosition.height / 2);
+
+    // node.previousPosition = pre.parent
+    //   ? relativeRect(node.parent.previousPosition, previousPosition)
+    //   : previousPosition;
     node.children = withRelativeValues(node.children);
     return node;
   });

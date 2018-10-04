@@ -7,80 +7,43 @@
       html {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       }
+    * {
+      margin: 0;
+      padding: 0;
+    }
 
-.box {
-  width: 70px;
-  background: chocolate;
-  text-align: center;
-}
+    html {
+      background: blue;
+      height: 100%;
+    }
 
-.box span {
-  display: inline-block;
-}
+    body {
+      margin: 0 auto;
+      width: 500px;
+      background: white;
+      height: 100%;
+    }
 
-.box.big {
-  width: 200px;
-  font-size: smaller;
-}
-
-.box.moved {
-  margin-left: 40px;
-}
-/*      .box {
-        display: inline-block;
-        background: yellow;
-        font-size: 24px;
-        padding: 20px;
-      }
-
-      .padded {
-        padding: 20px 60px;
-      }
-
-      .block .box {
-        display: block;
-        width: 300px;
-        margin: 10px 0;
-        font-size: 32px;
-      }
-
-      span {
-        display: inline-block;
-      }
-
-      ul {
-        width: 200px;
-      }
-      li {
-        text-align: center;
-        background-color: whitesmoke;
-        list-style: none;
-      }*/
-
+    .outer {
+      width: 100px;
+      height: 100px;
+      background: red;
+    }
+    .inner {
+      width: 50px;
+      height: 100px;
+      background: green;
+    }
     </style>
   </head>
   <body>
-    <div class="box"><h2><span>One</span> <span>two</span> <span>three</span></h2></div>
+    <div class="outer"><div class="inner"></div></div>
     <!-- <ul>
       <li>One</li>
       <li>Two</li>
       <li>Three</li>
       <li>Four</li>
     </ul> -->
-    <script src="./mjukna.js"></script>
-    <script>
-mjukna(document.querySelectorAll('.box, .box span'), { staggerBy: 200 });
-document.querySelector('.box').classList.add('moved')
-
-// setTimeout(() => {
-//   mjukna(document.querySelectorAll('li'), { staggerBy: 80 });
-//   document.querySelector('li').remove();
-// }, 1000);
-    </script>
+    <script type="module" src="./boxes.js"></script>
   </body>
 </html>
-
-
-
-
-
