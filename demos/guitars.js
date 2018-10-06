@@ -1,7 +1,7 @@
 /* global mjukna, GUITARS, h */
 
 const grid = document.querySelector(".grid");
-const mjuknaConfig = { spring: { stiffness: 10, damping: 0.6 } };
+const mjuknaConfig = { spring: { stiffness: 1, damping: 0.6 } };
 
 async function onDetailClose(index) {
   const gridItem = document.querySelectorAll(".grid-item")[index];

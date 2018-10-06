@@ -174,21 +174,32 @@ function calculateParentScale(mjuk) {
 }
 
 function relativeDiffs(mjuk) {
-  const diffs = {
-    xCenterDiff: mjuk.currentXDiff,
-    yCenterDiff: mjuk.currentYDiff,
-    leftDiff: mjuk.leftDiff,
-    topDiff: mjuk.topDiff
-  };
+  const { newPosition, previousPosition } = mjuk;
+  let newLeft = newPosition.left;
+  let newTop = newPosition.top;
+  let previousLeft = previousPosition.left;
+  let previousTop = previousPosition.top;
+
   let papa = mjuk.parent;
+
   while (papa) {
-    diffs.xCenterDiff -= papa.currentXDiff;
-    diffs.yCenterDiff -= papa.currentYDiff;
-    diffs.leftDiff -= papa.leftDiff;
-    diffs.topDiff -= papa.topDiff;
+    newLeft -= papa.newPosition.left;
+    newTop -= papa.newPosition.top;
+    previousLeft = papa.previousPosition.left;
+    previousTop = papa.previousPosition.top;
     papa = papa.parent;
   }
-  return diffs;
+
+  return {
+    xCenterDiff:
+      previousLeft +
+      previousPosition.width / 2 -
+      (newLeft + newPosition.width / 2),
+    yCenterDiff:
+      previousTop +
+      previousPosition.height / 2 -
+      (newTop + newPosition.height / 2)
+  };
 }
 
 function getCenterDiffs(mjuk) {
@@ -198,53 +209,26 @@ function getCenterDiffs(mjuk) {
 function FLIPScaleTranslate(mjuk, getStaggerBy) {
   const { element, newPosition, scale } = mjuk;
 
-  const { xCenterDiff, yCenterDiff, leftDiff, topDiff } = getCenterDiffs(mjuk);
-  const xForCenter = newPosition.width / 2;
-  const yForCenter = newPosition.height / 2;
+  const { xCenterDiff, yCenterDiff } = getCenterDiffs(mjuk);
+  const xForCenter = newPosition.left + newPosition.width / 2;
+  const yForCenter = newPosition.top + newPosition.height / 2;
 
   const parentScale = calculateParentScale(mjuk);
 
   element.style.willChange = "transform";
-  // console.log(scale.x, scale.y, xCenterDiff, yCenterDiff);
-  const halfWidth = newPosition.width / 2;
-  const halfHeight = newPosition.height / 2;
-  const scaleCompensationX = halfWidth * (1 / parentScale.x - 1);
-  const scaleCompensationY = halfHeight * (1 / parentScale.y - 1);
 
-  console.log("==========");
-  console.log(
-    "halfWidth, halfHeight, scaleCompensationX, scaleCompensationY",
-    halfWidth,
-    halfHeight,
-    scaleCompensationX,
-    scaleCompensationY
-  );
-  console.log(
-    "scale.x, scale.y, xCenterDiff, yCenterDiff",
-    scale.x,
-    scale.y,
-    xCenterDiff,
-    yCenterDiff
-  );
-  console.log(
-    "mjuk.xCenterDiff, mjuk.yCenterDiff",
-    mjuk.xCenterDiff,
-    mjuk.yCenterDiff
-  );
+  // console.log("forCenter", xForCenter, yForCenter);
+  // console.log("parentScale", parentScale.x, parentScale.y);
+  // console.log("centerDiffs", xCenterDiff, yCenterDiff);
 
   element.style.transform = m
     .clear()
-    .s(1 / parentScale.x, 1 / parentScale.y)
-    .t(scaleCompensationX * parentScale.x, scaleCompensationY * parentScale.y)
-    // .t(-xForCenter, -yForCenter)
-    // .s(1 / parentScale.x, 1 / parentScale.y)
-    // .t(xForCenter, yForCenter)
     .t(-xForCenter, -yForCenter)
-    .s(scale.x, scale.y)
+    .s(1 / parentScale.x, 1 / parentScale.y)
     .t(xForCenter, yForCenter)
-    .t(leftDiff, topDiff) // * (1 / scale.x), yCenterDiff * (1 / scale.y))
+    .t(xCenterDiff, yCenterDiff)
+    .s(scale.x, scale.y)
     .css();
-  console.log(element.style.transform);
 
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
@@ -253,11 +237,11 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
     progress[1] = maybeTimeout2(
       mjuk,
       () => {
-        const { leftDiff, topDiff } = getCenterDiffs(mjuk);
+        const { xCenterDiff, yCenterDiff } = getCenterDiffs(mjuk);
         progress[2] = tween(
           Object.assign(
             {
-              from: [leftDiff, topDiff, scale.x, scale.y],
+              from: [xCenterDiff, yCenterDiff, scale.x, scale.y],
               to: [0, 0, 1, 1, 1, 1],
               update([x, y, scaleX, scaleY]) {
                 mjuk.scale.x = scaleX;
@@ -266,26 +250,14 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
                 mjuk.currentTopDiff = y;
 
                 const currentParentScale = calculateParentScale(mjuk);
-                const scaleCompensationX =
-                  halfWidth * (1 / currentParentScale.x - 1);
-                const scaleCompensationY =
-                  halfHeight * (1 / currentParentScale.y - 1);
                 element.style.transform = m
                   .clear()
-                  .s(1 / currentParentScale.x, 1 / currentParentScale.y)
-                  .t(
-                    scaleCompensationX * currentParentScale.x,
-                    scaleCompensationY * currentParentScale.y
-                  )
+
                   .t(-xForCenter, -yForCenter)
-                  .s(scaleX, scaleY)
+                  .s(1 / currentParentScale.x, 1 / currentParentScale.y)
                   .t(xForCenter, yForCenter)
-                  .t(x, y) // * (1 / scale.x), yCenterDiff * (1 / scale.y))
-                  // .t(-xForCenter, -yForCenter)
-                  // .s(1 / currentParentScale.x, 1 / currentParentScale.y)
-                  // .t(xForCenter, yForCenter)
-                  // .s(scaleX, scaleY)
-                  // .t(x * scaleX, y * scaleY)
+                  .t(x, y)
+                  .s(scaleX, scaleY)
                   .css();
               },
               done() {
