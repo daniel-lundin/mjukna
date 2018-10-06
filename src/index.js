@@ -185,8 +185,8 @@ function relativeDiffs(mjuk) {
   while (papa) {
     newLeft -= papa.newPosition.left;
     newTop -= papa.newPosition.top;
-    previousLeft = papa.previousPosition.left;
-    previousTop = papa.previousPosition.top;
+    previousLeft -= papa.previousPosition.left;
+    previousTop -= papa.previousPosition.top;
     papa = papa.parent;
   }
 
@@ -216,10 +216,6 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
   const parentScale = calculateParentScale(mjuk);
 
   element.style.willChange = "transform";
-
-  // console.log("forCenter", xForCenter, yForCenter);
-  // console.log("parentScale", parentScale.x, parentScale.y);
-  // console.log("centerDiffs", xCenterDiff, yCenterDiff);
 
   element.style.transform = m
     .clear()
