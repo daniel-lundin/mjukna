@@ -36,7 +36,10 @@ async function injectHelpers(page) {
 p,div {
   width: 100px;
   height: 100px;
-  color: rebeccapurple;
+  background: green;
+}
+div > div {
+  background: tomato;
 }
 * {
   margin: 0;
