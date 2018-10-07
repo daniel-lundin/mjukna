@@ -32,9 +32,10 @@ test("moving and resizing nested elements", async () => {
     const initialPositions = elements.map(dumpClientRect);
     mjukna(elements);
 
-    // Resize/move outer
+    // Resize/move
     outer.style.marginLeft = "0px";
     outer.style.height = "200px";
+    inner.style.height = "100px";
 
     // Record inverted positions
     const invertedPositions = await new Promise(resolve => {
@@ -55,10 +56,7 @@ test("moving and resizing nested elements", async () => {
   assert(intermediatePositions[0].left < initialPositions[0].left);
   assert(intermediatePositions[0].height > initialPositions[0].height);
 
-  // Inner should move but not grow
+  // Inner should move and grow
   assert(intermediatePositions[1].left < initialPositions[1].left);
-  assert(
-    Math.abs(intermediatePositions[1].height - initialPositions[1].height) <
-      0.01
-  );
+  assert(intermediatePositions[1].height > initialPositions[1].height);
 });
