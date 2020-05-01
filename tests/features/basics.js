@@ -5,7 +5,7 @@ const { feature } = require("kuta/lib/bdd");
 
 const { setupNewPage } = require("../helpers/browser.js");
 
-feature("basics", scenario => {
+feature.only("basics", (scenario) => {
   let browser;
 
   scenario.before(async () => {
@@ -38,7 +38,7 @@ feature("basics", scenario => {
         document.body.prepend(h1);
         const div = document.querySelector("div");
 
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           requestAnimationFrame(() => resolve(dumpClientRect(div)));
         });
       });
@@ -84,7 +84,7 @@ feature("basics", scenario => {
         elements[1].style.height = 200;
         elements[2].style.height = 200;
 
-        return new Promise(resolve =>
+        return new Promise((resolve) =>
           requestAnimationFrame(() => {
             resolve(elements.map(dumpClientRect));
           })
@@ -139,7 +139,7 @@ feature("basics", scenario => {
         const elements = Array.from(document.querySelectorAll("div"));
         document.body.removeChild(elements[0]);
 
-        return new Promise(resolve =>
+        return new Promise((resolve) =>
           requestAnimationFrame(() => {
             resolve(elements.map(dumpClientRect));
           })

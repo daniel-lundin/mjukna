@@ -30,6 +30,9 @@ async function injectHelpers(page) {
     };
 
     window.byId = id => document.getElementById(id);
+    window.onerror = function(error) {
+      console.log("error", JSON.stringify(error));
+    };
   });
 
   const css = `

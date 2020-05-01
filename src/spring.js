@@ -11,7 +11,6 @@ function springTween(config, rAF) {
   let velocity = config.velocity || 0;
 
   const { from, to } = config;
-  const output = [...config.from];
 
   let tweenValue = 0;
 
@@ -30,7 +29,6 @@ function springTween(config, rAF) {
     }
 
     if (Math.abs(tweenValue - 1) < 0.001 && Math.abs(velocity) < 0.001) {
-      tweenArray(from, to, output, 1);
       config.update(to);
       if (config.done) {
         config.done();
@@ -38,8 +36,7 @@ function springTween(config, rAF) {
       return;
     }
 
-    tweenArray(from, to, output, tweenValue);
-    config.update(output);
+    config.update(from + (to - from) * tweenValue);
     rAF(tick);
   };
   rAF(tick);
@@ -51,7 +48,7 @@ export function tween(config) {
   const showStopper = () => {
     stopper.stopped = true;
   };
-  const rAF = cb => {
+  const rAF = (cb) => {
     if (!stopper.stopped) {
       window.requestAnimationFrame(cb);
     }

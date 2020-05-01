@@ -15,7 +15,7 @@ test.after(() => {
   return browser.close();
 });
 
-test("staggered elements should stay in place", async () => {
+test.only("staggered elements should stay in place", async () => {
   const page = await setupNewPage(browser);
   const { initialPositions, intermediatePositions } = await page.evaluate(
     async () => {
@@ -46,7 +46,7 @@ test("staggered elements should stay in place", async () => {
   // Only outer should have started to move
   console.log("initialPositions[0]", initialPositions[0]);
   console.log("intermediatePositions[0]", intermediatePositions[0]);
-  assert(initialPositions[0].left < intermediatePositions[0].left);
+  assert(initialPositions[0].left > intermediatePositions[0].left);
   assert.equal(initialPositions[1].left, intermediatePositions[1].left);
   // inner
 });

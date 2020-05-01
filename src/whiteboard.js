@@ -1,37 +1,5 @@
 /* Build a tree of all elements to animate to be able to calculate relative animations */
 
-export function buildTree(nodes, mjuk, parent) {
-  mjuk.element.style.transform = "";
-
-  const foundParent = nodes.find(node => {
-    return node.element.contains(mjuk.element);
-  });
-
-  if (foundParent) {
-    return nodes.map(node => {
-      if (node === foundParent) {
-        return Object.assign(node, {
-          parent,
-          children: buildTree(foundParent.children, mjuk, foundParent)
-        });
-      } else {
-        return node;
-      }
-    });
-  } else {
-    const elementChildren = nodes.filter(node =>
-      mjuk.element.contains(node.element)
-    );
-    const nonChildren = nodes.filter(
-      node => !mjuk.element.contains(node.element)
-    );
-
-    const me = Object.assign(mjuk, { parent, children: elementChildren });
-    reParent(me.children, me);
-    return [...nonChildren, me];
-  }
-}
-
 // function relativeRect(outer, inner) {
 //   return {
 //     left: inner.left - outer.left,
@@ -50,12 +18,12 @@ export function buildTree(nodes, mjuk, parent) {
 // }
 
 export function withRelativeValues(tree) {
-  return tree.map(node => {
+  return tree.map((node) => {
     const { previousPosition } = node;
     const newPosition = node.element.getBoundingClientRect();
     const scale = {
       x: previousPosition.width / newPosition.width,
-      y: previousPosition.height / newPosition.height
+      y: previousPosition.height / newPosition.height,
     };
 
     node.newPosition = newPosition;
@@ -89,7 +57,7 @@ export function withRelativeValues(tree) {
 }
 
 export function flatten(tree, items = []) {
-  tree.forEach(n => {
+  tree.forEach((n) => {
     items.push(n);
     flatten(n.children, items);
   });
@@ -97,7 +65,7 @@ export function flatten(tree, items = []) {
 }
 
 function reParent(nodes, parent) {
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     node.parent = parent;
   });
   return nodes;
