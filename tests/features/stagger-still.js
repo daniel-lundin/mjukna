@@ -15,7 +15,7 @@ test.after(() => {
   return browser.close();
 });
 
-test.only("staggered elements should stay in place", async () => {
+test("staggered elements should stay in place", async () => {
   const page = await setupNewPage(browser);
   const { initialPositions, intermediatePositions } = await page.evaluate(
     async () => {

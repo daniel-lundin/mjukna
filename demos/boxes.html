@@ -48,8 +48,11 @@
       import mjukna from '../src/index.js';
       const outer = document.querySelector('.outer');
       const inner = document.querySelector('.inner');
-      mjukna([inner, outer], {
-        staggerBy: 100
+      mjukna([outer, inner], {
+        staggerBy: 3000,
+        spring: {
+          stiffness: 2
+        }
       });
       outer.style.marginLeft = '300px';
     </script>

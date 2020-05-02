@@ -5,7 +5,7 @@ const { feature } = require("kuta/lib/bdd");
 
 const { setupNewPage } = require("../helpers/browser.js");
 
-feature.only("basics", (scenario) => {
+feature("basics", (scenario) => {
   let browser;
 
   scenario.before(async () => {

@@ -3,6 +3,7 @@ import { createMatrix } from "./matrix.js";
 import { fadeIn, fadeOut } from "./presets.js";
 
 const m = createMatrix();
+const rAF = window.requestAnimationFrame;
 
 const observeConfig = {
   childList: true,
@@ -156,27 +157,30 @@ function updateElements(activeNodes) {
   return Promise.all(animations);
 }
 
+async function idleAt(node, value, predicate) {
+  const element = node.getElement();
+  return new Promise((done) => {
+    function wait() {
+      if (predicate()) {
+        return done();
+      }
+      node.setValue(value);
+      element.style.transform = node.getCSSTransform();
+      rAF(wait);
+    }
+    rAF(wait);
+  });
+}
+
 async function FLIPScaleTranslate(node) {
   const element = node.getElement();
   element.style.willChange = "transform";
   node.setValue(1);
   element.style.transform = node.getCSSTransform();
 
-  const now = Date.now();
   if (node.staggerBy) {
-    await new Promise((resolve) => {
-      function chill() {
-        if (Date.now() - now >= node.staggerBy) {
-          resolve();
-          return;
-        }
-        node.setValue(1);
-        element.style.transform = node.getCSSTransform();
-
-        window.requestAnimationFrame(chill);
-      }
-      window.requestAnimationFrame(chill);
-    });
+    const now = Date.now();
+    await idleAt(node, 1, () => Date.now() - now >= node.staggerBy);
   }
 
   return new Promise((resolve) => {
@@ -187,8 +191,10 @@ async function FLIPScaleTranslate(node) {
         node.setValue(value);
         element.style.transform = node.getCSSTransform();
       },
-      done() {
+      async done() {
         node.setValue(0);
+        node.completed = true;
+        await idleAt(node, 0, () => !nodes.find((n) => !n.completed));
         element.style.transform = "";
         resolve();
       },
