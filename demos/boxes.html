@@ -18,10 +18,9 @@
     }
 
     body {
-      margin: 0 auto;
-      width: 500px;
       background: white;
       height: 100%;
+      margin-left: 100px
     }
 
     .outer {
@@ -37,7 +36,7 @@
     </style>
   </head>
   <body>
-    <div class="outer"><div class="inner"></div></div>
+    <div class="outer"><div class="inner">I</div></div>
     <!-- <ul>
       <li>One</li>
       <li>Two</li>
@@ -49,12 +48,15 @@
       const outer = document.querySelector('.outer');
       const inner = document.querySelector('.inner');
       mjukna([outer, inner], {
-        staggerBy: 3000,
+        staggerBy: 200,
         spring: {
           stiffness: 2
         }
       });
-      outer.style.marginLeft = '300px';
+      outer.style.marginLeft = '100px';
+      outer.style.width = '200px';
+      inner.style.marginLeft = '100px';
+      outer.style.height = '200px';
     </script>
   </body>
 </html>

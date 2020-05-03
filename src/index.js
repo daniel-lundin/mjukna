@@ -72,53 +72,17 @@ export default function mjukna(elements, options = {}) {
 }
 
 function init() {
-  observer = new MutationObserver((mutations, index) => {
+  observer = new MutationObserver(() => {
     observer.disconnect();
 
     nodes.forEach((node, index) => {
       node.readPosition();
       node.staggerBy = (config.staggerBy || 0) * index;
     });
-    updateElements(nodes);
-
-    return;
-
-    let stagger = 0;
-    const getStaggerBy = () => {
-      const current = stagger;
-      stagger += config.staggerBy;
-      return current;
-    };
-
-    const childListMutations = mutations.filter(
-      ({ type }) => type === "childList"
-    );
-    const removed = [];
-    for (const mutation of childListMutations) {
-      for (const removedNode of mutation.removedNodes) {
-        const mjuk = mjuka.find((mjuk) => mjuk.getElement() === removedNode);
-        const alsoAdded = addedNodes.includes(removedNode);
-        if (mjuk && !alsoAdded) {
-          removed.push([mjuk, mutation.target]);
-        }
-      }
-    }
-
-    const added = addedNodes
-      .filter((e) => config.enterFilter(e))
-      .filter((node) => !mjuka.find((m) => node === m.getElement()));
-    const present = mjuka.filter((mjuk) => mjuk.getElement().parentNode);
-
-    Promise.all(
-      []
-        .concat(
-          removed.map(([element, previousParent]) =>
-            exitAnimation(element, previousParent, getStaggerBy)
-          )
-        )
-        .concat(updateElements(present, getStaggerBy))
-        .concat(added.map((element) => enterAnimation(element, getStaggerBy)))
-    ).then(completionResolver);
+    updateElements(nodes).then(() => {
+      nodes = [];
+      completionResolver();
+    });
   });
 }
 
@@ -151,9 +115,15 @@ function updateElements(activeNodes) {
   });
   activeNodes.sort((a, b) => a.depth - b.depth);
 
+  window.nodes = nodes;
+  // nodes[0].setValue(0.5);
+  // nodes[0].getElement().style.transform = nodes[0].getCSSTransform();
+  // nodes[1].setValue(1);
+  // nodes[1].getElement().style.transform = nodes[1].getCSSTransform();
+  // return;
+
   const animations = activeNodes.map((node) => FLIPScaleTranslate(node));
 
-  // mjuka = [];
   return Promise.all(animations);
 }
 
@@ -177,6 +147,8 @@ async function FLIPScaleTranslate(node) {
   element.style.willChange = "transform";
   node.setValue(1);
   element.style.transform = node.getCSSTransform();
+
+  window.nodes = nodes;
 
   if (node.staggerBy) {
     const now = Date.now();
@@ -206,8 +178,8 @@ async function FLIPScaleTranslate(node) {
 function createNode({ getElement, previousPosition }) {
   let finalPosition;
 
-  let centerOffsetX;
-  let centerOffsetY;
+  let offsetFromCenterX;
+  let offsetFromCenterY;
   let centerDiffX;
   let centerDiffY;
   let scaleX;
@@ -221,8 +193,8 @@ function createNode({ getElement, previousPosition }) {
     readPosition() {
       finalPosition = getElement().getBoundingClientRect();
 
-      centerOffsetX = finalPosition.left + finalPosition.width / 2;
-      centerOffsetY = finalPosition.top + finalPosition.height / 2;
+      offsetFromCenterX = finalPosition.width - finalPosition.width / 2;
+      offsetFromCenterY = finalPosition.height - finalPosition.height / 2;
       centerDiffX =
         finalPosition.left +
         finalPosition.width / 2 -
@@ -243,77 +215,40 @@ function createNode({ getElement, previousPosition }) {
     setValue: (value) => {
       node.currentValue = value;
 
-      const desiredOffsetX = centerDiffX * value;
-      const actualOffsetX =
-        desiredOffsetX + (node.parent ? node.parent.currentOffsetX : 0);
-      const desiredOffsetY = centerDiffY * value;
-      const actualOffsetY =
-        desiredOffsetY + (node.parent ? node.parent.currentOffsetY : 0);
+      node.currentScaleX = scaleX * value + 1 - value;
+      node.currentScaleY = scaleY * value + 1 - value;
 
-      node.currentOffsetX = desiredOffsetX - (actualOffsetX - desiredOffsetX);
-      node.currentOffsetY = desiredOffsetY - (actualOffsetY - desiredOffsetY);
+      node.currentOffsetX =
+        -(centerDiffX + (node.parent ? node.parent.currentOffsetX : 0)) * value;
+      node.currentOffsetY =
+        -(centerDiffY + (node.parent ? node.parent.currentTopOffset : 0)) *
+        value;
     },
 
     getParentScale: () => {
-      if (!node.parent) return [1, 1];
-
-      const [parentScaleX, parentScaleY] = node.parent.getParentScale();
-      return [scaleX * parentScaleX, scaleY * parentScaleY];
+      let scaleX = 1;
+      let scaleY = 1;
+      let parent = node.parent;
+      while (parent) {
+        scaleX *= parent.currentScaleX;
+        scaleY *= parent.currentScaleY;
+        parent = parent.parent;
+      }
+      return [scaleX, scaleY];
     },
 
     getCSSTransform() {
       const parentScale = node.getParentScale();
-
       return m
         .clear()
-        .t(-centerOffsetX, -centerOffsetY)
+        .t(-offsetFromCenterX, -offsetFromCenterY)
         .s(1 / parentScale[0], 1 / parentScale[1])
-        .t(centerOffsetX, centerOffsetY)
-        .t(-node.currentOffsetX, -node.currentOffsetY)
-        .s(scaleX, scaleY)
+        .t(offsetFromCenterX, offsetFromCenterY)
+        .t(node.currentOffsetX, node.currentOffsetY)
+        .s(node.currentScaleX, node.currentScaleY)
         .css();
     },
     stop,
   };
   return node;
-}
-
-function enterAnimation(element) {
-  element.style.willChange = "transform, opacity";
-
-  return new Promise((resolve) => {
-    maybeTimeout(() => {
-      if (config.enterAnimation) return config.enterAnimation(element, resolve);
-      fadeIn(element, config.spring, resolve);
-    }, getStaggerBy());
-  });
-}
-
-function exitAnimation(mjuk, previousParent) {
-  const { previousPosition } = mjuk;
-  const element = mjuk.getElement();
-  previousParent.appendChild(element);
-  element.style.position = "absolute";
-  element.style.width = `${previousPosition.width}px`;
-  element.style.height = `${previousPosition.height}px`;
-  element.style.top = 0;
-  element.style.left = 0;
-
-  const newPosition = element.getBoundingClientRect();
-  const xCenterDiff = newPosition.left - previousPosition.left;
-  const yCenterDiff = newPosition.top - previousPosition.top;
-  element.style.willChange = "transform, opacity";
-  element.style.top = `${-yCenterDiff}px`;
-  element.style.left = `${-xCenterDiff}px`;
-
-  return new Promise((resolve) => {
-    maybeTimeout(() => {
-      const done = () => {
-        element.remove();
-        resolve();
-      };
-      if (config.exitAnimation) return config.exitAnimation(element, done);
-      fadeOut(element, config.spring, done);
-    }, getStaggerBy());
-  });
 }
