@@ -116,11 +116,11 @@ function updateElements(activeNodes) {
   activeNodes.sort((a, b) => a.depth - b.depth);
 
   window.nodes = nodes;
-  // nodes[0].setValue(0.5);
-  // nodes[0].getElement().style.transform = nodes[0].getCSSTransform();
-  // nodes[1].setValue(1);
-  // nodes[1].getElement().style.transform = nodes[1].getCSSTransform();
-  // return;
+  nodes[0].setValue(0.5);
+  nodes[0].getElement().style.transform = nodes[0].getCSSTransform();
+  nodes[1].setValue(0.5);
+  nodes[1].getElement().style.transform = nodes[1].getCSSTransform();
+  return;
 
   const animations = activeNodes.map((node) => FLIPScaleTranslate(node));
 
@@ -193,6 +193,7 @@ function createNode({ getElement, previousPosition }) {
     readPosition() {
       finalPosition = getElement().getBoundingClientRect();
 
+      console.log({ finalPosition, previousPosition });
       offsetFromCenterX = finalPosition.width - finalPosition.width / 2;
       offsetFromCenterY = finalPosition.height - finalPosition.height / 2;
       centerDiffX =
@@ -205,6 +206,8 @@ function createNode({ getElement, previousPosition }) {
         (previousPosition.top + previousPosition.height / 2);
       scaleX = previousPosition.width / finalPosition.width;
       scaleY = previousPosition.height / finalPosition.height;
+      console.log("centerDiffX", centerDiffX);
+      console.log("scaleX", scaleX);
     },
     getElement,
     previousPosition,
@@ -218,11 +221,32 @@ function createNode({ getElement, previousPosition }) {
       node.currentScaleX = scaleX * value + 1 - value;
       node.currentScaleY = scaleY * value + 1 - value;
 
-      node.currentOffsetX =
-        -(centerDiffX + (node.parent ? node.parent.currentOffsetX : 0)) * value;
-      node.currentOffsetY =
-        -(centerDiffY + (node.parent ? node.parent.currentTopOffset : 0)) *
-        value;
+      const currentWidth = finalPosition.width * node.currentScaleX;
+      const currentHeight = finalPosition.height * node.currentScaleY;
+
+      console.log("org centerdiff", centerDiffX);
+      console.log(
+        "width prev, final",
+        previousPosition.width,
+        finalPosition.width
+      );
+      console.log("centerdiff", -centerDiffX * value);
+      node.currentOffsetX = -centerDiffX * value;
+      node.currentOffsetY = -centerDiffY * value;
+      console.log("currXOffset", node.currentOffsetX);
+
+      // console.log("final width", finalPosition.width);
+      // console.log("x,y", node.currentOffsetX, node.currentOffsetY);
+      // console.log("centerDiff", centerDiffX);
+      // node.currentLeftOffset =
+      //   node.currentOffsetX -
+      //   (currentWidth / 2 - finalPosition.width / 2) -
+      //   (node.parent ? node.parent.currentLeftOffset : 0);
+      // node.currentTopOffset =
+      //   node.currentOffsetY -
+      //   (currentHeight / 2 - finalPosition.height / 2) -
+      //   (node.parent ? node.parent.currentTopOffset : 0);
+      console.log("current leftOffset", node.currentLeftOffset);
     },
 
     getParentScale: () => {
@@ -239,6 +263,20 @@ function createNode({ getElement, previousPosition }) {
 
     getCSSTransform() {
       const parentScale = node.getParentScale();
+      // const parentLeft = node.parent ? node.parent.currentLeftOffset : 0;
+      // const parentTop = node.parent ? node.parent.currentTopOffset : 0;
+      const css = `
+
+      translate(${-offsetFromCenterX}px, ${-offsetFromCenterY}px) scale(${
+        1 / parentScale[0]
+      }, ${1 / parentScale[1]})
+      translate(${offsetFromCenterX}px, ${offsetFromCenterY}px)
+
+      translate(${node.currentOffsetX}px, ${node.currentOffsetY}px)
+      scale(${node.currentScaleX}, ${node.currentScaleY})`;
+
+      console.log(css);
+      return css;
       return m
         .clear()
         .t(-offsetFromCenterX, -offsetFromCenterY)

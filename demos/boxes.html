@@ -13,30 +13,69 @@
     }
 
     html {
-      background: blue;
       height: 100%;
-    }
-
-    body {
-      background: white;
-      height: 100%;
-      margin-left: 100px
     }
 
     .outer {
-      width: 100px;
-      height: 100px;
-      background: red;
+      background-color: aliceblue;
     }
+
     .inner {
-      width: 50px;
-      height: 100px;
-      background: green;
+      background-color: hotpink;
     }
+
+    .root {
+      background: gray;
+      height: 540px;
+      width: 540px;
+      margin-top: 100px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      grid-template-rows: 1fr 2fr;
+    }
+
+
+    .top-left {
+      grid-column-start: 1;
+      grid-column-end: 2;
+      grid-rows-start: 1;
+      grid-rows-end: 2;
+    }
+
+    .bottom-right {
+      grid-column-start: 2;
+      grid-column-end: 3;
+      grid-row-start: 1;
+      grid-row-end: 2;
+    }
+
+    .col-1 {
+      grid-column-start: 1;
+      grid-column-end: 2;
+    }
+
+    .col-1-2 {
+      grid-column-start: 1;
+      grid-column-end: 3;
+    }
+
+    .col-2 {
+      grid-column-start: 2;
+      grid-column-end: 3;
+
+    }
+
     </style>
   </head>
   <body>
-    <div class="outer"><div class="inner">I</div></div>
+    <div class="grid root">
+      <div class="outer grid top-left">
+        <div class="inner top-left"></div>
+      </div>
+    </div class="grid">
     <!-- <ul>
       <li>One</li>
       <li>Two</li>
@@ -45,18 +84,22 @@
     </ul> -->
     <script type="module">
       import mjukna from '../src/index.js';
+
       const outer = document.querySelector('.outer');
       const inner = document.querySelector('.inner');
       mjukna([outer, inner], {
-        staggerBy: 200,
+        staggerBy: 1000,
         spring: {
           stiffness: 2
         }
       });
-      outer.style.marginLeft = '100px';
-      outer.style.width = '200px';
-      inner.style.marginLeft = '100px';
-      outer.style.height = '200px';
+
+      outer.classList.remove('top-left');
+      outer.classList.add('bottom-right');
+      inner.classList.remove('top-left');
+      inner.classList.add('bottom-right');
+      // inner.classList.remove('col-1-2');
+      // inner.classList.add('col-1');
     </script>
   </body>
 </html>
