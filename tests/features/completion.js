@@ -5,7 +5,7 @@ const { feature } = require("kuta/lib/bdd");
 
 const { setupNewPage } = require("../helpers/browser.js");
 
-feature("completion", scenario => {
+feature("completion", (scenario) => {
   let browser;
 
   scenario.before(async () => {
@@ -44,7 +44,7 @@ feature("completion", scenario => {
           p.style.height = "100px";
           document.body.prepend(p);
 
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             requestAnimationFrame(() => {
               const divs = Array.from(document.querySelectorAll("div"));
               resolve(divs.map(dumpClientRect));
@@ -74,9 +74,9 @@ feature("completion", scenario => {
       then("the elements should be in their final position", async () => {
         const finalTransforms = await page.evaluate(() => {
           const divs = Array.from(document.querySelectorAll("div"));
-          return divs.map(element => element.style.transform);
+          return divs.map((element) => element.style.transform);
         });
-        finalTransforms.forEach(transform => assert.equal(transform, ""));
+        finalTransforms.forEach((transform) => assert.equal(transform, ""));
       });
     }
   );

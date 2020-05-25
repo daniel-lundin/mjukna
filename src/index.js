@@ -1,14 +1,13 @@
 import { tween } from "./spring.js";
 import { createMatrix } from "./matrix.js";
 import { fadeIn, fadeOut } from "./presets.js";
-import { buildTree, flatten, withRelativeValues } from "./whiteboard.js";
 
 const m = createMatrix();
 
 const observeConfig = {
   childList: true,
   subtree: true,
-  attributes: true
+  attributes: true,
 };
 
 const maybeTimeout = (fn, timeout) =>
@@ -32,13 +31,13 @@ const FALSE = () => false;
 
 export default function mjukna(elements, options = {}) {
   enableObserver();
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     completionResolver = resolve;
     config = {
       spring: options.spring,
       staggerBy: options.staggerBy || 0,
       enterFilter: options.enterFilter || FALSE,
-      enterAnimation: options.enterAnimation
+      enterAnimation: options.enterAnimation,
     };
     const iterable = Number.isInteger(elements.length)
       ? elements
@@ -59,7 +58,7 @@ export default function mjukna(elements, options = {}) {
         previousPosition: item.anchor
           ? item.anchor.getBoundingClientRect()
           : getElement().getBoundingClientRect(),
-        stop: () => {}
+        stop: () => {},
       };
       mjuka.push(mjuk);
     }
@@ -69,7 +68,7 @@ export default function mjukna(elements, options = {}) {
 function enterAnimation(element, getStaggerBy) {
   element.style.willChange = "transform, opacity";
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     maybeTimeout(() => {
       if (config.enterAnimation) return config.enterAnimation(element, resolve);
       fadeIn(element, config.spring, resolve);
@@ -87,14 +86,14 @@ function exitAnimation(mjuk, previousParent, getStaggerBy) {
   element.style.top = 0;
   element.style.left = 0;
 
-  const newPosition = element.getBoundingClientRect();
-  const xDiff = newPosition.left - previousPosition.left;
-  const yDiff = newPosition.top - previousPosition.top;
+  const finalPosition = element.getBoundingClientRect();
+  const xDiff = finalPosition.left - previousPosition.left;
+  const yDiff = finalPosition.top - previousPosition.top;
   element.style.willChange = "transform, opacity";
   element.style.top = `${-yDiff}px`;
   element.style.left = `${-xDiff}px`;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     maybeTimeout(() => {
       const done = () => {
         element.remove();
@@ -107,7 +106,7 @@ function exitAnimation(mjuk, previousParent, getStaggerBy) {
 }
 
 function init() {
-  observer = new MutationObserver(mutations => {
+  observer = new MutationObserver((mutations) => {
     observer.disconnect();
 
     let stagger = 0;
@@ -122,14 +121,14 @@ function init() {
     );
 
     const addedNodes = childListMutations
-      .map(mutation => Array.from(mutation.addedNodes))
+      .map((mutation) => Array.from(mutation.addedNodes))
       .reduce((acc, curr) => acc.concat(curr), [])
       .filter(({ nodeType }) => nodeType === 1);
 
     const removed = [];
     for (const mutation of childListMutations) {
       for (const removedNode of mutation.removedNodes) {
-        const mjuk = mjuka.find(mjuk => mjuk.getElement() === removedNode);
+        const mjuk = mjuka.find((mjuk) => mjuk.getElement() === removedNode);
         const alsoAdded = addedNodes.includes(removedNode);
         if (mjuk && !alsoAdded) {
           removed.push([mjuk, mutation.target]);
@@ -138,9 +137,9 @@ function init() {
     }
 
     const added = addedNodes
-      .filter(e => config.enterFilter(e))
-      .filter(node => !mjuka.find(m => node === m.getElement()));
-    const present = mjuka.filter(mjuk => mjuk.getElement().parentNode);
+      .filter((e) => config.enterFilter(e))
+      .filter((node) => !mjuka.find((m) => node === m.getElement()));
+    const present = mjuka.filter((mjuk) => mjuk.getElement().parentNode);
 
     Promise.all(
       []
@@ -150,18 +149,28 @@ function init() {
           )
         )
         .concat(updateElements(present, getStaggerBy))
-        .concat(added.map(element => enterAnimation(element, getStaggerBy)))
+        .concat(added.map((element) => enterAnimation(element, getStaggerBy)))
     ).then(completionResolver);
   });
 }
 
 function updateElements(activeMjuka, getStaggerBy) {
-  const tree = activeMjuka
-    .map(mjuk => Object.assign(mjuk, { mjuk, element: mjuk.getElement() }))
-    .reduce((acc, mjuk) => buildTree(acc, mjuk), []);
-  const flatTree = flatten(withRelativeValues(tree));
+  const elements = activeMjuka.map((mjuk) => {
+    const element = mjuk.getElement();
+    element.style.transform = "";
+    const finalPosition = element.getBoundingClientRect();
+    return Object.assign(mjuk, {
+      mjuk,
+      element,
+      finalPosition,
+      scale: {
+        x: mjuk.previousPosition.width / finalPosition.width,
+        y: mjuk.previousPosition.height / finalPosition.height,
+      },
+    });
+  });
 
-  const animations = flatTree.map(mjuk =>
+  const animations = elements.map((mjuk) =>
     FLIPScaleTranslate(mjuk, getStaggerBy)
   );
 
@@ -170,56 +179,37 @@ function updateElements(activeMjuka, getStaggerBy) {
 }
 
 function FLIPScaleTranslate(mjuk, getStaggerBy) {
-  const { parentScale, element, scale, previousPosition, newPosition } = mjuk;
-  const xCenterDiff =
+  const { element, scale, previousPosition, finalPosition } = mjuk;
+  const centerDiffX =
     previousPosition.left +
     previousPosition.width / 2 -
-    (newPosition.left + newPosition.width / 2);
+    (finalPosition.left + finalPosition.width / 2);
 
-  const yCenterDiff =
+  const centerDiffY =
     previousPosition.top +
     previousPosition.height / 2 -
-    (newPosition.top + newPosition.height / 2);
-
-  const xScaleCompensation = scale.x;
-  const yScaleCompensation = scale.y;
-
-  const xForCenter = newPosition.left + newPosition.width / 2;
-  const yForCenter = newPosition.top + newPosition.height / 2;
+    (finalPosition.top + finalPosition.height / 2);
 
   element.style.willChange = "transform";
   element.style.transform = m
     .clear()
-    .t(-xForCenter, -yForCenter)
-    .s(1 / parentScale.x, 1 / parentScale.y)
-    .t(xForCenter, yForCenter)
-    .t(xCenterDiff, yCenterDiff)
-    .s(xScaleCompensation, yScaleCompensation)
+    .t(centerDiffX, centerDiffY)
+    .s(scale.x, scale.y)
     .css();
 
   const progress = [element, void 0, () => {}];
   inProgress.push(progress);
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     progress[1] = maybeTimeout(() => {
       progress[2] = tween(
         Object.assign(
           {
-            from: [
-              xCenterDiff,
-              yCenterDiff,
-              xScaleCompensation,
-              yScaleCompensation,
-              parentScale.x,
-              parentScale.y
-            ],
-            to: [0, 0, 1, 1, 1, 1],
-            update([x, y, scaleX, scaleY, parentScaleX, parentScaleY]) {
+            from: [centerDiffX, centerDiffY, scale.x, scale.y],
+            to: [0, 0, 1, 1],
+            update([x, y, scaleX, scaleY]) {
               element.style.transform = m
                 .clear()
-                .t(-xForCenter, -yForCenter)
-                .s(1 / parentScaleX, 1 / parentScaleY)
-                .t(xForCenter, yForCenter)
                 .t(x, y)
                 .s(scaleX, scaleY)
                 .css();
@@ -227,7 +217,7 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
             done() {
               element.style.transform = "";
               resolve();
-            }
+            },
           },
           config.spring
         )
