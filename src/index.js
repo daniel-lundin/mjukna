@@ -10,14 +10,14 @@ const observeConfig = {
   attributes: true,
 };
 
-const maybeTimeout = (fn, timeout) =>
+const smartTimeout = (fn, timeout) =>
   timeout === 0 ? fn() : setTimeout(fn, timeout);
 
 let mjuka = [];
 let config = {};
 let observer;
 
-let inProgress = [];
+let runningAnimations = [];
 let completionResolver = () => {};
 
 function enableObserver() {
@@ -45,19 +45,24 @@ export default function mjukna(elements, options = {}) {
     for (let item of iterable) {
       // Stop any running animations for element
       const getElement = item.anchor ? item.element : () => item;
-      inProgress = inProgress.filter(([e, staggerTimer, stopper]) => {
-        if (e === getElement()) {
-          clearInterval(staggerTimer);
-          stopper();
+      runningAnimations = runningAnimations.filter(
+        ({ element, staggerTimer, stopper }) => {
+          if (element === getElement()) {
+            clearInterval(staggerTimer);
+            stopper();
+          }
+          return element !== getElement();
         }
-        return e !== getElement();
-      });
+      );
 
       const mjuk = {
         getElement,
         previousPosition: item.anchor
           ? item.anchor.getBoundingClientRect()
           : getElement().getBoundingClientRect(),
+        previousBorderRadius: getComputedStyle(
+          item.anchor ? item.anchor : getElement()
+        ).borderRadius,
         stop: () => {},
       };
       mjuka.push(mjuk);
@@ -94,7 +99,7 @@ function exitAnimation(mjuk, previousParent, getStaggerBy) {
   element.style.left = `${-xDiff}px`;
 
   return new Promise((resolve) => {
-    maybeTimeout(() => {
+    smartTimeout(() => {
       const done = () => {
         element.remove();
         resolve();
@@ -197,12 +202,12 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
     .s(scale.x, scale.y)
     .css();
 
-  const progress = [element, void 0, () => {}];
-  inProgress.push(progress);
+  const animation = { element, staggerTimer: void 0, stopper: () => {} };
+  runningAnimations.push(animation);
 
   return new Promise((resolve) => {
-    progress[1] = maybeTimeout(() => {
-      progress[2] = tween(
+    animation.staggerTimer = smartTimeout(() => {
+      animation.stopper = tween(
         Object.assign(
           {
             from: [centerDiffX, centerDiffY, scale.x, scale.y],
