@@ -51,7 +51,7 @@ export function tween(config) {
   const showStopper = () => {
     stopper.stopped = true;
   };
-  const rAF = cb => {
+  const rAF = (cb) => {
     if (!stopper.stopped) {
       window.requestAnimationFrame(cb);
     }

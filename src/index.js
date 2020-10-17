@@ -71,10 +71,10 @@ export default function mjukna(elements, options = {}) {
 }
 
 function enterAnimation(element, getStaggerBy) {
-  element.style.willChange = "transform, opacity";
+  element.style.willChange = "transform, opacity, border-radius";
 
   return new Promise((resolve) => {
-    maybeTimeout(() => {
+    smartTimeout(() => {
       if (config.enterAnimation) return config.enterAnimation(element, resolve);
       fadeIn(element, config.spring, resolve);
     }, getStaggerBy());
@@ -164,15 +164,17 @@ function updateElements(activeMjuka, getStaggerBy) {
     const element = mjuk.getElement();
     element.style.transform = "";
     const finalPosition = element.getBoundingClientRect();
-    return Object.assign(mjuk, {
-      mjuk,
+    const finalBorderRadius = getComputedStyle(element).borderRadius;
+    return {
+      ...mjuk,
       element,
       finalPosition,
+      finalBorderRadius,
       scale: {
         x: mjuk.previousPosition.width / finalPosition.width,
         y: mjuk.previousPosition.height / finalPosition.height,
       },
-    });
+    };
   });
 
   const animations = elements.map((mjuk) =>
@@ -202,6 +204,13 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
     .s(scale.x, scale.y)
     .css();
 
+  const [, previousBorderRadius] = /(\d*)(\w*)/.exec(mjuk.previousBorderRadius);
+  const [, currentBorderRadius, borderRadiusUnit] = /(\d*)(\w*)/.exec(
+    mjuk.finalBorderRadius
+  );
+  element.style.borderRadius = `${
+    previousBorderRadius / scale.x
+  }${borderRadiusUnit} / ${previousBorderRadius / scale.y}${borderRadiusUnit}`;
   const animation = { element, staggerTimer: void 0, stopper: () => {} };
   runningAnimations.push(animation);
 
@@ -210,17 +219,31 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
       animation.stopper = tween(
         Object.assign(
           {
-            from: [centerDiffX, centerDiffY, scale.x, scale.y],
-            to: [0, 0, 1, 1],
-            update([x, y, scaleX, scaleY]) {
+            from: [
+              centerDiffX,
+              centerDiffY,
+              scale.x,
+              scale.y,
+              Number(previousBorderRadius),
+            ],
+            to: [0, 0, 1, 1, Number(currentBorderRadius)],
+            update([x, y, scaleX, scaleY, borderRadius]) {
               element.style.transform = m
                 .clear()
                 .t(x, y)
                 .s(scaleX, scaleY)
                 .css();
+              if (borderRadius !== 0) {
+                element.style.borderRadius = `${
+                  borderRadius / scaleX
+                }${borderRadiusUnit} / ${
+                  borderRadius / scaleY
+                }${borderRadiusUnit}`;
+              }
             },
             done() {
               element.style.transform = "";
+              element.style.borderRadius = mjuk.finalBorderRadius;
               resolve();
             },
           },
