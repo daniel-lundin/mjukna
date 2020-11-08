@@ -1,19 +1,21 @@
-/* global mjukna */
+import mjukna from "../src/index.js";
 
 const byId = document.getElementById.bind(document);
 
 function setupListeners() {
   const button = document.querySelector("button");
-  button.addEventListener("click", event => {
+  button.addEventListener("click", (event) => {
     event.preventDefault();
-    mjukna([button, button.querySelector("span")], {
+    mjukna(byId("example"), {
       spring: {
-        stiffness: parseFloat(byId("stiffness").value),
-        damping: parseFloat(byId("damping").value)
-      }
+        tension: parseFloat(byId("tension").value),
+        friction: parseFloat(byId("friction").value),
+        velocity: parseFloat(byId("initial-velocity").value),
+        mass: parseFloat(byId("mass").value),
+      },
     });
 
-    button.classList.toggle("big");
+    byId("example").classList.toggle("active");
   });
 }
 

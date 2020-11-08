@@ -5,10 +5,11 @@ function tweenArray(from, to, output, tweenValue) {
 }
 
 function springTween(config, rAF) {
-  const stiffness = config.stiffness || 10;
-  const damping = config.damping || 0.5;
+  const tension = (config.tension || 170) * (config.factor2D || 1);
+  const friction = config.friction || 26;
+  const mass = config.mass || 1;
   const noOvershoot = !!config.noOvershoot;
-  let velocity = config.velocity || 0;
+  let velocity = (config.velocity || 0) * 0.01;
 
   const { from, to } = config;
   const output = [...config.from];
@@ -18,9 +19,10 @@ function springTween(config, rAF) {
   const tick = () => {
     if (rAF.isStopped()) return;
 
-    const diff = 1 - tweenValue;
-    const acceleration = diff * (stiffness / 100) - velocity * damping;
-
+    const x = 1 - tweenValue;
+    const springForce = tension * 0.0001 * x;
+    const dampingForce = friction * 0.01 * velocity;
+    const acceleration = (springForce - dampingForce) / mass;
     velocity += acceleration;
     tweenValue += velocity;
 
@@ -46,7 +48,6 @@ function springTween(config, rAF) {
 }
 
 export function tween(config) {
-  // eslint-disable-line consistent-return
   const stopper = { stopped: false };
   const showStopper = () => {
     stopper.stopped = true;
@@ -58,5 +59,6 @@ export function tween(config) {
   };
   rAF.isStopped = () => stopper.stopped;
   springTween(config, rAF);
+
   return showStopper;
 }

@@ -1,4 +1,4 @@
-/* global mjukna */
+import mjukna from "../src/index.js";
 
 const descriptions = {
   function:
@@ -6,7 +6,7 @@ const descriptions = {
   "absolute value":
     "The <strong>absolute value</strong> or modulus |x| of a real number x is the non-negative value of x without regard to its sign.",
   chord:
-    "A <strong>chord</strong>, in music, is any harmonic set of pitches consisting of two or more (usually three or more) notes (also called pitches) that are heard as if sounding simultaneously."
+    "A <strong>chord</strong>, in music, is any harmonic set of pitches consisting of two or more (usually three or more) notes (also called pitches) that are heard as if sounding simultaneously.",
 };
 
 const imageText =
@@ -16,14 +16,14 @@ const dialog = document.querySelector("dialog");
 const main = document.querySelector("main");
 
 let _transitionResolver;
-let dialogTransition = new Promise(resolve => {
+let dialogTransition = new Promise((resolve) => {
   _transitionResolver = resolve;
 });
 
 dialog.addEventListener("transitionend", () => {
   _transitionResolver();
 
-  dialogTransition = new Promise(resolve => {
+  dialogTransition = new Promise((resolve) => {
     _transitionResolver = resolve;
   });
 });
@@ -40,8 +40,8 @@ async function describeWord(anchor, word) {
     { anchor, element: () => dialog.querySelector("h5 span") },
     {
       anchor,
-      element: () => dialog.querySelector(".backdrop")
-    }
+      element: () => dialog.querySelector(".backdrop"),
+    },
   ]);
   dialog.querySelector("h5").innerHTML = `<span>${word}</span>`;
   dialog.querySelector("p").innerHTML = descriptions[word];
@@ -53,8 +53,8 @@ async function describeWord(anchor, word) {
 function setup() {
   const words = document.querySelectorAll("strong");
 
-  words.forEach(word => {
-    word.addEventListener("click", function(evt) {
+  words.forEach((word) => {
+    word.addEventListener("click", function (evt) {
       evt.preventDefault();
 
       const text = this.textContent;
@@ -68,16 +68,16 @@ function setup() {
   });
 
   const paragraph = document.createElement("p");
-  imageText.split(" ").forEach(word => {
+  imageText.split(" ").forEach((word) => {
     const span = document.createElement("span");
     span.innerText = word;
     paragraph.appendChild(span);
     paragraph.appendChild(document.createTextNode(" "));
   });
   main.appendChild(paragraph);
-  document.querySelector("img").addEventListener("click", function() {
+  document.querySelector("img").addEventListener("click", function () {
     mjukna([...document.querySelectorAll("img, span")], {
-      staggerBy: 5
+      staggerBy: 5,
     });
     this.classList.toggle("float");
   });

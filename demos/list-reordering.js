@@ -1,4 +1,4 @@
-/* global mjukna */
+import mjukna from "../src/index.js";
 const byId = document.getElementById.bind(document);
 const $ = document.querySelectorAll.bind(document);
 const todo = byId("todo");
@@ -25,8 +25,8 @@ function shuffle(elements, result = []) {
 
 function setupListeners() {
   const checkboxes = Array.from(document.querySelectorAll("input"));
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", event => {
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", (event) => {
       if (event.target.checked) {
         markDone(checkbox.closest("li"));
       } else {
@@ -34,17 +34,17 @@ function setupListeners() {
       }
     });
   });
-  Array.from($(".shuffle")).forEach(button =>
-    button.addEventListener("click", function() {
+  Array.from($(".shuffle")).forEach((button) =>
+    button.addEventListener("click", function () {
       const ul = byId(this.dataset.list);
       const elements = shuffle(Array.from(ul.children));
       mjukna($("li"), { staggerBy: 30 });
       ul.innerHTML = "";
-      elements.forEach(e => ul.appendChild(e));
+      elements.forEach((e) => ul.appendChild(e));
     })
   );
-  Array.from($(".sort")).forEach(button =>
-    button.addEventListener("click", function() {
+  Array.from($(".sort")).forEach((button) =>
+    button.addEventListener("click", function () {
       const ul = byId(this.dataset.list);
       const elements = shuffle(Array.from(ul.children));
       elements.sort((a, b) => {
@@ -52,7 +52,7 @@ function setupListeners() {
       });
       mjukna([...$("li")], { staggerBy: 30 });
       ul.innerHTML = "";
-      elements.forEach(e => ul.appendChild(e));
+      elements.forEach((e) => ul.appendChild(e));
     })
   );
 }

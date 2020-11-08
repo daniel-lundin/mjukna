@@ -1,7 +1,9 @@
-/* global mjukna, GUITARS, h */
+/* globals h */
+import mjukna from "../src/index.js";
+import GUITARS from "./guitardata.js";
 
 const grid = document.querySelector(".grid");
-const mjuknaConfig = { spring: { stiffness: 10, damping: 0.6 } };
+const mjuknaConfig = { spring: { stiffness: 8, damping: 0.7, enable2D: true } };
 
 async function onDetailClose(index) {
   const gridItem = document.querySelectorAll(".grid-item")[index];
@@ -11,20 +13,20 @@ async function onDetailClose(index) {
     [
       {
         anchor: detailView.querySelector("h2 span"),
-        element: () => gridItem.querySelector("h2 span")
+        element: () => gridItem.querySelector("h2 span"),
       },
       {
         anchor: detailView.querySelector("img"),
-        element: () => gridItem.querySelector("img")
+        element: () => gridItem.querySelector("img"),
       },
       {
         anchor: detailView.querySelector(".content"),
-        element: () => gridItem.querySelector(".background")
+        element: () => gridItem.querySelector(".background"),
       },
       {
         anchor: detailView.querySelector(".header"),
-        element: () => gridItem.querySelector(".placeholder")
-      }
+        element: () => gridItem.querySelector(".placeholder"),
+      },
     ],
     mjuknaConfig
   );
@@ -40,13 +42,15 @@ function onProductClick(index) {
   const gridItem = document.querySelectorAll(".grid-item")[index];
   const detailView = h.div({ class: "detail-view" }, [
     h.div({ class: "header" }, [
+      h.div({ class: "backdrop" }),
       h.h2({}, h.span({}, guitar.title)),
-      h.button({ class: "close", onClick: () => onDetailClose(index) }, "X")
+      h.button({ class: "close", onClick: () => onDetailClose(index) }, "X"),
     ]),
     h.div({ class: "content" }, [
+      h.div({ class: "backdrop" }),
       h.h3({}, guitar.subtitle),
       h.div({ class: "price" }, `$${guitar.price}`),
-      h.p({ class: "description" }, guitar.description)
+      h.p({ class: "description" }, guitar.description),
     ]),
     h.img({
       src: guitar.img,
@@ -56,20 +60,20 @@ function onProductClick(index) {
           [
             {
               anchor: gridItem.querySelector("h2 span"),
-              element: () => detailView.querySelector("h2 span")
+              element: () => detailView.querySelector("h2 span"),
             },
             {
               anchor: gridItem.querySelector("img"),
-              element: () => detailView.querySelector("img")
+              element: () => detailView.querySelector("img"),
             },
             {
               anchor: gridItem.querySelector(".background"),
-              element: () => detailView.querySelector(".content")
+              element: () => detailView.querySelector(".content .backdrop"),
             },
             {
               anchor: gridItem.querySelector(".placeholder"),
-              element: () => detailView.querySelector(".header")
-            }
+              element: () => detailView.querySelector(".header .backdrop"),
+            },
           ],
           mjuknaConfig
         );
@@ -77,8 +81,8 @@ function onProductClick(index) {
         gridItem.querySelector("img").style.opacity = 0;
         await animation;
         detailView.classList.add("active");
-      }
-    })
+      },
+    }),
   ]);
 }
 
@@ -87,14 +91,14 @@ function buildGrid() {
     const gridItem = h.div(
       {
         class: "grid-item",
-        onClick: () => onProductClick(index)
+        onClick: () => onProductClick(index),
       },
       h.div({ class: "product" }, [
         h.div({ class: "placeholder" }),
         h.div({ class: "background" }),
         h.img({ src: guitar.img }),
         h.h2({}, h.span({}, guitar.title)),
-        h.h3({}, guitar.subtitle)
+        h.h3({}, guitar.subtitle),
       ])
     );
 

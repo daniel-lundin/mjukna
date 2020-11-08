@@ -33,11 +33,12 @@ h5 {
 
 article {
   width: 50%;
-  background: #cecece;
   padding: 6px;
   border: 1px sold whitesmoke;
-  will-change: transform;
-  overflow: auto;
+  overflow: visible;
+}
+article .backdrop {
+  background: #cecece;
 }
 
 article.font-small span {
@@ -115,12 +116,12 @@ span {
       </label>
     </fieldset>
 
-    <article class="card medium">
-      <div class="card-body" id="root">
+    <article>
+      <div class="backdrop"></div>
+      <div  id="root">
       </div>
     </article>
-    <script src="./mjukna.js"></script>
-    <script src="./words.js"></script>
+    <script type="module" src="./words.js"></script>
   </body>
 </html>
 

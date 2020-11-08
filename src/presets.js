@@ -3,10 +3,7 @@ import { tween } from "./spring.js";
 const matrix = createMatrix();
 
 function scaleCSS(value) {
-  return matrix
-    .clear()
-    .s(value, value)
-    .css();
+  return matrix.clear().s(value, value).css();
 }
 
 function fade(element, from, to, springConfig, done) {
@@ -14,22 +11,20 @@ function fade(element, from, to, springConfig, done) {
   element.style.transform = scaleCSS(from[1]);
 
   tween(
-    Object.assign(
-      {
-        from,
-        to,
-        update([opacity, scale]) {
-          element.style.opacity = opacity;
-          element.style.transform = scaleCSS(scale);
-        },
-        done() {
-          element.style.opacity = to[0];
-          element.style.transform = scaleCSS(to[1]);
-          done();
-        }
+    Object.assign({
+      from,
+      to,
+      update([opacity, scale]) {
+        element.style.opacity = opacity;
+        element.style.transform = scaleCSS(scale);
       },
-      springConfig
-    )
+      done() {
+        element.style.opacity = to[0];
+        element.style.transform = scaleCSS(to[1]);
+        done();
+      },
+      spring: [springConfig],
+    })
   );
 }
 

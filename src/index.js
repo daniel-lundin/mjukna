@@ -211,44 +211,39 @@ function FLIPScaleTranslate(mjuk, getStaggerBy) {
   element.style.borderRadius = `${
     previousBorderRadius / scale.x
   }${borderRadiusUnit} / ${previousBorderRadius / scale.y}${borderRadiusUnit}`;
+
   const animation = { element, staggerTimer: void 0, stopper: () => {} };
   runningAnimations.push(animation);
 
   return new Promise((resolve) => {
     animation.staggerTimer = smartTimeout(() => {
       animation.stopper = tween(
-        Object.assign(
-          {
-            from: [
-              centerDiffX,
-              centerDiffY,
-              scale.x,
-              scale.y,
-              Number(previousBorderRadius),
-            ],
-            to: [0, 0, 1, 1, Number(currentBorderRadius)],
-            update([x, y, scaleX, scaleY, borderRadius]) {
-              element.style.transform = m
-                .clear()
-                .t(x, y)
-                .s(scaleX, scaleY)
-                .css();
-              if (borderRadius !== 0) {
-                element.style.borderRadius = `${
-                  borderRadius / scaleX
-                }${borderRadiusUnit} / ${
-                  borderRadius / scaleY
-                }${borderRadiusUnit}`;
-              }
-            },
-            done() {
-              element.style.transform = "";
-              element.style.borderRadius = mjuk.finalBorderRadius;
-              resolve();
-            },
+        Object.assign({
+          from: [
+            centerDiffX,
+            centerDiffY,
+            scale.x,
+            scale.y,
+            Number(previousBorderRadius),
+          ],
+          to: [0, 0, 1, 1, Number(currentBorderRadius)],
+          update([x, y, scaleX, scaleY, borderRadius]) {
+            element.style.transform = m.clear().t(x, y).s(scaleX, scaleY).css();
+            if (borderRadius !== 0) {
+              element.style.borderRadius = `${
+                borderRadius / scaleX
+              }${borderRadiusUnit} / ${
+                borderRadius / scaleY
+              }${borderRadiusUnit}`;
+            }
           },
-          config.spring
-        )
+          done() {
+            element.style.transform = "";
+            element.style.borderRadius = mjuk.finalBorderRadius;
+            resolve();
+          },
+          spring: config.spring,
+        })
       );
     }, getStaggerBy());
   });

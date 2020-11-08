@@ -8,13 +8,13 @@ const emojis = document.querySelectorAll(".animal span");
 function makeItMjukna() {
   return mjukna([...animals, ...emojis], {
     tension: 0.05,
-    deceleration: 0.7
+    deceleration: 0.7,
   });
 }
 
 async function go() {
   const animation = makeItMjukna();
-  animals.forEach(animal => {
+  animals.forEach((animal) => {
     const from = random(1, 10);
     const to = random(from, 10);
 

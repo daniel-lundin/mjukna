@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.box {
+  width: 100px;
+  height: 100px;
+  position: relative;
+}
+
+.box.big {
+  margin: 50px 200px;
+  width: 200px;
+  height: 150px;
+}
+
+.box.big .backdrop {
+  border-radius: 20px;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background-color: hotpink;
+  border-radius: 10px;
+}
+    </style>
+  </head>
+  <body>
+    <div class="box"><div class="backdrop"></div><div>
+    <!-- <ul>
+      <li>One</li>
+      <li>Two</li>
+      <li>Three</li>
+      <li>Four</li>
+    </ul> -->
+    <script type="module">
+      import mjukna from '../src/index.js';
+      setTimeout(() => {
+        mjukna(document.querySelectorAll('.box .backdrop'));
+        document.querySelector('.box').classList.add('big')
+      }, 1000);
+
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
