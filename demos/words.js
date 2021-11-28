@@ -5,7 +5,9 @@ const lorem =
 
 function makeItMjukna() {
   const elements = document.querySelectorAll("span, article, img");
-  mjukna([...elements], { tension: 0.1, decelaration: 0.7, staggerBy: 5 });
+  const elementConfigs = Array.from(elements).map(element => ({ element}));
+  console.log('elementConfigs', elementConfigs);
+  return mjukna(elementConfigs, { tension: 0.1, decelaration: 0.7, staggerBy: 5 });
 }
 const $ = document.querySelectorAll.bind(document);
 const article = document.querySelector("article");
@@ -13,29 +15,33 @@ const article = document.querySelector("article");
 function setupListeners() {
   [...$("input[name='font-size']")].forEach(element => {
     element.addEventListener("change", evt => {
-      makeItMjukna();
+      const animation = makeItMjukna();
       article.classList.remove("font-small");
       article.classList.remove("font-medium");
       article.classList.remove("font-large");
       article.classList.add(evt.target.value);
+      animation.execute();
     });
   });
   [...$("input[name='box-size']")].forEach(element => {
     element.addEventListener("change", evt => {
-      makeItMjukna();
+      const animation = makeItMjukna();
       article.style.width = evt.target.value;
+      animation.execute();
     });
   });
   [...$("input[name='image-style']")].forEach(element => {
     element.addEventListener("change", evt => {
-      makeItMjukna();
+      const animation = makeItMjukna();
       article.classList.remove("image-left");
       article.classList.remove("image-block");
       article.classList.remove("image-right");
       article.classList.add(evt.target.value);
+      animation.execute();
     });
   });
 }
+
 function setup() {
   setupListeners();
   const root = document.getElementById("root");

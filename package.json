@@ -16,7 +16,7 @@
     "prepare-demos": "npm run build && cp dist/browser.js demos/mjukna.js",
     "gh-pages": "npm run prepare-demos && gh-pages -d demos",
     "prepublishOnly": "npm run build",
-    "build:web": "rollup -c rollup.config.js --environment MINIFY -o dist/browser.js -f iife --name mjukna",
+    "build:web": "esbuild src/index.ts --bundle --global-name=mjukna --banner:js='(() => {' --footer:js='window.mjukna=mjukna.default;})()' --outfile=dist/browser.js",
     "build:node": "rollup -c rollup.config.js -o dist/main.js -f cjs",
     "build:module": "rollup -c rollup.config.js -o dist/main.m.js -f es",
     "build": "npm run build:web && npm run build:node && npm run build:module && npm run bundle-size",
@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/daniel-lundin/mjukna#readme",
   "devDependencies": {
+    "esbuild": "^0.14.0",
     "eslint": "^4.19.1",
     "gh-pages": "^1.2.0",
     "kuta": "^1.7.4",
