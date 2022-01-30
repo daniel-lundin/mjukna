@@ -33,14 +33,14 @@ function fade(element, from, to, springConfig, done) {
   );
 }
 
-export function fadeIn(element, springConfig, done) {
+export function fadeIn(element, springConfig) {
   const from = [0, 0.8];
   const to = [1, 1];
-  fade(element, from, to, springConfig, done);
+  return new Promise(done => fade(element, from, to, springConfig, done));
 }
 
-export function fadeOut(element, springConfig, done) {
+export function fadeOut(element, springConfig) {
   const from = [1, 1];
   const to = [0, 0.8];
-  fade(element, from, to, springConfig, done);
+  return new Promise(done => fade(element, from, to, springConfig, done));
 }

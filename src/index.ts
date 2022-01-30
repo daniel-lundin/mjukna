@@ -1,5 +1,6 @@
 import { tween } from "./spring.js";
 import { createMatrix } from "./matrix.js";
+import { fadeIn, fadeOut } from "./presets.js";
 // import { fadeIn, fadeOut } from "./presets.js";
 
 const m = createMatrix();
@@ -16,8 +17,18 @@ interface DOMElement {
   style: {
     transform: string;
     willChange: string;
+    position: string;
+    width: string | number;
+    height: string | number;
+    top: string | number;
+    left: string | number;
   };
+  isConnected: boolean;
+  parentElement: DOMElement;
+  appendChild: (arg: DOMElement) => void;
+  remove: () => void;
 }
+
 type ElementList = {
   element?: DOMElement;
   getElement?: () => DOMElement;
@@ -48,6 +59,7 @@ export default function mjukna(
     const elementConfig = elementConfigs[i];
     let previousPosition: Rect;
     let getElement: () => DOMElement;
+    let previousParent: DOMElement = null;
     if ("getBoundingClientRect" in elementConfig) {
       previousPosition = elementConfig.getBoundingClientRect();
       getElement = () => elementConfig;
@@ -56,6 +68,7 @@ export default function mjukna(
       getElement = elementConfig.getElement;
     } else if (elementConfig.element) {
       previousPosition = elementConfig.element.getBoundingClientRect();
+      previousParent = elementConfig.element.parentElement;
       getElement = () => elementConfig.element;
     } else {
       getElement = elementConfig.getElement;
@@ -63,28 +76,30 @@ export default function mjukna(
     const snapshot = {
       getElement,
       previousPosition,
+      previousParent,
       staggerBy: "staggerBy" in elementConfig ? elementConfig.staggerBy : 0,
     };
-    console.log("adding snapshot", JSON.stringify(snapshot, null, 2));
     snapshots.push(snapshot);
   }
 
   return {
     async execute() {
-      console.log("executing", snapshots.length);
       const animations = snapshots.map((snapshot) => {
-        console.log("map ");
-        console.log("map flip", snapshot, snapshot.getElement());
         const element = snapshot.getElement();
         element.style.transform = "";
         const finalPosition = element.getBoundingClientRect();
-        console.log(
-          "previous position",
-          JSON.stringify(snapshot.previousPosition, null, 2)
-        );
-        console.log("final position", JSON.stringify(finalPosition, null, 2));
-        // TODO: Exit/enter
-        console.log("flip");
+
+        if (!snapshot.previousPosition) {
+          return fadeIn(element, options);
+        }
+        if (!element.isConnected) {
+          return exitAnimation(
+            element,
+            snapshot.previousParent,
+            snapshot.previousPosition,
+            options
+          );
+        }
 
         return FLIPScaleTranslate(
           element,
@@ -98,6 +113,31 @@ export default function mjukna(
       await Promise.all(animations);
     },
   };
+}
+
+function exitAnimation(
+  element: DOMElement,
+  previousPosition: DOMRect,
+  previousParent: DOMElement,
+  options: Options
+) {
+  previousParent.appendChild(element);
+  element.style.position = "absolute";
+  element.style.width = `${previousPosition.width}px`;
+  element.style.height = `${previousPosition.height}px`;
+  element.style.top = 0;
+  element.style.left = 0;
+
+  const finalPosition = element.getBoundingClientRect();
+  const xDiff = finalPosition.left - previousPosition.left;
+  const yDiff = finalPosition.top - previousPosition.top;
+  element.style.willChange = "transform, opacity";
+  element.style.top = `${-yDiff}px`;
+  element.style.left = `${-xDiff}px`;
+
+  return fadeOut(element, options).then(() => {
+    element.remove();
+  });
 }
 
 function FLIPScaleTranslate(
@@ -122,7 +162,6 @@ function FLIPScaleTranslate(
     previousPosition.height / 2 -
     (finalPosition.top + finalPosition.height / 2);
 
-  console.log("centerDiffY", centerDiffY);
   element.style.willChange = "transform";
   element.style.transform = m
     .clear()
