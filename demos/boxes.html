@@ -10,8 +10,17 @@
 
 .box {
   width: 70px;
-  background: chocolate;
   text-align: center;
+  position: relative;
+}
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: chocolate;
+  z-index: -1;
 }
 
 .box span {
@@ -56,18 +65,20 @@
     </style>
   </head>
   <body>
-    <div class="box"><h2><span>One</span> <span>two</span> <span>three</span></h2></div>
+    <div class="box"><div class="backdrop"></div><h2><span>One</span> <span>two</span> <span>three</span></h2></div>
     <!-- <ul>
       <li>One</li>
       <li>Two</li>
       <li>Three</li>
       <li>Four</li>
     </ul> -->
-    <script src="./mjukna.js"></script>
+    <script src="../dist/browser.js"></script>
     <script>
 setTimeout(() => {
-mjukna(document.querySelectorAll('.box, .box span'));
+        const elements = document.querySelectorAll('.backdrop, .box span')
+        const animation = mjukna(Array.from(elements).map((element, index) => ({element, staggerBy: index* 100})));
 document.querySelector('.box').classList.add('big')
+        animation.execute();
 }, 2000);
 
 // setTimeout(() => {

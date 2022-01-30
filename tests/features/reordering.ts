@@ -1,11 +1,11 @@
 /* global mjukna, dumpClientRect, elementStill */
-const assert = require("assert");
-const puppeteer = require("puppeteer");
-const { feature } = require("kuta/lib/bdd");
+import assert from "assert";
+import puppeteer from "puppeteer";
+import { feature } from "kuta/lib/bdd";
 
-const { setupNewPage } = require("../helpers/browser.js");
+import { setupNewPage } from "../helpers/browser.js";
 
-feature("reordering", scenario => {
+feature("reordering", (scenario) => {
   let browser;
 
   scenario.before(async () => {
@@ -14,10 +14,12 @@ feature("reordering", scenario => {
 
   scenario.after(() => browser.close());
 
-  scenario("swap elements", ({ before, given, when, then, but }) => {
+  scenario("swap elements", ({ before, given, when, then }) => {
     let page;
-    const scope = {};
-
+    const scope: {
+      initialPositions?: any;
+      intermediatePositions?: any;
+    } = {};
     before(async () => {
       page = await setupNewPage(browser);
     });
@@ -30,6 +32,7 @@ feature("reordering", scenario => {
         lower.classList.add("lower");
         document.body.appendChild(upper);
         document.body.appendChild(lower);
+        // @ts-ignore error
         return [upper, lower].map(dumpClientRect);
       });
     });
@@ -37,15 +40,14 @@ feature("reordering", scenario => {
     when("the elements are swapped", async () => {
       scope.intermediatePositions = await page.evaluate(() => {
         const [upper, lower] = document.querySelectorAll(".upper, .lower");
-        mjukna([upper, lower]);
+        // @ts-ignore error
+        animation = mjukna([{ element: upper }, { element: lower }]);
         lower.remove();
         document.body.prepend(lower);
-
-        return new Promise(resolve => {
-          requestAnimationFrame(() =>
-            resolve([upper, lower].map(dumpClientRect))
-          );
-        });
+        // @ts-ignore error
+        animation.execute();
+        // @ts-ignore error
+        return [upper, lower].map(dumpClientRect);
       });
     });
 
@@ -58,6 +60,7 @@ feature("reordering", scenario => {
 
     when("elements have stopped moving", async () => {
       await page.waitForFunction(() => {
+        // @ts-ignore error
         return elementStill(document.querySelector(".upper"));
       });
     });
@@ -66,6 +69,7 @@ feature("reordering", scenario => {
       const finalPositions = await page.evaluate(async () => {
         const upper = document.querySelector(".upper");
         const lower = document.querySelector(".lower");
+        // @ts-ignore error
         return [upper, lower].map(dumpClientRect);
       });
 

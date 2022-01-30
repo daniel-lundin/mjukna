@@ -12,7 +12,7 @@
     "timeout": 10000
   },
   "scripts": {
-    "test": "kuta",
+    "test": "kuta -r esbuild-register",
     "prepare-demos": "npm run build && cp dist/browser.js demos/mjukna.js",
     "gh-pages": "npm run prepare-demos && gh-pages -d demos",
     "prepublishOnly": "npm run build",
@@ -39,11 +39,11 @@
     "gh-pages": "^1.2.0",
     "kuta": "^1.7.4",
     "puppeteer": "^1.5.0",
-    "rollup": "^0.60.1",
-    "rollup-plugin-terser": "^1.0.1",
     "version-bump-prompt": "^4.1.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "esbuild-register": "^3.3.2"
+  },
   "files": [
     "dist"
   ]

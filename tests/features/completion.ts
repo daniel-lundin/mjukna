@@ -1,9 +1,9 @@
-/* global mjukna, dumpClientRect, waitForRAFs */
-const assert = require("assert");
-const puppeteer = require("puppeteer");
-const { feature } = require("kuta/lib/bdd");
+// @ts-ignore
+import assert from "assert";
+import puppeteer from "puppeteer";
+import { feature } from "kuta/lib/bdd";
 
-const { setupNewPage } = require("../helpers/browser.js");
+import { setupNewPage } from "../helpers/browser.js";
 
 feature("completion", (scenario) => {
   let browser;
@@ -25,6 +25,7 @@ feature("completion", (scenario) => {
       });
 
       given("two mjukt elements", async () => {
+        // @ts-ignore
         scope.initialPositions = await page.evaluate(() => {
           const first = document.createElement("div");
           first.style.height = "100px";
@@ -33,40 +34,47 @@ feature("completion", (scenario) => {
           second.style.height = "100px";
           document.body.appendChild(second);
 
-          window.animationPromise = mjukna([first, second]);
+          // @ts-ignore
           return [first, second].map(dumpClientRect);
         });
       });
 
       when("a new element is added", async () => {
+        // @ts-ignore
         scope.newPositions = await page.evaluate(() => {
+          const divs = document.querySelectorAll("div");
+          const animation = mjukna(divs);
           const p = document.createElement("p");
           p.style.height = "100px";
           document.body.prepend(p);
 
-          return new Promise((resolve) => {
-            requestAnimationFrame(() => {
-              const divs = Array.from(document.querySelectorAll("div"));
-              resolve(divs.map(dumpClientRect));
-            });
-          });
+          // @ts-ignore
+          window.animationPromise = animation.execute();
+
+          const divArray = Array.from(document.querySelectorAll("div"));
+          // @ts-ignore
+          return divArray.map(dumpClientRect);
         });
       });
 
       then("the elements should stay in place", () => {
+        // @ts-ignore
         scope.initialPositions.forEach((position, index) => {
           assert.deepStrictEqual(position, scope.newPositions[index]);
         });
       });
 
       when("a few rAFs happen", async () => {
+        // @ts-ignore
         scope.intermediatePosition = await page.evaluate(async () => {
+          // @ts-ignore
           await waitForRAFs(5);
         });
       });
 
       when("the promise resolves", () => {
         return page.evaluate(async () => {
+          // @ts-ignore
           await window.animationPromise;
         });
       });

@@ -25,11 +25,9 @@ type ElementList = {
   staggerBy?: number;
 }[];
 
+type DOMNodeList = DOMElement[];
+
 interface Animation {
-  snapshots: {
-    getElement: () => DOMElement;
-    previousPosition: Rect;
-  }[];
   execute: () => Promise<void>;
 }
 
@@ -41,49 +39,63 @@ type Options = {
 };
 
 export default function mjukna(
-  elementConfigs: ElementList,
+  elementConfigs: ElementList | DOMNodeList,
   options: Options
 ): Animation {
   // Record previous positions
   const snapshots = [];
-  for (const elementConfig of elementConfigs) {
+  for (let i = 0; i < elementConfigs.length; i++) {
+    const elementConfig = elementConfigs[i];
     let previousPosition: Rect;
     let getElement: () => DOMElement;
-    if (elementConfig.anchor) {
+    if ("getBoundingClientRect" in elementConfig) {
+      previousPosition = elementConfig.getBoundingClientRect();
+      getElement = () => elementConfig;
+    } else if (elementConfig.anchor) {
       previousPosition = elementConfig.anchor.getBoundingClientRect();
       getElement = elementConfig.getElement;
     } else if (elementConfig.element) {
       previousPosition = elementConfig.element.getBoundingClientRect();
       getElement = () => elementConfig.element;
+    } else {
+      getElement = elementConfig.getElement;
     }
     const snapshot = {
       getElement,
       previousPosition,
+      staggerBy: "staggerBy" in elementConfig ? elementConfig.staggerBy : 0,
     };
+    console.log("adding snapshot", JSON.stringify(snapshot, null, 2));
     snapshots.push(snapshot);
   }
 
-  console.log("snapshots", snapshots, elementConfigs);
-
   return {
-    snapshots,
-    execute() {
-      console.log("executing", snapshots);
-      this.snapshots.forEach((snapshot) => {
+    async execute() {
+      console.log("executing", snapshots.length);
+      const animations = snapshots.map((snapshot) => {
+        console.log("map ");
+        console.log("map flip", snapshot, snapshot.getElement());
         const element = snapshot.getElement();
         element.style.transform = "";
         const finalPosition = element.getBoundingClientRect();
+        console.log(
+          "previous position",
+          JSON.stringify(snapshot.previousPosition, null, 2)
+        );
+        console.log("final position", JSON.stringify(finalPosition, null, 2));
+        // TODO: Exit/enter
+        console.log("flip");
 
-        console.log("finalPosition", finalPosition, element);
-        FLIPScaleTranslate(
+        return FLIPScaleTranslate(
           element,
           snapshot.previousPosition,
           finalPosition,
+          snapshot.staggerBy,
           options
         );
       });
 
-      return Promise.resolve();
+      await Promise.all(animations);
     },
   };
 }
@@ -92,8 +104,9 @@ function FLIPScaleTranslate(
   element: DOMElement,
   previousPosition: Rect,
   finalPosition: Rect,
+  staggerBy: number,
   options: Options
-) {
+): Promise<void> {
   // const { element, scale, previousPosition, finalPosition } = mjuk;
   const [scaleX, scaleY] = [
     previousPosition.width / finalPosition.width,
@@ -109,6 +122,7 @@ function FLIPScaleTranslate(
     previousPosition.height / 2 -
     (finalPosition.top + finalPosition.height / 2);
 
+  console.log("centerDiffY", centerDiffY);
   element.style.willChange = "transform";
   element.style.transform = m
     .clear()
@@ -116,6 +130,7 @@ function FLIPScaleTranslate(
     .s(scaleX, scaleY)
     .css();
 
+  // await delay(staggerBy);
   // const [, previousBorderRadius] = /(\d*)(\w*)/.exec(mjuk.previousBorderRadius);
   // const [, currentBorderRadius, borderRadiusUnit] = /(\d*)(\w*)/.exec(
   //   mjuk.finalBorderRadius
@@ -125,7 +140,6 @@ function FLIPScaleTranslate(
   // }${borderRadiusUnit} / ${previousBorderRadius / scale.y}${borderRadiusUnit}`;
   // const animation = { element, staggerTimer: void 0, stopper: () => {} };
   // runningAnimations.push(animation);
-
   return new Promise((resolve) => {
     tween({
       from: [
@@ -155,3 +169,5 @@ function FLIPScaleTranslate(
     });
   });
 }
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

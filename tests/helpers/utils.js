@@ -1,9 +1,8 @@
 const path = require("path");
+const { exec } = require("child_process");
 const assert = require("assert");
-const rollup = require("rollup");
-const rollupConfig = require(path.join(__dirname, "../../rollup.config.js"));
 
-const sleep = time => new Promise(resolve => setTimeout(resolve, time));
+const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 function deepEquals(a, b) {
   try {
@@ -15,17 +14,25 @@ function deepEquals(a, b) {
 }
 
 async function getMjuknaCode() {
-  const bundle = await rollup.rollup(rollupConfig);
-  const { code } = await bundle.generate({ format: "iife", name: "mjukna" });
-  return code;
+  return new Promise((resolve, reject) => {
+    exec(
+      "esbuild src/index.ts --bundle --global-name=mjukna --banner:js='(() => {' --footer:js='window.mjukna=mjukna.default;})()'",
+      (err, stdout) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(stdout);
+      }
+    );
+  });
 }
 
 const assertEqualPositions = (pos1, pos2) => {
-  if (Object.keys(pos1).some(key => Math.abs(pos1[key] - pos2[key]) > 0.01))
+  if (Object.keys(pos1).some((key) => Math.abs(pos1[key] - pos2[key]) > 0.01))
     assert.deepStrictEqual(pos1, pos2);
 };
 
-const repeat = length => cb =>
+const repeat = (length) => (cb) =>
   Array.from({ length }).forEach((_, index) => cb(index));
 
 module.exports = {
@@ -33,5 +40,5 @@ module.exports = {
   assertEqualPositions,
   sleep,
   repeat,
-  getMjuknaCode
+  getMjuknaCode,
 };

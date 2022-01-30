@@ -1,12 +1,12 @@
 /* global mjukna, dumpClientRect, elementStill, byId */
-const assert = require("assert");
-const puppeteer = require("puppeteer");
-const { feature } = require("kuta/lib/bdd");
+import assert from "assert";
+import puppeteer from "puppeteer";
+import { feature } from "kuta/lib/bdd";
 
-const { setupNewPage } = require("../helpers/browser.js");
+import { setupNewPage } from "../helpers/browser.js";
 
-feature("shared transitions", scenario => {
-  let browser;
+feature("shared transitions", (scenario) => {
+  let browser: { close: () => any };
 
   scenario.before(async () => {
     browser = await puppeteer.launch();
@@ -19,8 +19,14 @@ feature("shared transitions", scenario => {
   scenario(
     "using other element as origin",
     ({ before, given, when, then, and }) => {
-      let page;
-      const scope = {};
+      let page: {
+        evaluate: (arg0: { (): Promise<any>; (): any }) => any;
+        waitForFunction: (arg0: () => any) => any;
+      };
+      const scope: {
+        initialPosition?: any;
+        addPosition?: any;
+      } = {};
 
       before(async () => {
         page = await setupNewPage(browser);
@@ -34,7 +40,9 @@ feature("shared transitions", scenario => {
           div.style.width = "100px";
           div.style.background = "red";
           document.body.appendChild(div);
+          // @ts-ignore error
           mjukna(div);
+          // @ts-ignore error
           return Promise.resolve(dumpClientRect(div));
         });
       });
@@ -49,15 +57,20 @@ feature("shared transitions", scenario => {
           div.style.right = "0";
           div.style.height = "200px";
           div.style.width = "200px";
-          mjukna({
-            anchor: byId("anchor-element"),
-            element: () => div
-          });
-          document.body.appendChild(div);
 
-          return new Promise(resolve => {
-            requestAnimationFrame(() => resolve(dumpClientRect(div)));
-          });
+          // @ts-ignore
+          const animation = mjukna([
+            {
+              // @ts-ignore
+              anchor: byId("anchor-element"),
+              getElement: () => div,
+            },
+          ]);
+          document.body.appendChild(div);
+          animation.execute();
+
+          // @ts-ignore
+          return dumpClientRect(div);
         });
       });
 
@@ -67,6 +80,7 @@ feature("shared transitions", scenario => {
 
       and("eventually move into it's new position", async () => {
         await page.waitForFunction(() => {
+          // @ts-ignore
           return elementStill(byId("added-element"));
         });
       });

@@ -1,11 +1,12 @@
 /* global mjukna, dumpClientRect, elementStill */
-const assert = require("assert");
-const puppeteer = require("puppeteer");
-const { feature } = require("kuta/lib/bdd");
+// @ts-ignore
+import assert from "assert";
+import puppeteer from "puppeteer";
+import { feature } from "kuta/lib/bdd";
 
-const { setupNewPage } = require("../helpers/browser.js");
+import { setupNewPage } from "../helpers/browser.js";
 
-feature("basics", scenario => {
+feature("basics", (scenario) => {
   let browser;
 
   scenario.before(async () => {
@@ -23,33 +24,43 @@ feature("basics", scenario => {
     });
 
     given("a paragraph element", async () => {
+      // @ts-ignore
       scope.initialPosition = await page.evaluate(() => {
         const div = document.createElement("div");
         document.body.appendChild(div);
-        mjukna(div);
-        return Promise.resolve(dumpClientRect(div));
+        // @ts-ignore
+        return dumpClientRect(div);
       });
     });
 
     when("a h1 is prepended", async () => {
+      // @ts-ignore
       scope.newPosition = await page.evaluate(() => {
+        const div = document.querySelector("div");
         const h1 = document.createElement("h1");
         h1.innerText = "A heading";
-        document.body.prepend(h1);
-        const div = document.querySelector("div");
 
-        return new Promise(resolve => {
-          requestAnimationFrame(() => resolve(dumpClientRect(div)));
-        });
+        // @ts-ignore
+        const animation = mjukna([div]);
+
+        document.body.prepend(h1);
+
+        animation.execute();
+        // @ts-ignore
+        return dumpClientRect(div);
       });
     });
 
     then("the paragraph should stay in place", async () => {
+      // @ts-ignore
+      console.log("new, initial", scope.newPosition, scope.initialPosition);
+      // @ts-ignore
       assert.deepStrictEqual(scope.newPosition, scope.initialPosition);
     });
 
     and("eventually move into it's new position", async () => {
       await page.waitForFunction(() => {
+        // @ts-ignore
         return elementStill(document.querySelector("div"));
       });
     });
@@ -64,6 +75,7 @@ feature("basics", scenario => {
     });
 
     given("three mjukt elements", async () => {
+      // @ts-ignore
       scope.initialPositions = await page.evaluate(() => {
         for (let i = 0; i < 3; ++i) {
           const div = document.createElement("div");
@@ -71,29 +83,33 @@ feature("basics", scenario => {
           document.body.appendChild(div);
         }
         const elements = Array.from(document.querySelectorAll("div"));
-        mjukna(elements);
-
-        return Promise.resolve(elements.map(dumpClientRect));
+        // @ts-ignore
+        return elements.map(dumpClientRect);
       });
     });
 
     when("elements are resized", async () => {
+      // @ts-ignore
       scope.newPositions = await page.evaluate(() => {
         const elements = Array.from(document.querySelectorAll("div"));
-        elements[0].style.width = 200;
-        elements[1].style.height = 200;
-        elements[2].style.height = 200;
+        // @ts-ignore
+        const animation = mjukna(elements);
 
-        return new Promise(resolve =>
-          requestAnimationFrame(() => {
-            resolve(elements.map(dumpClientRect));
-          })
-        );
+        elements[0].style.width = "200px";
+        elements[1].style.height = "200px";
+        elements[2].style.height = "200px";
+
+        animation.execute();
+
+        // @ts-ignore
+        return elements.map(dumpClientRect);
       });
     });
 
     then("elements should stay in place", () => {
+      // @ts-ignore
       scope.initialPositions.forEach((position, index) => {
+        // @ts-ignore
         assert.deepStrictEqual(position, scope.newPositions[index]);
       });
     });
@@ -102,6 +118,7 @@ feature("basics", scenario => {
       await page.waitForFunction(() => {
         const elements = Array.from(document.querySelectorAll("div"));
         return elements.reduce(
+          // @ts-ignore
           (still, element) => still && elementStill(element),
           true
         );
@@ -128,22 +145,19 @@ feature("basics", scenario => {
           document.body.appendChild(div);
         }
         const elements = Array.from(document.querySelectorAll("div"));
-        mjukna(elements);
 
-        return Promise.resolve(elements.map(dumpClientRect));
+        return elements.map(dumpClientRect);
       });
     });
 
     when("the first element is removed", async () => {
       scope.newPositions = await page.evaluate(() => {
         const elements = Array.from(document.querySelectorAll("div"));
+        const animation = mjukna(elements);
         document.body.removeChild(elements[0]);
+        animation.execute();
 
-        return new Promise(resolve =>
-          requestAnimationFrame(() => {
-            resolve(elements.map(dumpClientRect));
-          })
-        );
+        return elements.map(dumpClientRect);
       });
     });
 
