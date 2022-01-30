@@ -61,6 +61,7 @@ export default function mjukna(
     let getElement: () => DOMElement;
     let previousParent: DOMElement = null;
     if ("getBoundingClientRect" in elementConfig) {
+      previousParent = elementConfig.parentElement;
       previousPosition = elementConfig.getBoundingClientRect();
       getElement = () => elementConfig;
     } else if (elementConfig.anchor) {
@@ -95,8 +96,8 @@ export default function mjukna(
         if (!element.isConnected) {
           return exitAnimation(
             element,
-            snapshot.previousParent,
             snapshot.previousPosition,
+            snapshot.previousParent,
             options
           );
         }
@@ -115,7 +116,7 @@ export default function mjukna(
   };
 }
 
-function exitAnimation(
+async function exitAnimation(
   element: DOMElement,
   previousPosition: DOMRect,
   previousParent: DOMElement,
@@ -134,10 +135,10 @@ function exitAnimation(
   element.style.willChange = "transform, opacity";
   element.style.top = `${-yDiff}px`;
   element.style.left = `${-xDiff}px`;
+  console.log(xDiff, yDiff);
 
-  return fadeOut(element, options).then(() => {
-    element.remove();
-  });
+  await fadeOut(element, options);
+  element.remove();
 }
 
 function FLIPScaleTranslate(

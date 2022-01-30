@@ -89,6 +89,7 @@ feature("enter/exit", (scenario) => {
 
       scope.removePosition = await page.evaluate(() => {
         const exitNode = document.querySelectorAll(".leave");
+        // @ts-ignore
         const animation = mjukna(exitNode);
         exitNode[0].remove();
         // @ts-ignore
